@@ -15,7 +15,7 @@ This section reports the performance and power usage of Qwen 3 on NPU (FastFlowL
 
 ---
 
-### 🚀 Decoding Speed (TPS, or Tokens per Second, @ different sequence lengths)
+### 🚀 Decoding Speed (TPS, or Tokens per Second, @ different context lengths)
 
 | **Model**        | **Hardware**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**Model**  |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|---------|
@@ -26,7 +26,7 @@ This section reports the performance and power usage of Qwen 3 on NPU (FastFlowL
 
 ---
 
-### 🚀 Prefill Speed (TTFT, or Time to First Token in **Seconds**, @ different sequence lengths)
+### 🚀 Prefill Speed (TTFT, or Time to First Token in **Seconds**, with different prompt lengths)
 
 | **Model**        | **Hardware**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**Model**  |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|---------|
