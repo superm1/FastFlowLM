@@ -9,9 +9,10 @@ nav_order: 2
 This section reports the performance and power usage of Qwen 3 on NPU (FastFlowLM, or FLM).
 
 > **Note:** 
-- Results are based on FastFlowLM v0.9.8. 
-- Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM. 
-- Newer versions may deliver improved performance. 
+- Results are based on FastFlowLM v0.9.8.  
+- Under FLM's default NPU power mode (Performance)    
+- Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM.   
+- Newer versions may deliver improved performance.   
 
 ---
 

@@ -9,9 +9,10 @@ nav_order: 1
 This section reports the performance and power usage of LLaMA 3.x on NPU (FastFlowLM, or FLM), NPU (Ryzen™ AI Software, or RAI), iGPU (LM Studio), and CPU (Ollama).
 
 > **Note:** 
-- Results are based on FastFlowLM v0.9.8. 
-- Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM. 
-- Newer versions may deliver improved performance. 
+- Results are based on FastFlowLM v0.9.8.  
+- Under FLM's default NPU power mode (Performance)   
+- Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM.   
+- Newer versions may deliver improved performance.   
 
 ---
 
@@ -42,7 +43,8 @@ This section reports the performance and power usage of LLaMA 3.x on NPU (FastFl
 > **Note:** 
 - The official release of Ryzen™ AI Software limits context length to 2,048 tokens, thus "*NA*" is used in the table (NPU-only mode). 
 - The hybrid mode of Ryzen™ AI Software uses iGPU for decoding. Its performance is simliar to iGPU (LM Studio). Also, it limits context length to 2,048, thus, we did not include hybrid mode for comparison. 
-- OOM: Out of Memory
+- OOM: Out Of Memory
+- On systems with more than 32 GB DRAM, longer context lengths are supported. FLM supports the full context length available for each model.
 
 ---
 
