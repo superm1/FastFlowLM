@@ -282,3 +282,46 @@ gc.collect()
 ```
 
 ---
+
+### 🖼️ Example: Multi-Image Input
+
+Send multiple images together with a text prompt.  
+The model will analyze them, compare, and respond with reasoning.
+
+```python
+import base64
+from openai import OpenAI
+
+# Paths to your local images
+image_path_0 = r"C:\Users\info\OneDrive\Desktop\FLM\image_test\image0.jpg"
+image_path_1 = r"C:\Users\info\OneDrive\Desktop\FLM\image_test\image1.png"
+
+# Read and encode the images as Base64 strings (required for API input)
+with open(image_path_0, "rb") as image_file:
+    image_0 = base64.b64encode(image_file.read()).decode("utf-8")
+with open(image_path_1, "rb") as image_file:
+    image_1 = base64.b64encode(image_file.read()).decode("utf-8")
+
+# Connect to your local FLM/OpenAI-compatible endpoint
+client = OpenAI(base_url="http://localhost:11434/v1", api_key="dummykey")
+
+# Create a chat completion request with text + two images
+response = client.chat.completions.create(
+    model="gemma3:4b",  # Vision-capable model
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Describe the images. Which one you like better and why?"},
+                {"type": "image_url", "image_url": {"url": image_0}},
+                {"type": "image_url", "image_url": {"url": image_1}},
+            ],
+        }
+    ],
+)
+
+# Print the model's answer
+print(response.choices[0].message.content)
+```
+
+---
