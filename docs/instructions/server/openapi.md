@@ -322,6 +322,11 @@ response = client.chat.completions.create(
 
 # Print the model's answer
 print(response.choices[0].message.content)
+
+# cleanup
+del response, client
+import gc
+gc.collect()
 ```
 
 ---
