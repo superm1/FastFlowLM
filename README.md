@@ -8,15 +8,14 @@
   <img src="https://img.shields.io/badge/NPU-Optimized-red" />
 </p>
 
-Run large language models on AMD Ryzen™ AI NPUs — in minutes.
+# ⚡ FastFlowLM (FLM) — Unlock Ryzen™ AI NPUs
 
-FastFlowLM (FLM) is a lightweight runtime for deploying LLMs like Gemma3 (Vision supported), Qwen3, DeepSeek-R1, MedGemma and LLaMA3.1/3.2 directly on AMD’s NPU — no GPU needed, faster and over 11x more power efficient than the iGPU or hybrid (iGPU+NPU) solutions.
+Run large language models — now with **Vision support** — on AMD Ryzen™ AI NPUs in minutes.  
+**No GPU required. 10× more power-efficient. Context lengths up to 256k tokens.**
 
-FLM supports full context lengths — up to **256k** tokens with Qwen3-4B-Instruct/Thinking-2507.
+✨ *From Idle Silicon to Instant Power — FastFlowLM Makes Ryzen™ AI Shine.*
 
-**Just like Ollama — but purpose-built and deeply optimized for the Ryzen™ AI NPU**
-
-> FastFlowLM supports all Ryzen™ AI Series chips with XDNA2 NPUs (Strix, Strix Halo, and Kraken).
+> FastFlowLM (FLM) supports all Ryzen™ AI Series chips with XDNA2 NPUs (Strix, Strix Halo, and Kraken).
 
 🔽 **Download:** [flm-setup.exe](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)  
 📦 **Supported Models:** [docs.fastflowlm.com/models/](https://docs.fastflowlm.com/models/)  
