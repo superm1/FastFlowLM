@@ -24,7 +24,7 @@ Run large language models — now with **Vision support** — on AMD Ryzen™ AI
 | 🔽 **[Download](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)** | 📊 **[Benchmarks](https://docs.fastflowlm.com/benchmarks/)** | 📦 **[Model List](https://docs.fastflowlm.com/models/)** |
 
 
-| 📖 **[Docs](https://docs.fastflowlm.com)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://github.com/fastflowlm/#-remote-test-drive)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** |
+| 📖 **[Docs](https://docs.fastflowlm.com)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://github.com/FastFlowLM/FastFlowLM?tab=readme-ov-file#-remote-test-drive)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** |
 
 ---
 
