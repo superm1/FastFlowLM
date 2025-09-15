@@ -28,10 +28,10 @@ Fast, power-efficient, and 100% offline.
 > - ⚠️ Some universities or companies may **block access** to the test drive site. If it doesn't load over Wi-Fi, try switching to a **cellular network**.  
 > - Real-time demo powered by **FastFlowLM + Open WebUI** — no downloads, no installs.
 
-⚠️ **Please note**:  
-- FastFlowLM is designed for **single-user local use**. This remote demo machine may experience short wait times when **multiple users** access it concurrently — please be patient.
-- When switching models, it may take longer time to replace the model in memory.
-- Large prompts and VLM (gemma3:4b) may take longer — but it works! 🙂
+> ⚠️ **Please note**:  
+> - FastFlowLM is designed for **single-user local use**. This remote demo machine may experience short wait times when **multiple users** access it concurrently — please be patient.
+> - When switching models, it may take longer time to replace the model in memory.
+> - Large prompts and VLM (gemma3:4b) may take longer — but it works! 🙂
 
 ---
 

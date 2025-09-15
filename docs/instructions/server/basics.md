@@ -6,7 +6,7 @@ parent: Local Server (Server Mode)
 
 # 🧠 Understanding Local LLM Servers
 
-This page explains the key concepts behind **Local LLM Servers**, including FastFlowLM Server and others.  
+This page explains the key concepts behind **Local LLM Servers**, including FastFlowLM (FLM) Server and others.  
 
 ---
 
@@ -74,16 +74,5 @@ It makes switching between cloud and local effortless:
 - You can build your app using OpenAI’s cloud models.
 - Later, switch to a local LLM (for privacy, cost, or speed).
 - Your app won’t need to change — it keeps using the same API.
-
----
-
-## 🧠 Summary
-
-| Concept | Meaning |
-|--------|---------|
-| **Local Server** | Server software running on your own device. |
-| **Local LLM Server** | A program that loads an LLM locally and exposes it via an API. |
-| **OpenAI API Standard** | A common interface for apps to talk to LLMs — used by OpenAI, but also by many local tools. |
-| **Why it’s useful** | Simplifies integration, saves memory, allows for easy cloud-to-local switch. |
 
 ---

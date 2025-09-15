@@ -56,12 +56,11 @@ flm serve gemma3:4b --pmode balanced
 
 > ⚠️ Note: Using powersaver or balanced will lower NPU clock speeds and cause a significant drop in speed. For more details about NPU power mode, refer to the [AMD XRT SMI Documentation](https://ryzenai.docs.amd.com/en/latest/xrt_smi.html).
 
-
 ---
 
 ## 🧪 Quick Test (CLI Mode)
 
-After installation, do a quick test to see if FastFlowLM is properly installed. Open **PowerShell**, and run a model in terminal (CLI mode):
+After installation, do a quick test to see if FastFlowLM is properly installed. Open **PowerShell** (`Win + X → I`), and run a model in terminal (CLI mode):
 
 ```powershell
 flm run llama3.2:1b
@@ -72,3 +71,14 @@ flm run llama3.2:1b
 > - By default, models are stored in: `C:\Users\<USER>\Documents\flm\models\`  
 > - During installation, you can select a different base folder (e.g., if you choose `C:\Users\<USER>\flm`, models will be saved under `C:\Users\<USER>\flm\models\`).
 > - ⚠️ If HuggingFace is not directly accessible in your region, you can manually download the model (e.g., [hf-mirror](https://hf-mirror.com/models?search=fastflowlm)) and place it in the directory.
+
+🎉🚀 FastFlowLM (FLM) is ready — your NPU is unlocked and you can start chatting with models right away!
+
+Open **Task Manager** (`Ctrl + Shift + Esc`). Go to the **Performance** tab → click **NPU** to monitor usage.  
+
+> **⚡ Quick Tips:**  
+> - Use `/verbose` during a session to turn on performance reporting (toggle off with `/verbose` again).   
+> - Type `/bye` to exit a conversation.  
+> - Run `flm list` in PowerShell to show all available models.  
+
+**[![FastFlowLM Docs](https://img.shields.io/badge/FastFlowLM-Detailed%20Instructions-red?style=flat&logo=readthedocs)](https://docs.fastflowlm.com/instructions/)**

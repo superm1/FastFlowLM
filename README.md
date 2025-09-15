@@ -21,10 +21,10 @@ Run large language models — now with **Vision support** — on AMD Ryzen™ AI
 
 ## 🔗 Quick Links
 
-| 🔽 **[Download](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)** | 📊 **[Benchmarks](https://docs.fastflowlm.com/benchmarks/)** | 📦 **[Model List](https://docs.fastflowlm.com/models/)** |
+  🔽 **[Download](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)** | 📊 **[Benchmarks](https://docs.fastflowlm.com/benchmarks/)** | 📦 **[Model List](https://docs.fastflowlm.com/models/)**  
 
 
-| 📖 **[Docs](https://docs.fastflowlm.com)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://docs.fastflowlm.com/#-test-drive-remote-demo)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** |
+  📖 **[Docs](https://docs.fastflowlm.com)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://docs.fastflowlm.com/#-test-drive-remote-demo)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** 
 
 ---
 
@@ -36,7 +36,7 @@ A packaged FLM Windows installer is available here: [**flm-setup.exe**](https://
 
 > ⚠️ Ensure NPU driver is **32.0.203.258** or later (check via Task Manager→Performance→NPU or Device Manager) — [Driver Download](https://www.amd.com/en/support).
 
-After installation, open **PowerShell**. To run a model in terminal (CLI Mode):
+After installation, open **PowerShell** (`Win + X → I`). To run a model in terminal (**CLI Mode**):
 ```powershell
 flm run llama3.2:1b
 ```
@@ -44,15 +44,24 @@ flm run llama3.2:1b
 > - Internet access to HuggingFace is required to download the optimized model kernels.  
 > - By default, models are stored in: `C:\Users\<USER>\Documents\flm\models\`  
 > - During installation, you can select a different base folder (e.g., if you choose `C:\Users\<USER>\flm`, models will be saved under `C:\Users\<USER>\flm\models\`).  
-> - ⚠️ If HuggingFace is not accessible in your region, manually download the model and place it in the chosen directory.   
+> - ⚠️ If HuggingFace is not accessible in your region, manually download the model ([check this issue](https://github.com/FastFlowLM/FastFlowLM/issues/2)) and place it in the chosen directory.   
 
-To start the local server (Server Mode):
+🎉🚀 FastFlowLM (FLM) is ready — your NPU is unlocked and you can start chatting with models right away!
+
+Open **Task Manager** (`Ctrl + Shift + Esc`). Go to the **Performance** tab → click **NPU** to monitor usage.  
+
+> **⚡ Quick Tips:**  
+> - Use `/verbose` during a session to turn on performance reporting (toggle off with `/verbose` again).   
+> - Type `/bye` to exit a conversation.  
+> - Run `flm list` in PowerShell to show all available models.  
+
+To start the local server (**Server Mode**):
 ```powershell
 flm serve llama3.2:1b
 ```
 > The model tag (e.g., `llama3.2:1b`) sets the initial model, which is optional. If another model is requested, FastFlowLM will automatically switch to it. Local server is on port 11434 (default).  
 
-🔗 **[Detailed instructions](https://docs.fastflowlm.com/instructions/)**
+**[![FastFlowLM Docs](https://img.shields.io/badge/FastFlowLM-Detailed%20Instructions-red?style=flat&logo=readthedocs)](https://docs.fastflowlm.com/instructions/)**
 
 ---
 
@@ -60,7 +69,7 @@ flm serve llama3.2:1b
 
 FLM makes it easy to run cutting-edge **LLMs** (and now **VLMs**) locally with:
 - ⚡ Fast and low power
-- 🧰 Simple CLI and API
+- 🧰 Simple CLI and API (REST and OpenAI API)
 - 🔐 Fully private and offline
 
 No model rewrites, no tuning — it just works.
@@ -88,7 +97,7 @@ For commercial use or licensing inquiries, email us: info@fastflowlm.com
 
 ---
 
-💬 Have **feedback/issues** or want **early access** to our new releases?[Open an issue](https://github.com/fastflowlm/fastflowlm/issues/new) or [Join our Discord community](https://discord.gg/z24t23HsHF)
+💬 Have **feedback/issues** or want **early access** to our new releases? [Open an issue](https://github.com/fastflowlm/fastflowlm/issues/new) or [Join our Discord community](https://discord.gg/z24t23HsHF)
 
 ---
 

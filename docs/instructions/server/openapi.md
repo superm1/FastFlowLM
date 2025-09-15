@@ -134,15 +134,11 @@ import gc
 gc.collect()
 ```
 
-> ⚠️ The OpenAI API (and FastFlowLM server mode) is **stateless** — you must resend the full conversation each time. No KV cache is kept between turns.
-
-> 🌀 This means all previous messages are reprocessed (**prefill**), which adds latency for long chats.
-
-> ⚡ **FastFlowLM’s CLI mode** uses a **real KV cache**, making multi-turn responses much faster — especially with long conversations.
-
-> 🧠 FastFlowLM is optimized for **long sequences** with large KV caches, ideal for 32k–128k context windows.
-
-> 🔧 We’re working on adding **stateful KV cache** to server mode. Stay tuned!
+> ⚠️ The OpenAI API (and FastFlowLM server mode) is **stateless** — you must resend the full conversation each time. No KV cache is kept between turns.  
+> 🌀 This means all previous messages are reprocessed (**prefill**), which adds latency for long chats.  
+> ⚡ **FastFlowLM’s CLI mode** uses a **real KV cache**, making multi-turn responses much faster — especially with long conversations.  
+> 🧠 FastFlowLM is optimized for **long sequences** with large KV caches, ideal for 32k–256k context windows.  
+<!-- > 🔧 We’re working on adding **stateful KV cache** to server mode. Stay tuned!   -->
 
 ---
 
