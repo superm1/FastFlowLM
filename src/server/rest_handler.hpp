@@ -4,7 +4,7 @@
  * \brief RestHandler class and related declarations
  * \author FastFlowLM Team
  * \date 2025-06-24
- * \version 0.9.9
+ * \version 0.9.10
  */
 #pragma once
 
@@ -26,7 +26,7 @@ using StreamResponseCallback = std::function<void(const json&, bool)>; // data, 
 
 class RestHandler {
 public:
-    RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int ctx_length = -1);
+    RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int ctx_length = -1, bool preemption = false);
     ~RestHandler();
 
     void handle_generate(const json& request, 
@@ -104,4 +104,5 @@ private:
     int chat_context_id;
     int ctx_length;
     std::string last_question;
+    bool preemption;
 }; 

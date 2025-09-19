@@ -2,7 +2,7 @@
 /// \brief gemma_npu class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.9
+/// \version 0.1.0
 /// \note This is a header file for the gemma_npu class
 #pragma once
 #include "lm_config.hpp"
@@ -26,7 +26,7 @@ public:
     /// \brief  initialize the gemma_text_npu
     /// \param config the configuration
     /// \param npu_instance the npu instance
-    gemma_text_npu(LM_Config config, npu_manager *npu_instance, int MAX_L = 4096);
+    gemma_text_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
     ~gemma_text_npu();
 
     /// \brief forward the gemma_text_npu

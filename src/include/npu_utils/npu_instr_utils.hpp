@@ -1,3 +1,8 @@
+/// \file npu_instr_utils.hpp
+/// \brief npu_instr_utils class
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
+/// \note This file contains the classes for managing the npu instructions
 #ifndef __NPU_INSTR_UTILS_HPP__
 #define __NPU_INSTR_UTILS_HPP__
 
@@ -19,6 +24,7 @@
 #include "instr_utils/npu_cmd_issue_token.hpp"
 #include "instr_utils/npu_cmd_wait.hpp"
 #include "instr_utils/npu_cmd_maskwrite.hpp"
+#include "instr_utils/npu_cmd_preemption.hpp"
 
 // This function is used to interperate instructions
 // Useful files:
@@ -116,19 +122,17 @@ typedef enum: uint32_t{
 class npu_sequence{
     public:
         npu_sequence() {
-            this->npu_seq = nullptr;
-            this->belonging_device = nullptr;
-            this->belonging_kernel = nullptr;
-            this->is_valid = false;
+            this->npu_seq.resize(0);
         }; // default constructor, not allowed
-        npu_sequence(npu_device device_gen, xrt::device* device, xrt::kernel* kernel, std::string app_name); // for construct from xclbin and app_name
+        npu_sequence(npu_device device_gen, bool enable_preemption = false); // for construct from xclbin and app_name
         void from_file(std::string filename, bool is_binary = true); // read from file
         void write_out_sequence(std::string filename); // write out the sequence
         void interpret(); // print the sequence
-        void name_instr(std::string instr_name);
         void setup_device(npu_device device);
         void seq2cmds(); // parse the sequence
         void cmds2seq(); // parse the sequence
+
+        // npu control sequence commands
         void rtp_write(npu_tiles tile, uint32_t addr, uint32_t value);
         void npu_dma_memcpy_nd(
             int elem_size,
@@ -146,12 +150,13 @@ class npu_sequence{
         );
         void npu_dma_wait(npu_tiles tile, dma_direction channel_direction, npu_it_channel it_channel);
         void npu_maskwrite(npu_tiles tile, uint32_t addr, uint32_t value, uint32_t mask);
-        xrt::bo& bo();
+        void npu_preemption(uint32_t preemption_level);
+
         void clear_cmds();
-        void sync() {this->npu_seq->sync_to_device();}
-        size_t size() {return this->npu_seq->size() * sizeof(uint32_t);}
-        buffer<uint32_t> dump();
-        std::string name() {return this->instr_name;}
+        size_t size() {return this->npu_seq.size() * sizeof(uint32_t);}
+        std::pair<uint32_t*, size_t> dump();
+        inline bool sequence_valid(){return this->is_valid;}
+        inline uint8_t sequence_version(){return this->instr_version;}
         npu_device device_gen;
     private:
         constexpr static uint32_t dev_n_row_shift = 24;
@@ -174,24 +179,12 @@ class npu_sequence{
         uint32_t npu_major;
         uint32_t instruction_counts;
         uint32_t instruction_lines;
+        bool enable_preemption;
 
-        std::string instr_name;
         std::vector<std::unique_ptr<npu_cmd>> cmds;
-        xrt::device* belonging_device;
-        xrt::kernel* belonging_kernel;
-        std::unique_ptr<buffer<uint32_t>> npu_seq;
+        std::vector<uint32_t> npu_seq;
         bool is_valid;
-
-        bool _check_bo_valid(){
-
-            if (this->belonging_device == nullptr){
-                return false;
-            }
-            if (this->belonging_kernel == nullptr){
-                return false;
-            }
-            return true;
-        }
+        uint8_t instr_version;
 };
 
 #endif

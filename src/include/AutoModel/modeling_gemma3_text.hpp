@@ -21,27 +21,18 @@ extern "C" {
 }
 
 
-/************              Gemma3_4b            **************/
-class Gemma3 : public AutoModel {
+
+/************              Gemma3_Text_Only            **************/
+class Gemma3_Text_Only : public AutoModel {
 private:
-    std::string current_model = "Gemma3";
+    std::string current_model = "Gemma3_Text_Only";
+
+    int think_marker_id;
 
     void setup_tokenizer(std::string model_path);
-    
-    // Image processing functionality
-    static bool ffmpeg_initialized;
-    void initialize_ffmpeg();
-    void resolve_source_format_and_range(AVPixelFormat input_format,
-                                        AVPixelFormat &resolved_format,
-                                        int &src_full_range,
-                                        AVColorRange frame_color_range,
-                                        AVCodecID codec_id);
-    bytes load_image(const std::string& filename);
-    bytes load_image_base64(const std::string& base64_string);
-    buffer<bf16> preprocess_image(bytes& image);
 
 public:
-    Gemma3(unsigned int device_id);
+    Gemma3_Text_Only(unsigned int device_id);
 
     void load_model(std::string model_path, json model_inf, int default_context_length = -1, bool enable_preemption = false) override;
     //void toggle_enable_think() override;

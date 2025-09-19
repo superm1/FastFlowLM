@@ -1,8 +1,7 @@
 /// \file npu_cmd_write_dma.hpp
 /// \brief npu dma block write command
-/// \author FastFlowLM Team
-/// \date 2025-06-24
-/// \version 0.9.9
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
 /// \note This is a class for the npu dma block write command
 #pragma once
 
@@ -20,6 +19,7 @@ struct npu_dma_block_cmd : public npu_cmd{
     constexpr static uint32_t packet_type_shift = 16; 
     constexpr static uint32_t dim_size_shift = 20;
     constexpr static uint32_t dim_stride_shift = 0;
+    constexpr static uint32_t ax_cache_shift = 24; 
     constexpr static uint32_t curr_iter_shift = 26;
     constexpr static uint32_t iter_size_shift = 20;
     constexpr static uint32_t iter_stride_shift = 0;
@@ -45,6 +45,7 @@ struct npu_dma_block_cmd : public npu_cmd{
     constexpr static uint32_t curr_iter_mask = 0x3FF;
     constexpr static uint32_t iter_size_mask = 0x3FF;
     constexpr static uint32_t iter_stride_mask = 0xFFFFF;
+    constexpr static uint32_t ax_cache_mask = 0xF; 
     constexpr static uint32_t next_bd_id_mask = 0xF;
     constexpr static uint32_t use_next_bd_mask = 0x1;
     constexpr static uint32_t valid_bd_mask = 0x1;
@@ -93,7 +94,7 @@ struct npu_dma_block_cmd : public npu_cmd{
 
 
     void dump_cmd(uint32_t *bd){
-        assert(*bd == dma_block_write);
+        assert(*bd == XAIE_IO_BLOCKWRITE);
         LOG_VERBOSE(1, "bd_addr: " << bd);
         this->col = ((bd[2] >> bd_col_shift) & bd_col_mask);
         this->row = ((bd[2] >> bd_row_shift) & bd_row_mask);
@@ -228,7 +229,7 @@ struct npu_dma_block_cmd : public npu_cmd{
     }
     
     void to_npu(std::vector<uint32_t>& npu_seq){
-        npu_seq.push_back(dma_block_write);
+        npu_seq.push_back(XAIE_IO_BLOCKWRITE);
         npu_seq.push_back(0x0);
         npu_seq.push_back((row << bd_row_shift) | (col << bd_col_shift) | (bd_id << bd_id_shift) | 0x1D000);
         npu_seq.push_back(this->op_size * 4);
@@ -237,7 +238,9 @@ struct npu_dma_block_cmd : public npu_cmd{
         npu_seq.push_back((this->packet_enable << en_packet_shift) | (this->out_of_order_id << out_of_order_shift) | (this->packet_id << packet_id_shift) | (this->packet_type << packet_type_shift));
         npu_seq.push_back((this->dim0_size << dim_size_shift) | ((this->dim0_stride - 1) << dim_stride_shift));
         npu_seq.push_back(0xc0000000 | (this->dim1_size << dim_size_shift) | ((this->dim1_stride - 1) << dim_stride_shift));
-        npu_seq.push_back((0 << dim_size_shift) | ((this->dim2_stride - 1) << dim_stride_shift)); // dim 2 size is not required to be set
+        // npu_seq.push_back((0 << dim_size_shift) | ((this->dim2_stride - 1) << dim_stride_shift)); // dim 2 size is not required to be set
+        npu_seq.push_back((0x2 << ax_cache_shift) | ((this->dim2_stride - 1) << dim_stride_shift)); // upper bits used for QoS fields ex. AxCache 
+
         npu_seq.push_back(((this->iter_size - 1) << iter_size_shift) | ((this->iter_stride - 1) << iter_stride_shift));
         npu_seq.push_back(
             (this->next_bd_id << next_bd_id_shift) | 

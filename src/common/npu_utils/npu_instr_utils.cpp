@@ -1,16 +1,20 @@
+/// \file npu_instr_utils.cpp
+/// \brief npu_instr_utils class
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
+/// \note This file contains the implementation of the npu_instr_utils class
+
 #include "npu_utils/npu_instr_utils.hpp"
 
 ///@brief constructor
 ///@param npu_seq the npu sequence
 ///@note The function will copy the npu sequence and parse it
-npu_sequence::npu_sequence(npu_device device_gen, xrt::device* device, xrt::kernel* kernel, std::string app_name){
+npu_sequence::npu_sequence(npu_device device_gen, bool enable_preemption){
     this->device_gen = device_gen;
     this->setup_device(device_gen);
-    this->belonging_device = device;
-    this->belonging_kernel = kernel;
-    this->instr_name = app_name;
-    this->npu_seq = nullptr;
     this->is_valid = false;
+    this->instr_version = 0xFF;
+    this->enable_preemption = enable_preemption;
     this->clear_cmds();
 }
 
@@ -22,27 +26,23 @@ npu_sequence::npu_sequence(npu_device device_gen, xrt::device* device, xrt::kern
 ///@note If the file is not found, the function will throw an error
 ///@warning If the from_file is false, the function will not check if the filename is valid, and the npu sequence is empty
 void npu_sequence::from_file(std::string filename, bool is_binary){
-    if (!this->_check_bo_valid()){
-        throw std::runtime_error("NPU sequence is not binded to a device and kernel!");
-    }
     std::ifstream instr_file(filename, std::ios::binary);
     if (!instr_file.is_open()){
         throw std::runtime_error("Failed to open file: " + filename);
     }
 
-    std::vector<uint32_t> instr_v;
     if (is_binary){
         instr_file.seekg(0, std::ios::end);
         size_t instr_size = instr_file.tellg();
         instr_file.seekg(0, std::ios::beg);
 
-        instr_v.resize(instr_size / 4);
+        this->npu_seq.resize(instr_size / 4);
 
         if (instr_size % 4 != 0){
             throw std::runtime_error("Instr file is invalied!");
         }
 
-        if (!instr_file.read(reinterpret_cast<char *>(instr_v.data()), instr_size)) {
+        if (!instr_file.read(reinterpret_cast<char *>(this->npu_seq.data()), instr_size)) {
             throw std::runtime_error("Failed to read instruction file\n");
         }
     }
@@ -54,36 +54,21 @@ void npu_sequence::from_file(std::string filename, bool is_binary){
             if (!(iss >> std::hex >> a)) {
                 throw std::runtime_error("Unable to parse instruction file\n");
             }
-            instr_v.push_back(a);
+            this->npu_seq.push_back(a);
         }
     }
 
-    if ((this->npu_seq == nullptr) || (this->npu_seq->size() != instr_v.size())){
-        this->npu_seq = std::make_unique<buffer<uint32_t>>(instr_v.size(), *(this->belonging_device), *(this->belonging_kernel), 1, XRT_BO_FLAGS_CACHEABLE);
-    }
-    this->npu_seq->copy_from(instr_v);
-    this->sync();
     this->seq2cmds();
     this->is_valid = true;
+    this->instr_version++;
 }
 
-
-///@brief name the npu sequence
-///@param instr_name the name of the npu sequence
-///@note The function will set the name of the npu sequence
-///@warning The name of the npu sequence is not used in the npu sequence, it is only for the user to identify the npu sequence
-void npu_sequence::name_instr(std::string instr_name){
-    this->instr_name = instr_name;
-}
 
 ///@brief parse the npu sequence
 ///@note The function will parse the npu sequence and set the npu major, minor, dev gen, rows, cols, mem tile rows, instruction counts, instruction lines
 void npu_sequence::seq2cmds(){
-    if (!this->_check_bo_valid()){
-        throw std::runtime_error("NPU sequence is not binded to a device and kernel!");
-    }
-    assert(this->npu_seq->size() > 0);
-    uint32_t* seq = this->npu_seq->data();
+    assert(this->npu_seq.size() > 0);
+    uint32_t* seq = this->npu_seq.data();
     this->clear_cmds();
     // Parse the npu sequence
     this->npu_major = (seq[0] >> dev_major_shift) & dev_major_mask;
@@ -95,8 +80,8 @@ void npu_sequence::seq2cmds(){
     this->instruction_counts = seq[2];
     this->instruction_lines = seq[3] / 4;
     int i = 4;
-    while (i < this->npu_seq->size()){
-        if (seq[i] == op_headers::dma_block_write){
+    while (i < this->npu_seq.size()){
+        if (seq[i] == op_headers::XAIE_IO_BLOCKWRITE){
             LOG_VERBOSE(1, "DMA block write");
             std::unique_ptr<npu_dma_block_cmd> cmd = std::make_unique<npu_dma_block_cmd>();
             cmd->dump_cmd(seq + i);
@@ -104,28 +89,28 @@ void npu_sequence::seq2cmds(){
             this->cmds.push_back(std::move(cmd));
             LOG_VERBOSE(1, "DMA block write" << i);
         }
-        else if (seq[i] == op_headers::dma_ddr_patch_write){
+        else if (seq[i] == op_headers::XAIE_IO_CUSTOM_OP_DDR_PATCH){
             LOG_VERBOSE(1, "DMA DDR patch write");
             std::unique_ptr<npu_ddr_cmd> cmd = std::make_unique<npu_ddr_cmd>();
             cmd->dump_cmd(seq + i);
             i += cmd->get_op_lines();
             this->cmds.push_back(std::move(cmd));
         }
-        else if (seq[i] == op_headers::dma_mask_write){
+        else if (seq[i] == op_headers::XAIE_IO_MASKWRITE){
             LOG_VERBOSE(1, "DMA issue token write");
             std::unique_ptr<npu_issue_token_cmd> cmd = std::make_unique<npu_issue_token_cmd>();
             cmd->dump_cmd(seq + i);
             i += cmd->get_op_lines();
             this->cmds.push_back(std::move(cmd));
         }
-        else if (seq[i] == op_headers::queue_write){
+        else if (seq[i] == op_headers::XAIE_IO_WRITE){
             LOG_VERBOSE(1, "Queue write");
             std::unique_ptr<npu_write_cmd> cmd = std::make_unique<npu_write_cmd>();
             cmd->dump_cmd(seq + i);
             i += cmd->get_op_lines();
             this->cmds.push_back(std::move(cmd));
         }
-        else if (seq[i] == op_headers::dma_sync_write){ // Wait sync, AIETargetNPU.cpp line 62
+        else if (seq[i] == op_headers::XAIE_IO_CUSTOM_OP_TCT){ // Wait sync, AIETargetNPU.cpp line 62
             LOG_VERBOSE(1, "DMA sync write");
             std::unique_ptr<npu_wait_cmd> cmd = std::make_unique<npu_wait_cmd>();
             cmd->dump_cmd(seq + i);
@@ -143,7 +128,7 @@ void npu_sequence::seq2cmds(){
 void npu_sequence::interpret(){
     int line_number = 0;
     MSG_BONDLINE(INSTR_PRINT_WIDTH);
-    uint32_t* seq = this->npu_seq->data();
+    uint32_t* seq = this->npu_seq.data();
     instr_print(line_number, seq[line_number], "NPU information");
     instr_print(-1, seq[line_number], "--NPU version: " + std::to_string(this->npu_major) + "." + std::to_string(this->npu_minor));
     instr_print(-1, seq[line_number], "--NPU generation: " + std::to_string(this->npu_dev_gen));
@@ -173,39 +158,34 @@ void npu_sequence::interpret(){
 ///@note If the npu sequence is not pre-generated, the function will update the npu sequence inside the class
 ///@warning If a npu sequence is not pre-generated, this function must be called before the npu sequence is used by the npu_app
 ///@return the npu sequence in std::vector<uint32_t>
-void npu_sequence::cmds2seq(){
-    std::vector<uint32_t> npu_seq_generated;
+void npu_sequence::cmds2seq(){   
+    this->instruction_lines = 4;
+    for (int i = 0; i < this->cmds.size(); i++){
+        this->instruction_lines += this->cmds[i]->get_op_lines();
+    }
+    this->npu_seq.reserve(this->instruction_lines);
     
-    npu_seq_generated.push_back(
+    this->npu_seq.push_back(
         (this->npu_major << dev_major_shift) |
         (this->npu_minor << dev_minor_shift) |
         (this->npu_dev_gen << dev_gen_shift) |
         (this->npu_rows << dev_n_row_shift)
     );
     
-    npu_seq_generated.push_back(
+    this->npu_seq.push_back(
         (this->npu_cols << dev_num_cols_shift) |
         (this->npu_mem_tile_rows << dev_mem_tile_rows_shift)
     );
 
     this->instruction_counts = this->cmds.size();
-    this->instruction_lines = 4;
+    this->npu_seq.push_back(this->instruction_counts);
+    this->npu_seq.push_back(this->instruction_lines << 2);
     for (int i = 0; i < this->cmds.size(); i++){
-        this->instruction_lines += this->cmds[i]->get_op_lines();
-    }
-    npu_seq_generated.push_back(this->instruction_counts);
-    npu_seq_generated.push_back(this->instruction_lines << 2);
-    for (int i = 0; i < this->cmds.size(); i++){
-        this->cmds[i]->to_npu(npu_seq_generated);
+        this->cmds[i]->to_npu(this->npu_seq);
     }
 
-    if ((this->npu_seq == nullptr) || (this->npu_seq->size() != npu_seq_generated.size())){
-        this->npu_seq = std::make_unique<buffer<uint32_t>>(npu_seq_generated.size(), *this->belonging_device, *this->belonging_kernel, 1, XRT_BO_FLAGS_CACHEABLE);
-    }
-
-    this->npu_seq->copy_from(npu_seq_generated);
-    this->sync();
     this->is_valid = true;
+    this->instr_version++;
 }
 
 
@@ -216,14 +196,15 @@ void npu_sequence::write_out_sequence(std::string filename){
         throw std::runtime_error("Failed to open file: " + filename);
     }
 
-    file.write(reinterpret_cast<const char*>(this->npu_seq->data()), this->npu_seq->size() * sizeof(uint32_t));
+    file.write(reinterpret_cast<const char*>(this->npu_seq.data()), this->npu_seq.size() * sizeof(uint32_t));
     file.close();
 }
 
-buffer<uint32_t> npu_sequence::dump(){
-    buffer<uint32_t> copy_buf = buffer<uint32_t>(this->npu_seq->size());
-    copy_buf.copy_from(*(this->npu_seq));
-    return copy_buf;
+std::pair<uint32_t*, size_t> npu_sequence::dump(){
+    if (this->is_valid == false){
+        this->cmds2seq();
+    }
+    return std::make_pair(this->npu_seq.data(), this->npu_seq.size());
 }
 
 ///@brief setup the npu device
@@ -258,6 +239,9 @@ void npu_sequence::setup_device(npu_device device){
  *  @param value: the value to write to the register
  */
 void npu_sequence::rtp_write(npu_tiles tile, uint32_t addr, uint32_t value){
+    if (this->is_valid == true) {
+        this->clear_cmds();
+    }
     std::unique_ptr<npu_write_cmd> cmd = std::make_unique<npu_write_cmd>();
     uint32_t row = (tile >> 4) & 0xF;
     uint32_t col = tile & 0xF;
@@ -266,7 +250,6 @@ void npu_sequence::rtp_write(npu_tiles tile, uint32_t addr, uint32_t value){
     cmd->reg_addr = addr;
     cmd->value = value;
     cmd->could_be_push_queue = false;
-    this->is_valid = false;
     this->cmds.push_back(std::move(cmd));
 }
 
@@ -303,7 +286,9 @@ void npu_sequence::npu_dma_memcpy_nd(
     bool issue_token
 ){
     assert(elem_size <= 4); // not supported
-    this->is_valid = false;
+    if (this->is_valid == true) {
+        this->clear_cmds();
+    }
     std::vector<uint32_t> offset = _offset;
     std::vector<uint32_t> size = _size;
     std::vector<uint32_t> stride = _stride;
@@ -393,7 +378,7 @@ void npu_sequence::npu_dma_memcpy_nd(
     }
     cmd->issue_token = issue_token;
 
-    cmd->get_lock_rel_val = 0;
+    cmd->get_lock_rel_val = 128;
     cmd->get_lock_rel_id = 0;
     cmd->get_lock_acq_enable = 0;
     cmd->get_lock_acq_val = 0;
@@ -447,7 +432,10 @@ void npu_sequence::npu_dma_memcpy_nd(
  *  @return void
  */
 void npu_sequence::npu_dma_wait(npu_tiles tile, dma_direction channel_direction, npu_it_channel it_channel){
-    this->is_valid = false;
+    if (this->is_valid == true) {
+        this->clear_cmds();
+        
+    }
     std::unique_ptr<npu_wait_cmd> wait_cmd = std::make_unique<npu_wait_cmd>();
     uint32_t row = (tile >> 4) & 0xF;
     uint32_t col = tile & 0xF;
@@ -468,7 +456,9 @@ void npu_sequence::npu_dma_wait(npu_tiles tile, dma_direction channel_direction,
  *  @return void
  */
 void npu_sequence::npu_maskwrite(npu_tiles tile, uint32_t addr, uint32_t value, uint32_t mask){
-    this->is_valid = false;
+    if (this->is_valid == true) {
+        this->clear_cmds();
+    }
     std::unique_ptr<npu_maskwrite_cmd> maskwrite_cmd = std::make_unique<npu_maskwrite_cmd>();
     uint32_t row = (tile >> 4) & 0xF;
     uint32_t col = tile & 0xF;
@@ -480,13 +470,27 @@ void npu_sequence::npu_maskwrite(npu_tiles tile, uint32_t addr, uint32_t value, 
     this->cmds.push_back(std::move(maskwrite_cmd));
 }
 
-xrt::bo& npu_sequence::bo(){
-    assert(this->is_valid);
-    assert(this->npu_seq != nullptr);
-    return this->npu_seq->bo();
+///@{
+/**
+ *  @brief generate a npu preemption command  
+ *  @param preemption_level: the level of the preemption
+ *  @return void
+ */
+void npu_sequence::npu_preemption(uint32_t preemption_level){
+    if (this->enable_preemption == false){
+        return;
+    }
+    if (this->is_valid == true) {
+        this->clear_cmds();
+    }
+    // LOG_VERBOSE(2, "Adding preemption command with level: " + std::to_string(preemption_level));
+    std::unique_ptr<npu_preemption_cmd> preemption_cmd = std::make_unique<npu_preemption_cmd>();
+    preemption_cmd->preemption_level = preemption_level;
+    this->cmds.push_back(std::move(preemption_cmd));
 }
 
 void npu_sequence::clear_cmds(){
     this->cmds.clear();
+    this->npu_seq.clear();
     this->is_valid = false;
 }

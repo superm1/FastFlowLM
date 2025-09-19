@@ -2,7 +2,7 @@
 /// \brief automodel class
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This is a source file for the auto_model class
 
 #include "AutoModel/automodel.hpp"
@@ -23,7 +23,11 @@ AutoModel::AutoModel(unsigned int device_id) {
 /// \note The function will setup the tokenizer
 nlohmann::json AutoModel::_shared_setup_tokenizer(std::string model_path) {
     // load tokenizer configurations
+    #ifdef _WIN32
     std::string tokenizer_config_path = model_path + "\\tokenizer_config.json";
+    #else
+    std::string tokenizer_config_path = model_path + "/tokenizer_config.json";
+    #endif
     std::ifstream fs_config(tokenizer_config_path, std::ios::in | std::ios::binary);
     if (fs_config.fail()) {
         std::cerr << "Cannot open " << tokenizer_config_path << std::endl;
@@ -67,7 +71,7 @@ nlohmann::json AutoModel::_shared_setup_tokenizer(std::string model_path) {
 }
 
 
-void AutoModel::_shared_load_model(std::string model_path, json model_info, int default_context_length) {
+void AutoModel::_shared_load_model(std::string model_path, json model_info, int default_context_length, bool enable_preemption) {
     if (this->is_model_loaded && this->model_path == model_path) {
         header_print("FLM", "Model already loaded: " << this->model_path);
         return;
@@ -77,8 +81,8 @@ void AutoModel::_shared_load_model(std::string model_path, json model_info, int 
     header_print("FLM", "Loading model: " << this->model_path);
     this->lm_config = std::make_unique<LM_Config>();
     this->lm_config->from_pretrained(this->model_path);
-    this->npu = std::make_unique<npu_manager>(npu_device::device_npu2, device_id);
-    
+    this->npu = std::make_unique<npu_xclbin_manager>(npu_device::device_npu2, device_id, enable_preemption);
+    this->enable_preemption = enable_preemption;
     // Set context length: use provided value if not -1, otherwise use model default
     if (default_context_length != -1) {
         this->MAX_L = default_context_length;

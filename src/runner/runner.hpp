@@ -4,7 +4,7 @@
  * \brief Main entry point for the FLM application
  * \author FastFlowLM Team
  * \date 2025-06-24
- * \version 0.9.9
+ * \version 0.9.10
  */
 #pragma once
 #include "utils/utils.hpp"
@@ -39,7 +39,7 @@ typedef enum {
 /// \brief Runner class
 class Runner {
     public: 
-        Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, int ctx_length);
+        Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, int ctx_length, bool preemption);
         void run();
     private:
         std::string tag;
@@ -49,6 +49,7 @@ class Runner {
         int generate_limit;
         int ctx_length;
         std::string system_prompt;
+        bool preemption;
         // CLI instance for interactive input
         CLIWide cli;
 

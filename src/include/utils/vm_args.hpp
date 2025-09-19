@@ -2,7 +2,7 @@
 /// \brief vm_args class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This class is used to parse the command line arguments.
 #pragma once
 
@@ -23,7 +23,10 @@ struct ParsedArgs {
     std::string power_mode;
     bool force_redownload;
     bool version_requested;
+    bool preemption;
     int ctx_length;
+    size_t max_socket_connections;
+    size_t max_npu_queue;
     ParsedArgs() : power_mode("performance"), force_redownload(false), 
                    version_requested(false) {}
 };
@@ -41,11 +44,17 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             ("help,h", "Show help message")
             ("version,v", "Show version information")
             ("pmode", po::value<std::string>(&parsed_args.power_mode)->default_value("performance"),
-             "Set power mode: default, powersaver, balanced, performance, turbo")
+             "Set power mode: powersaver, balanced, performance, turbo")
             ("force", po::bool_switch(&parsed_args.force_redownload),
              "Force re-download even if model exists (for pull command)")
-            ("ctx-len", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
-             "Set context length");
+            ("ctx-len,c", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
+             "Set context length")
+            ("socket,s", po::value<size_t>(&parsed_args.max_socket_connections)->default_value(10),
+            "Set the maximum number of socket connections allowed (for serve command)")
+            ("q-len,q", po::value<size_t>(&parsed_args.max_npu_queue)->default_value(10),
+            "Set number of max npu queue length (for serve command)")
+            ("preemption", po::value<bool>(&parsed_args.preemption)->default_value(false),
+             "Enable preemption");
 
         // Define positional arguments
         po::positional_options_description pos_desc;
@@ -90,8 +99,15 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             std::cout << "  " << argv[0] << " serve llama3.2:1b --pmode balanced" << std::endl;
             std::cout << "  " << argv[0] << " pull llama3.2:1b --force" << std::endl;
             std::cout << "  " << argv[0] << " serve llama3.2:1b --ctx-len 8192" << std::endl;
+            std::cout << "  " << argv[0] << " serve llama3.2:1b --socket 10" << std::endl;
+            std::cout << "  " << argv[0] << " serve llama3.2:1b --q-len 10" << std::endl;
             std::cout << "  " << argv[0] << " list" << std::endl;
             return false; // Exit after showing help
+        }
+
+        if (vm.count("version")) {
+            parsed_args.version_requested = true;
+            return true; // Exit after showing help
         }
         
 
@@ -119,6 +135,8 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --pmode balanced" << std::endl;
                 std::cout << "  " << argv[0] << " pull llama3.2:1b --force" << std::endl;
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --ctx-len 8192" << std::endl;
+                std::cout << "  " << argv[0] << " serve llama3.2:1b --socket 10" << std::endl;
+                std::cout << "  " << argv[0] << " serve llama3.2:1b --q-len 10" << std::endl;
                 std::cout << "  " << argv[0] << " list" << std::endl;
                 return false; // Exit after showing help
             }
@@ -140,6 +158,19 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
         if (parsed_args.command == "run" || parsed_args.command == "pull" || parsed_args.command == "remove") {
             if (parsed_args.model_tag.empty()) {
                 std::cerr << "Error: Model tag is required for command '" << parsed_args.command << "'" << std::endl;
+                return false;
+            }
+        }
+        if (parsed_args.command != "serve")
+        {
+            if (!vm["socket"].defaulted())
+            {
+                std::cerr << "Error: Max socket connections is only required for serve command! " << std::endl;
+                return false;
+            }
+            if (!vm["q-len"].defaulted())
+            {
+                std::cerr << "Error: Max npu queue length is only required for serve command! " << std::endl;
                 return false;
             }
         }

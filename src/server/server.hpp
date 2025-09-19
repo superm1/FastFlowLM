@@ -4,7 +4,7 @@
  * \brief WebServer class and related declarations
  * \author FastFlowLM Team
  * \date 2025-06-24
- * \version 0.9.9
+ * \version 0.9.10
  */
 #pragma once
 
@@ -26,6 +26,8 @@
 #include "wstream_buf.hpp"
 #include "streaming_ostream.hpp"
 #include "model_downloader.hpp"
+#include <queue>
+#include <functional>
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -101,13 +103,14 @@ public:
     void set_max_connections(size_t max_conns) { max_connections_ = max_conns; }
     void set_request_timeout(std::chrono::seconds timeout) { request_timeout_ = timeout; }
     void set_io_threads(size_t num_threads) { io_thread_count_ = num_threads; }
+    void set_npu_queue_length(size_t q_len) { max_npu_queue_ = q_len; }
     // Maximum accepted HTTP request body size (in bytes)
     void set_max_body_size_bytes(std::size_t bytes) { max_body_size_bytes_ = bytes; }
     std::size_t get_max_body_size_bytes() const { return max_body_size_bytes_; }
 
     void register_handler(const std::string& method, const std::string& path, RequestHandler handler);
 
-    void handle_request(http::request<http::string_body>& req,
+    bool handle_request(http::request<http::string_body>& req,
                        http::response<http::string_body>& res,
                        tcp::socket& socket,
                        std::shared_ptr<HttpSession> session);
@@ -127,7 +130,7 @@ public:
 private:
     ///@brief do accept
     void do_accept();
-    
+    void process_next_npu_request();
     ///@brief io context
     net::io_context ioc;
     ///@brief acceptor
@@ -140,11 +143,12 @@ private:
     int port;
     
     // Concurrency configuration
-    size_t max_connections_ = 5;
+    size_t max_connections_ = 10;
     std::chrono::seconds request_timeout_ = std::chrono::seconds(600); // 5 minutes
     size_t io_thread_count_ = 5;
     std::size_t max_body_size_bytes_ = 256ull * 1024 * 1024; // 256 MB default
-    
+    size_t max_npu_queue_ = 10;
+
     // Request tracking
     mutable std::mutex active_requests_mutex_;
     mutable std::unordered_map<std::string, std::shared_ptr<CancellationToken>> active_requests_;
@@ -152,7 +156,8 @@ private:
     // Connection tracking
     std::atomic<size_t> active_connections_{0};
     std::vector<std::thread> io_threads_;
-    
+    std::queue<std::function<void()>> npu_request_queue_;
+    std::mutex npu_queue_mutex_;
     // Friend declaration for HttpSession to access private members
     friend class HttpSession;
 };
@@ -164,7 +169,7 @@ public:
     void start();
     void write_streaming_response(const json& data, bool is_final);
     void close_connection();
-
+    void write_response_from_callback();
 private:
     void read_request();
     void handle_request();
@@ -196,5 +201,5 @@ class model_list;
 ///@param default_tag the default tag
 ///@param port the port to listen on, default is 11434, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port = 11434, int ctx_length = -1);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port = 11434, int ctx_length = -1, bool preemption = false);
 

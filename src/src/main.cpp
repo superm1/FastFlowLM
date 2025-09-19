@@ -2,7 +2,7 @@
 /// \brief Main entry point for the FLM application
 /// \author FastFlowLM Team
 /// \date 2025-08-05
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This is a source file for the main entry point
 #pragma once
 #include "runner.hpp"
@@ -121,7 +121,7 @@ void handle_user_input() {
 ///@param default_tag the default tag
 ///@param port the port to listen on, default is 11434, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length, bool preemption);
 
 
 ///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
@@ -181,6 +181,7 @@ int main(int argc, char* argv[]) {
         std::cout << "FLM v" << __FLM_VERSION__ << std::endl;
         return 0;
     }
+
     
     // Extract parsed values
     std::string command = parsed_args.command;
@@ -189,6 +190,9 @@ int main(int argc, char* argv[]) {
     std::string power_mode = parsed_args.power_mode;
     bool got_power_mode = (power_mode != "performance"); // Check if user explicitly set power mode
     int ctx_length = parsed_args.ctx_length;
+    bool preemption = parsed_args.preemption;
+    size_t max_socket_connections = parsed_args.max_socket_connections;
+    size_t max_npu_queue = parsed_args.max_npu_queue;
 
     // Set process priority to high for better performance
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
@@ -212,6 +216,11 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
+
+    if (preemption){
+        header_print("FLM", "Allowing high priority tasks to preempt FLM!");
+    }
+
     // Get the command, model tag, and force flag
     std::string exe_dir = get_executable_directory();
     std::string config_path = exe_dir + "/model_list.json";
@@ -230,15 +239,16 @@ int main(int argc, char* argv[]) {
         }
 
         if (command == "run") {
-            Runner runner(supported_models, downloader, tag, ctx_length);
+            Runner runner(supported_models, downloader, tag, ctx_length, preemption);
             runner.run();
 
         } else if (command == "serve") {
             // Create the server
             int port = get_server_port();
             auto server = create_lm_server(supported_models, downloader, tag, port, ctx_length);
-            server->set_max_connections(5);           // Allow up to 2000 concurrent connections
+            server->set_max_connections(max_socket_connections);           // Allow up to 10 concurrent connections
             server->set_io_threads(5);          // Allow up to 5 io threads
+            server->set_npu_queue_length(max_npu_queue);           // Allow up to 10 concurrent queue
             server->set_request_timeout(std::chrono::seconds(600)); // 10 minute timeout for long requests
             // Start the server
             header_print("FLM", "Starting server on port " << port << "...");

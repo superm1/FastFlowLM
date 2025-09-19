@@ -4,7 +4,7 @@
 *  \brief Runner implementation for interactive model execution
 *  \author FastFlowLM Team
 *  \date 2025-08-05
-*  \version 0.9.9
+*  \version 0.9.10
 */
 #include "runner.hpp"
 #include <iostream>
@@ -32,13 +32,14 @@ std::map<std::string, runner_cmd_t> cmd_map = {
 /// \param supported_models - the list of supported models
 /// \param downloader - the downloader for the models
 /// \param tag - the tag of the model to load
-Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, int ctx_length)
+Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, int ctx_length, bool preemption)
     : supported_models(supported_models), downloader(downloader), tag(tag) {
     if (ctx_length != -1) {
         this->ctx_length = ctx_length >= 512 ? ctx_length : 512;
     } else {
         this->ctx_length = -1;
     }
+    this->preemption = preemption;
     if (this->auto_chat_engine != nullptr) {
         this->auto_chat_engine.reset();
     }
@@ -49,7 +50,7 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         this->downloader.pull_model(this->tag);
     }
     nlohmann::json model_info = this->supported_models.get_model_info(this->tag);
-    this->auto_chat_engine->load_model(this->supported_models.get_model_path(this->tag), model_info, this->ctx_length);
+    this->auto_chat_engine->load_model(this->supported_models.get_model_path(this->tag), model_info, this->ctx_length, this->preemption);
     this->generate_limit = -1;
 }
 
@@ -271,7 +272,7 @@ void Runner::cmd_load(std::vector<std::string>& input_list) {
     
     nlohmann::json model_info = this->supported_models.get_model_info(this->tag);
     
-    this->auto_chat_engine->load_model(this->supported_models.get_model_path(this->tag), model_info, this->ctx_length);
+    this->auto_chat_engine->load_model(this->supported_models.get_model_path(this->tag), model_info, this->ctx_length, this->preemption);
     this->auto_chat_engine->configure_parameter("system_prompt", this->system_prompt);
 }
 

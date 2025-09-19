@@ -2,12 +2,12 @@
 /// \brief all_models class
 /// \author FastFlowLM Team
 /// \date 2025-09-10
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This is a header file for the all_models class
 #pragma once
 
-#include "modeling_deepseek.hpp"
 #include "modeling_gemma3.hpp"
+#include "modeling_gemma3_text.hpp"
 #include "modeling_llama3.hpp"
 #include "modeling_qwen3.hpp"
 

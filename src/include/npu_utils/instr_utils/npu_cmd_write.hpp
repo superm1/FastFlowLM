@@ -1,8 +1,7 @@
 /// \file npu_cmd_write.hpp
 /// \brief npu write command
-/// \author FastFlowLM Team
-/// \date 2025-06-24
-/// \version 0.9.9
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
 /// \note This is a class for the npu write command
 #pragma once
 
@@ -95,7 +94,7 @@ struct npu_write_cmd : public npu_cmd{
     }
     
     void to_npu(std::vector<uint32_t>& npu_seq){
-        npu_seq.push_back(queue_write);
+        npu_seq.push_back(XAIE_IO_WRITE);
         npu_seq.push_back(0x0);
         if (this->could_be_push_queue){
             this->reg_addr = 0;

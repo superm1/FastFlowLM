@@ -1,8 +1,7 @@
 /// \file npu_cmd_issue_token.hpp
 /// \brief npu issue token command
-/// \author FastFlowLM Team
-/// \date 2025-06-24
-/// \version 0.9.9
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
 /// \note This is a class for the npu issue token command
 #pragma once
 
@@ -24,7 +23,7 @@ struct npu_issue_token_cmd : public npu_cmd{
     uint32_t controller_packet_id;
     uint32_t row, col;
     constexpr static uint32_t op_size = 7;
-    const uint32_t mask = 0x00000f00;
+    const uint32_t mask = 0x00001f00;
 
     void dump_cmd(uint32_t *bd){
         this->row = (bd[2] >> bd_row_shift) & bd_row_mask;
@@ -63,7 +62,7 @@ struct npu_issue_token_cmd : public npu_cmd{
     }
     
     void to_npu(std::vector<uint32_t>& npu_seq){
-        npu_seq.push_back(dma_mask_write);
+        npu_seq.push_back(XAIE_IO_MASKWRITE);
         npu_seq.push_back(0x0);
         npu_seq.push_back(0x1D200 + this->channel_id * 0x08 + 0x10 * this->channel_direction + (this->row << bd_row_shift) + (this->col << bd_col_shift));
         npu_seq.push_back(0x0);

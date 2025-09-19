@@ -2,7 +2,7 @@
 /// \brief model_list class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This class is used to manage the model list.
 #pragma once
 #include "nlohmann/json.hpp"
@@ -12,7 +12,7 @@
 #include <vector>
 #include "utils/utils.hpp"
 
-#define __FLM_VERSION__ "0.9.9"
+#define __FLM_VERSION__ "0.9.10"
 
 /// \note This class is used to manage the model list.
 class model_list {
@@ -160,7 +160,7 @@ class model_list {
             nlohmann::json response = {
                 {"object", "list"},
                 {"data", nlohmann::json::array()},
-                { "object", "list" }
+                {"object", "list" }
             };
 
             std::time_t now = std::time(nullptr);

@@ -1,8 +1,7 @@
 /// \file npu_cmd_ddr.hpp
 /// \brief npu ddr command
-/// \author FastFlowLM Team
-/// \date 2025-06-24
-/// \version 0.9.9
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
 /// \note This is a class for the npu ddr command
 #pragma once
 
@@ -69,7 +68,7 @@ struct npu_ddr_cmd : public npu_cmd{
     }
 
     void to_npu(std::vector<uint32_t>& npu_seq){
-        npu_seq.push_back(dma_ddr_patch_write);
+        npu_seq.push_back(XAIE_IO_CUSTOM_OP_DDR_PATCH);
         npu_seq.push_back(op_size << 2);
         npu_seq.push_back(0x0);
         npu_seq.push_back(0x0);

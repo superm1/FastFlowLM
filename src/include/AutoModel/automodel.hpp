@@ -2,7 +2,7 @@
 /// \brief automodel class
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.6
+/// \version 0.9.10
 /// \note This is a header file for the auto_model class
 #pragma once
 
@@ -106,7 +106,8 @@ protected:
 	bool is_model_loaded = false;
 	std::string current_model;
 	std::vector<int> token_history;
-	std::unique_ptr<npu_manager> npu = nullptr;
+	std::unique_ptr<npu_xclbin_manager> npu = nullptr;
+	bool enable_preemption = false;
 
 	uint32_t MAX_L = 0;
 	int device_id = 0;
@@ -140,7 +141,7 @@ protected:
 	std::vector<profiler> profiler_list;
 	time_utils::time_with_unit last_prefill_time;
 
-	void _shared_load_model(std::string model_path, json model_info, int default_context_length = -1);
+	void _shared_load_model(std::string model_path, json model_info, int default_context_length = -1, bool enable_preemption = false);
 	nlohmann::json _shared_setup_tokenizer(std::string model_path);
 
 	bool _shared_insert(chat_meta_info_t& meta_info, std::vector<int>& tokens, void* payload = nullptr);
@@ -250,7 +251,7 @@ public:
 
 	//************ Unique for each model *************/
 	
-	virtual void load_model(std::string model_path, json model_info, int default_context_length = -1) {}
+	virtual void load_model(std::string model_path, json model_info, int default_context_length = -1, bool enable_preemption = false) {}
 	virtual std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os) = 0;
 
 	/// \brief Insert the tokens

@@ -4,7 +4,7 @@
  * \brief WebServer class and related declarations
  * \author FastFlowLM Team
  * \date 2025-06-24
- * \version 0.9.9
+ * \version 0.9.10
  */
 #include "server.hpp"
 #include "rest_handler.hpp"
@@ -299,12 +299,12 @@ void HttpSession::handle_request() {
     
     
     // Handle the request through the server
-    server_.handle_request(req_, res_, socket_, shared_from_this());
+    bool deferred = server_.handle_request(req_, res_, socket_, shared_from_this());
     
     // Clear the buffer after processing to prevent data accumulation
     buffer_.consume(buffer_.size());
     
-    if (!is_streaming_) {
+    if (!is_streaming_ && !deferred) {
         write_response();
     } else {
         // For streaming responses, we need to handle connection cleanup differently
@@ -353,6 +353,13 @@ void HttpSession::write_response() {
         });
 }
 
+///@brief write response from callback (for queued requests)
+void HttpSession::write_response_from_callback() {
+    // This function is called by the send_response lambda
+    // when a queued request is finally processed.
+    write_response();
+}
+
 ///@brief write streaming response
 ///@param data the data
 ///@param is_final the is final
@@ -369,6 +376,7 @@ void HttpSession::write_streaming_response(const json& data, bool is_final) {
         // Send headers immediately using raw socket write
         std::string headers = "HTTP/1.1 200 OK\r\n";
         headers += "Content-Type: text/event-stream\r\n";
+        //headers += "Content-Type: application/x-ndjson\r\n";
         headers += "Cache-Control: no-cache\r\n";
         headers += "Connection: keep-alive\r\n";
         headers += "Transfer-Encoding: chunked\r\n";
@@ -425,21 +433,24 @@ void HttpSession::send_chunk_data(const json& data, bool is_final) {
         // Send final chunk (0-length chunk to end stream)
         std::string final_chunk = "0\r\n\r\n";
         net::write(socket_, net::buffer(final_chunk), ec);
-        
-        if (!req_.keep_alive()) {
-            header_print("🔒 ", "Closing TCP connection (streaming, non-keep-alive)");
-            socket_.shutdown(tcp::socket::shutdown_both, ec);
-            // Decrement connection counter for non-keep-alive connections
-            server_.active_connections_.fetch_sub(1);
-        } else {
-            header_print("🔗 ", "Keeping TCP connection alive for next request (streaming)");
-            // Clear the buffer before reading the next request
-            buffer_.consume(buffer_.size());
-            // Clear the request object before reading the next request
-            req_ = {};
-            // For keep-alive connections, read the next request
-            read_request();
-        }
+        header_print("🔒 ", "Closing TCP connection (streaming, non-keep-alive)");
+        socket_.shutdown(tcp::socket::shutdown_both, ec);
+        // Decrement connection counter for non-keep-alive connections
+        server_.active_connections_.fetch_sub(1);
+        //if (!req_.keep_alive()) {
+        //    header_print("🔒 ", "Closing TCP connection (streaming, non-keep-alive)");
+        //    socket_.shutdown(tcp::socket::shutdown_both, ec);
+        //    // Decrement connection counter for non-keep-alive connections
+        //    server_.active_connections_.fetch_sub(1);
+        //} else {
+        //    header_print("🔗 ", "Keeping TCP connection alive for next request (streaming)");
+        //    // Clear the buffer before reading the next request
+        //    buffer_.consume(buffer_.size());
+        //    // Clear the request object before reading the next request
+        //    req_ = {};
+        //    // For keep-alive connections, read the next request
+        //    read_request();
+        //}
     }
 }
 
@@ -548,15 +559,44 @@ void WebServer::do_accept() {
         });
 }
 
+///@brief process_next_npu_request Handles one queued NPU task at a time
+void WebServer::process_next_npu_request() {
+    // Lock the queue to check it
+    std::lock_guard<std::mutex> lock(npu_queue_mutex_);
+
+    if (npu_request_queue_.empty()) {
+        return; // Queue is empty, NPU is free
+    }
+
+    // Queue is not empty. Try to acquire the NPU lock.
+    if (NPUAccessManager::try_acquire_npu_access()) {
+        // Got the NPU lock! Pop the next task and post it to the io_context.
+        auto task = npu_request_queue_.front();
+        npu_request_queue_.pop();
+
+        header_print("🟢 ", "Dequeuing NPU request (" + std::to_string(npu_request_queue_.size()) + " remaining)...");
+
+        // Post the task to be executed by the io_context
+        net::post(ioc, task);
+    }
+    else {
+        // NPU is still busy. This can happen if a new request
+        // acquired the lock between release() and this call.
+        // That's fine. The request *currently* using the NPU
+        // will call this function again when it finishes.
+    }
+}
+
 ///@brief handle request
 ///@param req the request
 ///@param res the response
 ///@param socket the socket
 ///@param session the session
-void WebServer::handle_request(http::request<http::string_body>& req,
-                              http::response<http::string_body>& res,
-                              tcp::socket& socket,
-                              std::shared_ptr<HttpSession> session) {
+///@return true if the response is deferred (queued), false otherwise
+bool WebServer::handle_request(http::request<http::string_body>& req,
+    http::response<http::string_body>& res,
+    tcp::socket& socket,
+    std::shared_ptr<HttpSession> session) {
     // Log request details
     std::cout << "================================================" << std::endl;
     header_print("⬇️ ", "Incoming Request: " << req.method_string());
@@ -564,109 +604,148 @@ void WebServer::handle_request(http::request<http::string_body>& req,
     header_print("LOG", "Target: " << req.target());
     header_print("LOG", "Version: " << req.version());
     header_print("LOG", "Keep-Alive: " << req.keep_alive());
-    json request_json;
+    json request_json_log;
     try {
         if (!req.body().empty()) {
-            request_json = json::parse(req.body());
+            request_json_log = json::parse(req.body());
         }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         header_print("LOG", "Error parsing request body: " + std::string(e.what()));
     }
-    brief_print_message_request(request_json);
-    // std::cout << "request_json: " << request_json.dump(4) << std::endl;
+    brief_print_message_request(request_json_log);
 
+    // Route lookup
     std::string key = std::string(req.method_string()) + " " + std::string(req.target());
-
     auto it = routes.find(key);
-    if (it != routes.end()) {
-        // Check if this endpoint requires NPU access
-        bool needs_npu = requires_npu_access(std::string(req.method_string()), std::string(req.target()));
-        
+    if (it == routes.end()) {
+        // No route: respond 404 synchronously.
+        res.result(http::status::not_found);
+        res.body() = json{ {"error", "Not Found"} }.dump();
+        res.set(http::field::content_type, "application/json");
+        res.prepare_payload();
+        return false; 
+    }
+
+    // Decide if this handler needs exclusive NPU access.
+    bool needs_npu = requires_npu_access(std::string(req.method_string()), std::string(req.target()));
+
+    // Define a task lambda with is_deferred flag
+    auto process_task = [this, it, &req, &res, session, needs_npu, key](bool is_deferred) {
+
         if (needs_npu) {
-            // Try to acquire NPU access using the shared manager
-            if (!NPUAccessManager::try_acquire_npu_access()) {
-                // NPU is currently in use by another request
-                res.result(http::status::service_unavailable);
-                res.body() = json{{"error", "NPU is currently in use by another request. Please try again later."}}.dump();
-                res.set(http::field::content_type, "application/json");
-                res.prepare_payload();
-                header_print("🚫 ", "NPU access denied for request: " + key);
-                return;
-            }
-            
             header_print("🟢 ", "NPU access granted for request: " + key);
         }
-        
+
         // Parse JSON request body
         json request_json;
         try {
             if (!req.body().empty()) {
                 request_json = json::parse(req.body());
             }
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e) {
             res.result(http::status::bad_request);
-            res.body() = json{{"error", "Invalid JSON"}}.dump();
+            res.body() = json{ {"error", "Invalid JSON"} }.dump();
             res.set(http::field::content_type, "application/json");
             res.prepare_payload();
+
+            // Only write from callback when deferred
+            if (is_deferred && session) session->write_response_from_callback();
+
+            if (needs_npu) {
+                NPUAccessManager::release_npu_access();
+                header_print("🔵 ", "NPU access released (JSON parse error)");
+                this->process_next_npu_request();
+            }
             return;
         }
-        
-        // Create cancellation token for this request
+
         auto cancellation_token = std::make_shared<CancellationToken>(session);
-        
-        // Extract request_id for tracking (generate one if not provided)
+
         std::string request_id;
         if (request_json.contains("request_id")) {
             request_id = request_json["request_id"];
-        } else {
-            // Generate a unique request ID
-            static std::atomic<int> counter{0};
+        }
+        else {
+            static std::atomic<int> counter{ 0 };
             request_id = "req_" + std::to_string(counter.fetch_add(1));
         }
-        
-        // Register the request for potential cancellation
+
         register_active_request(request_id, cancellation_token);
-        
-        // Create response callback that unregisters the request when done
-        auto send_response = [&res, this, request_id, needs_npu](const json& response_data) {
+
+        // catch is_deferred 
+        auto send_response = [&res, session, this, request_id, needs_npu, is_deferred](const json& response_data) {
             res.result(http::status::ok);
             res.body() = response_data.dump();
             res.set(http::field::content_type, "application/json");
             res.prepare_payload();
             unregister_active_request(request_id);
-            
-            // Release NPU access if this was an NPU-intensive request
+
             if (needs_npu) {
                 NPUAccessManager::release_npu_access();
                 header_print("🔵 ", "NPU access released for request: " + request_id);
+                this->process_next_npu_request();
             }
-        };
-        
-        // Create streaming response callback that uses the session
+
+            if (is_deferred && session) {
+                session->write_response_from_callback();
+            }
+            };
+
         auto send_streaming_response = [session, this, request_id, needs_npu](const json& data, bool is_final) {
             if (session) {
                 session->write_streaming_response(data, is_final);
             }
             if (is_final) {
                 unregister_active_request(request_id);
-                
-                // Release NPU access if this was an NPU-intensive request
+
                 if (needs_npu) {
                     NPUAccessManager::release_npu_access();
                     header_print("🔵 ", "NPU access released for streaming request: " + request_id);
+                    this->process_next_npu_request();
                 }
             }
-        };
-        
-        // Call the handler with the session and cancellation token
+            };
+
         it->second(req, send_response, send_streaming_response, session, cancellation_token);
-    } else {
-        res.result(http::status::not_found);
-        res.body() = json{{"error", "Not Found"}}.dump();
-        res.set(http::field::content_type, "application/json");
+        }; // --- End of process_task lambda ---
+
+
+    // --- Logic to run or queue the task ---
+
+    if (!needs_npu) {
+        process_task(false); //  return false
+        return false;
     }
-    
-    res.prepare_payload();
+
+    if (NPUAccessManager::try_acquire_npu_access()) {
+        process_task(false); //  return false
+        return false;
+    }
+
+    //const int NPU_QUEUE_LIMIT = 10;
+    std::lock_guard<std::mutex> lock(npu_queue_mutex_);
+
+    if (npu_request_queue_.size() >= max_npu_queue_) {
+        res.result(http::status::service_unavailable);
+        res.body() = json{
+            {"error", "NPU is in use and request queue is full (limit: " + std::to_string(max_npu_queue_) + "). Please try again later."}
+        }.dump();
+        res.set(http::field::content_type, "application/json");
+        res.prepare_payload();
+        header_print("🚫 ", "NPU busy and queue full, request denied: " + key);
+        return false;
+    }
+    else {
+        // Create a new lambda to bind process_task(true)
+        npu_request_queue_.push([this, process_task]() {
+            process_task(true);
+            });
+        header_print("🕒 ", "NPU busy, request queued (" + std::to_string(npu_request_queue_.size()) + "/" + std::to_string(max_npu_queue_) + "): " + key);
+
+        return true;
+    }
 }
 
 ///@brief create lm server
@@ -675,7 +754,7 @@ void WebServer::handle_request(http::request<http::string_body>& req,
 ///@param default_tag the default tag
 ///@param port the port
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length) {
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length, bool preemption) {
     auto server = std::make_unique<WebServer>(port);
     auto rest_handler = std::make_shared<RestHandler>(models, downloader, default_tag, ctx_length);
     

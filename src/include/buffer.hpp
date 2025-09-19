@@ -2,7 +2,7 @@
 /// \brief Buffer and bytes class for memory management
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This class is used to manage the memory.
 #pragma once
 #include <cstdint>
@@ -21,6 +21,7 @@
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_kernel.h"
 #include "xrt/xrt_device.h"
+#include "xrt/experimental/xrt_ext.h"
 #endif
 
 #include "utils/debug_utils.hpp"
@@ -108,15 +109,14 @@ public:
     /// \param kernel the kernel
     /// \param group_id the group id
     /// \param flags the flags
-    bytes(size_t size, xrt::device& device, xrt::kernel& kernel, int group_id, xrtBufferFlags flags = XRT_BO_FLAGS_HOST_ONLY)
+    bytes(xrt::device& device, size_t size)
         : owned_data_(nullptr), size_(size), is_owner_(false), is_bo_owner_(true)
     {
         int padded_size = (size + 4095) / 4096 * 4096; // 4K alignment
-        if (flags == XRT_BO_FLAGS_HOST_ONLY){
-            owned_bo_ = std::make_unique<xrt::bo>(device, padded_size, flags, kernel.group_id(group_id));
-        } else {
-            owned_bo_ = std::make_unique<xrt::bo>(device, size, flags, kernel.group_id(group_id));
+        if (padded_size < 512 * 1024){
+            padded_size = 512 * 1024;
         }
+        owned_bo_ = std::make_unique<xrt::ext::bo>(device, padded_size);
         data_ = owned_bo_->map<uint8_t*>();
         bo_ = owned_bo_.get();
     }
@@ -329,8 +329,8 @@ public:
     /// \param kernel the kernel
     /// \param group_id the group id
     /// \param flags the flags
-    buffer(size_t count, xrt::device& device, xrt::kernel& kernel, int group_id, xrtBufferFlags flags = XRT_BO_FLAGS_HOST_ONLY)
-        : bytes(count * sizeof(T), device, kernel, group_id, flags) {}
+    buffer(xrt::device& device, size_t count)
+        : bytes(device, count * sizeof(T)) {}
 #endif
 
     /// \brief constructor

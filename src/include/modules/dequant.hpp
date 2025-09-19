@@ -2,11 +2,11 @@
 /// \brief dequant class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.9
+/// \version 0.9.10
 /// \note This is a header file for the dequant class
 #pragma once
 #include "lm_config.hpp"
-#include "npu_utils/npu_utils.hpp"
+#include "npu_utils/npu_instr_utils.hpp"
 
 /// \brief dequant class
 /// \note This is a class for the dequant layer
@@ -27,13 +27,6 @@ public:
     /// \param D_out the output dimension
     /// \param weight_offset the weight offset
     void generate_seq(npu_sequence* seq, const uint32_t D_in, const uint32_t D_out, const uint32_t weight_offset);
-
-    /// \brief get q_group_id
-    /// \return the q group id
-    int q_id();
-    /// \brief get qw_group_id
-    /// \return the qw group id
-    int qw_id();
 
 private:
     struct Impl;

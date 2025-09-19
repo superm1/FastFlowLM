@@ -1,3 +1,8 @@
+/// \file npu_cmd.hpp
+/// \brief npu command
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
+/// \note This is a class for the npu command, it is a virtual class for all npu commands
 #ifndef __NPU_CMD_HPP__
 #define __NPU_CMD_HPP__
 
@@ -15,12 +20,32 @@
 
 const int INSTR_PRINT_WIDTH = 80;
 
-typedef enum: uint32_t{
-    queue_write = 0x00,
-    dma_block_write = 0x01,
-    dma_mask_write = 0x03,
-    dma_sync_write = 0x80,
-    dma_ddr_patch_write = 0x81,
+typedef enum : uint32_t {
+	XAIE_IO_WRITE,
+	XAIE_IO_BLOCKWRITE,
+	XAIE_IO_BLOCKSET,
+	XAIE_IO_MASKWRITE,
+	XAIE_IO_MASKPOLL,
+	XAIE_IO_NOOP,
+	XAIE_IO_PREEMPT,
+	XAIE_IO_MASKPOLL_BUSY,
+	XAIE_IO_LOADPDI,
+	XAIE_IO_LOAD_PM_START,
+	XAIE_IO_CREATE_SCRATCHPAD,
+	XAIE_IO_UPDATE_STATE_TABLE,
+	XAIE_IO_UPDATE_REG,
+	XAIE_IO_UPDATE_SCRATCH,
+	XAIE_CONFIG_SHIMDMA_BD,
+	XAIE_CONFIG_SHIMDMA_DMABUF_BD,
+	XAIE_IO_CUSTOM_OP_BEGIN = 1U<<7U, // 0x80
+	XAIE_IO_CUSTOM_OP_TCT = XAIE_IO_CUSTOM_OP_BEGIN, // still 0x80
+	XAIE_IO_CUSTOM_OP_DDR_PATCH, // Previously this was XAIE_IO_CUSTOM_OP_BEGIN + 1, 0x81
+	XAIE_IO_CUSTOM_OP_READ_REGS, // Previously this was XAIE_IO_CUSTOM_OP_BEGIN + 2
+	XAIE_IO_CUSTOM_OP_RECORD_TIMER, // Previously this was XAIE_IO_CUSTOM_OP_BEGIN + 3
+	XAIE_IO_CUSTOM_OP_MERGE_SYNC, // Previously this was XAIE_IO_CUSTOM_OP_BEGIN + 4
+	XAIE_IO_CUSTOM_OP_NEXT,
+	XAIE_IO_LOAD_PM_END_INTERNAL = 200,
+	XAIE_IO_CUSTOM_OP_MAX = UCHAR_MAX,
 } op_headers;
 
 

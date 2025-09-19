@@ -4,7 +4,7 @@
  * \brief RestHandler class and related declarations
  * \author FastFlowLM Team
  * \date 2025-08-05
- * \version 0.9.9
+ * \version 0.9.10
  */
 #include "rest_handler.hpp"
 #include "wstream_buf.hpp"
@@ -24,8 +24,8 @@
 ///@param downloader the downloader
 ///@param default_tag the default tag
 ///@return the rest handler
-RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int ctx_length)
-    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""){
+RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int ctx_length, bool preemption)
+    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""), preemption(preemption){
 
     if (ctx_length != -1) {
         this->ctx_length = ctx_length >= 512 ? ctx_length : 512;
@@ -56,7 +56,7 @@ void RestHandler::ensure_model_loaded(const std::string& model_tag) {
         auto_chat_engine = std::move(auto_model.second);
         ensure_tag = auto_model.first;
         nlohmann::json model_info = supported_models.get_model_info(ensure_tag);
-        auto_chat_engine->load_model(supported_models.get_model_path(ensure_tag), model_info, ctx_length);
+        auto_chat_engine->load_model(supported_models.get_model_path(ensure_tag), model_info, ctx_length, preemption);
         current_model_tag = ensure_tag;
     }
 }

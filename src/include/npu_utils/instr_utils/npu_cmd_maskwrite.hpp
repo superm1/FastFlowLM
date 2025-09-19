@@ -1,3 +1,8 @@
+/// \file npu_cmd_maskwrite.hpp
+/// \brief npu maskwrite command
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
+/// \note This is a class for the npu maskwrite command
 #ifndef __NPU_CMD_MASKWRITE_HPP__
 #define __NPU_CMD_MASKWRITE_HPP__
 
@@ -47,7 +52,7 @@ struct npu_maskwrite_cmd : public npu_cmd{
     }
     
     void to_npu(std::vector<uint32_t>& npu_seq){
-        npu_seq.push_back(dma_mask_write);
+        npu_seq.push_back(XAIE_IO_MASKWRITE);
         npu_seq.push_back(0x0);
         npu_seq.push_back((this->addr&0xFFFFF)  | (this->row << bd_row_shift) + (this->col << bd_col_shift));
         npu_seq.push_back(0x0);

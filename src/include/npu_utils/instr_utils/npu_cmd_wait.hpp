@@ -1,8 +1,7 @@
 /// \file npu_cmd_wait.hpp
 /// \brief npu wait command
-/// \author FastFlowLM Team
-/// \date 2025-06-24
-/// \version 0.9.9
+/// \author FastFlowLM Team, Alfred
+/// \date 2025-09-09
 /// \note This is a class for the npu wait command
 #pragma once
 
@@ -55,7 +54,7 @@ struct npu_wait_cmd : public npu_cmd{
     }
 
     void to_npu(std::vector<uint32_t>& npu_seq){
-        npu_seq.push_back(dma_sync_write);
+        npu_seq.push_back(XAIE_IO_CUSTOM_OP_TCT);
         npu_seq.push_back(this->op_size << 2);
         npu_seq.push_back((this->wait_row << wait_sync_row_shift) | (this->wait_col << wait_sync_col_shift) | (this->channel_direction << wait_sync_direction_shift));
         npu_seq.push_back((this->wait_channel << wait_sync_channel_shift) | 0x10100);
