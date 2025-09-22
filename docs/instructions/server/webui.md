@@ -10,7 +10,7 @@ parent: Local Server (Server Mode)
 - **[🧪 More Examples](#-more-examples)**
   - [ Example: Multi Models Comparision Enabled by FLM Queuing](#-example-multi-models-comparision-enabled-by-flm-queuing)  
   - [ Example: Agentic AI Web Search with FastFlowLM](#-example-agentic-ai-web-search-with-fastflowlm)  
-  - [ Local Private Database with RAG + FastFlowLM](#️-example-local-private-database-with-rag--fastflowlm)
+  - [ Example: Local Private Database with RAG + FastFlowLM](#️-example-local-private-database-with-rag--fastflowlm)
   
 ---
 
