@@ -181,6 +181,8 @@ Well done 🎉 — now let’s explore more apps together!
 
 A step-by-step guide to launching FastFlowLM and interacting with multiple models via Open WebUI.
 
+[🎬 Watch the Teaser Video](https://www.youtube.com/watch?v=vUyt2MZFDm0)
+
 ---
 
 ### 🌐 Step 1: Run Open WebUI with FastFlowLM
@@ -229,6 +231,8 @@ After receiving replies from multiple models, choose how you'd like to continue:
 
 Step-by-step guide to powering Agentic AI web search in Open WebUI — NPU-only, lightning-fast, with Google PSE + FLM.
 
+[🎬 Watch the Teaser Video](https://www.youtube.com/watch?v=wHO8ektTlik)
+
 ---
 
 ### 🛠️ Step 1: Set Up Google PSE
@@ -273,7 +277,7 @@ With your **API Key** and **Search Engine ID** from Step 1, follow these steps:
 
 ### 💬 Step 4: Start Using Web Search
 
-1. Start a new chat and select your preferred model (e.g., qwen3-tk:4b).
+1. Start a new chat and select your preferred model (e.g., qwen3-it:4b).
 > ⚠️ **Note:** not all models handle web search well.
 2. Under the chat input box, Click `integrations`, and toggle **Web Search** to activate it .
 - 🔄 You’ll need to activate this **every time you start a new chat**. 
