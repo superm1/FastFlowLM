@@ -8,9 +8,9 @@ parent: Local Server (Server Mode)
 
 - **[🧩 Run Open WebUI with FastFlowLM](#-run-open-webui-with-fastflowlm)**
 - **[🧪 More Examples](#-more-examples)**
-  - [Example: Multi Models Comparision Enabled by FLM Queuing](#-example-multi-models-comparision-enabled-by-flm-queuing)
-  - [Example: Web Search Integration](#-example-web-search-integration)
-
+  - [ Example: Multi Models Comparision Enabled by FLM Queuing](#-example-multi-models-comparision-enabled-by-flm-queuing)  
+  - [ Example: Agentic AI Web Search with FastFlowLM](#-example-agentic-ai-web-search-with-fastflowlm)  
+  - [ Local Private Database with RAG + FastFlowLM](#️-local-private-database-with-rag--fastflowlm)
 ---
 
 # 🧩 Run Open WebUI with FastFlowLM
@@ -19,7 +19,7 @@ This guide walks you through using `docker-compose.yaml` to run Open WebUI conne
 
 ---
 
-## ✅ Prerequisites
+### ✅ Prerequisites
 
 1. [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop)
    - During installation, enable **WSL2 backend**
@@ -29,7 +29,7 @@ This guide walks you through using `docker-compose.yaml` to run Open WebUI conne
 
 ---
 
-## 📁 Step 1: Create Project Folder
+### 📁 Step 1: Create Project Folder
 
 Open PowerShell and run:
 
@@ -41,7 +41,7 @@ This creates a clean workspace for your Docker setup.
 
 ---
 
-## 📝 Step 2: Create `docker-compose.yaml`
+### 📝 Step 2: Create `docker-compose.yaml`
 
 Launch Notepad:
 
@@ -83,7 +83,7 @@ volumes:
 
 ---
 
-## ▶️ Step 3: Launch the Open WebUI Container (in PowerShell)
+### ▶️ Step 3: Launch the Open WebUI Container (in PowerShell)
 
 ```powershell
 docker compose up -d
@@ -99,7 +99,7 @@ docker logs -f open-webui
 
 ---
 
-## 🌐 Step 4: Access the WebUI (in Browser)
+### 🌐 Step 4: Access the WebUI (in Browser)
 
 Open browser and go to:  
 **http://localhost:3000**
@@ -108,7 +108,7 @@ You should now see the Open WebUI interface.
 
 ---
 
-## 🧪 Step 5: Serve FastFlowLM with Model
+### 🧪 Step 5: Serve FastFlowLM with Model
 
 ```powershell
 flm serve llama3.2:1b
@@ -119,7 +119,7 @@ You can now use `FastFlowLM` directly in Open WebUI.
 
 ---
 
-## 🧼 Step 6: Stop or Clean Up (in PowerShell)
+### 🧼 Step 6: Stop or Clean Up (in PowerShell)
 
 ```powershell
 docker compose stop
@@ -143,7 +143,7 @@ This removes the container and persistent volume data.
 
 ---
 
-## 🧼 Step 7: Update Open WebUI
+### 🧼 Step 7: Update Open WebUI
 
 ```powershell
 docker compose pull
@@ -151,7 +151,7 @@ docker compose pull
 
 ---
 
-## 🧠 Notes
+### 🧠 Notes
 
 - Want login? Set `WEBUI_AUTH=true`
 - You must keep FastFlowLM server running
@@ -224,7 +224,7 @@ After receiving replies from multiple models, choose how you'd like to continue:
 
 ---
 
-## 🌐 Example: Web Search Integration
+## 🌐 Example: Agentic AI Web Search with FastFlowLM
 
 Step-by-step guide to powering Agentic AI web search in Open WebUI — NPU-only, lightning-fast, with Google PSE + FLM.
 
@@ -250,7 +250,7 @@ Step-by-step guide to powering Agentic AI web search in Open WebUI — NPU-only,
 
 ### 🌐 Step 2: Run Open WebUI with FastFlowLM
 
-Follow the quick setup guide **[here](#-example-multi-models-comparison-enabled-by-flm-queuing-v0910-or-beyond)**.
+Follow the quick setup guide **[here](#-run-open-webui-with-fastflowlm)**.
 
 ---
 ### 🧩 Step 3: Enable Web Search in Open WebUI
@@ -277,5 +277,64 @@ With your **API Key** and **Search Engine ID** from Step 1, follow these steps:
 2. Under the chat input box, Click `integrations`, and toggle **Web Search** to activate it .
 - 🔄 You’ll need to activate this **every time you start a new chat**. 
 3. Ask anything you're curious about—real-time search will enhance your answers!
+
+---
+
+## 🗄️ Local Private Database with RAG + FastFlowLM  
+
+This example walks you through setting up a **local, private knowledge base** using **Retrieval-Augmented Generation (RAG)** powered by FastFlowLM.  
+
+RAG combines two steps:  
+1. **Retrieval** – fetch the most relevant information from your knowledge base (e.g., `.md` docs).  
+2. **Generation** – use an AI model to create accurate, context-aware answers based on that retrieved data.  
+
+In this example, the knowledge base is the **Open WebUI documentation**. With FastFlowLM running on the **NPU**, you get fast, efficient, and secure responses — all without sending your data to the cloud.  
+
+### 📝 Step 1: Download the Documentation
+
+1. Download the latest `Open WebUI` **[documentation](https://github.com/open-webui/docs/archive/refs/heads/main.zip)**.
+2. Extract the `docs-main.zip` file to get all documentation files.
+3. In the extracted folder, locate all files with `.md` and `.mdx`extensions (tip: `Ctrl+F` and search for `*.md*`).
+
+---
+
+### 🌐 Step 2: Run Open WebUI with FastFlowLM 
+
+Follow the quick setup at **[here](#-run-open-webui-with-fastflowlm)**.
+
+---
+### 🧠 Step 3: Create a Knowledge Bases
+
+1. In Open WebUI,from the **top-left** menu, navigate to **Workspace** > **Knowledge** (top bar) > Click `+` symbol on the right side to **Create a Knowledge Base**.
+2. Enter `What are you working on?` → `Open WebUI Documentation`
+3. Enter `What are you trying to achieve?`→ `Assistance`.
+4. Click on **`Create Knowledge`**.
+5. In the extracted folder, press `Ctrl+A`, then drag and drop the `.md` and `.mdx` files from the extracted folder into the `Open WebUI Documentation` knowledge base. (159 files in total as of 09/22/2025)
+
+---
+
+### 🧩 Step 4: Create and Configure the Model
+
+1. Go to **left-top** menu, navigate to **Workspace** > **Models** (top bar) > Click `+` symbol on the right side to **Add New Model**
+2. Configure the Model:
+	- **Model Name**: Enter a name, e.g. `FLM_RAG`
+	- **Base Model**: Choose from the available list, e.g., gemma3:4b
+	- **Knowledge**: Select `Open WebUI Documentation` from the dropdown
+	- **Capabilities**: Check the options you need (e.g. enable **citation** to show sources)
+3. Save  & Create.
+
+---
+
+### 💬 Step 5: Examples and Usage
+
+1. Start a New Chat:
+    - Navigate to **New Chat** and select the `FLM_RAG` model.
+2. Example Queries:
+
+🧑 User: "Introduce Open WebUI."  
+🤖 Assistant: *Based on the knowledge base `Open WebUI Documentation`, here’s an introduction...*  
+
+🧑 User: "How to use Open WebUI with Docker?"  
+🤖 Assistant: *Here are the steps from the knowledge base `Open WebUI Documentation`...*  
 
 ---
