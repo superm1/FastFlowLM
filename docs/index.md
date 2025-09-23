@@ -6,7 +6,13 @@ has_children: false
 
 # ⚡ FastFlowLM (FLM)
 
-**FLM** is the only **NPU-first runtime** built for AMD Ryzen™ AI. Run **LLMs (now with Vision support) ** in minutes — **no GPU needed**. Get **faster performance**, **10× more power-efficient**, and **context lengths up to 256k tokens**. Think **Ollama — but laser-optimized for NPUs**. From *idle silicon* to *instant power* — **FastFlowLM makes Ryzen™ AI shine.**
+**FLM** is the only **NPU-first runtime** built for AMD Ryzen™ AI.  
+
+Run **LLMs — now with Vision support — in minutes**: **no GPU required**, **over 10× more power-efficient**, and with **context lengths up to 256k tokens**.  
+
+Think **Ollama — but laser-optimized for NPUs**.  
+
+From *idle silicon* to *instant power* — **FastFlowLM makes Ryzen™ AI shine.**
 
 ---
 
