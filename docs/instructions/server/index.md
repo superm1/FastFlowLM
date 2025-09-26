@@ -9,7 +9,7 @@ has_children: true
 
 ## Activate "Server Mode" 
 
-simply open PowerShell and enter:
+Open PowerShell and enter:
 
 ```bash
 flm serve llama3.2:1b

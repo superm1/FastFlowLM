@@ -9,7 +9,7 @@ nav_order: 3
 This section reports the performance on NPU with FastFlowLM (FLM).
 
 > **Note:** 
-- Results are based on FastFlowLM v0.9.8.
+- Results are based on FastFlowLM v0.9.11.
 - Under FLM's default NPU power mode (Performance)  
 - Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM. 
 - Newer versions may deliver improved performance. 
