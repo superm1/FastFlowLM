@@ -67,6 +67,12 @@ flm serve llama3.2:1b
 
 ---
 
+## 📰 In the News
+
+- 10/01/2025 🎉 FLM was integrated into AMD's **[Lemonade Server 🍋](https://lemonade-server.ai/)**. Watch this **[short demo](https://www.youtube.com/watch?v=w0Tb3h4WUnE)** about using FLM in Lemonade.
+
+---
+
 ## 🧠 Local AI on NPU
 
 FLM makes it easy to run cutting-edge **LLMs** (and now **VLMs**) locally with:
@@ -109,4 +115,4 @@ For commercial use or licensing inquiries, email us: info@fastflowlm.com
 - Inspired by the widely adopted [Ollama](https://github.com/ollama/ollama)
 - Tokenization accelerated with [MLC-ai/tokenizers-cpp](https://github.com/mlc-ai/tokenizers-cpp)
 - Chat formatting via [Google/minja](https://github.com/google/minja)
-- Low-level kernels optimized using the powerful [IRON](https://github.com/Xilinx/mlir-aie/tree/main/programming_guide)+[AIE-MLIR](https://github.com/Xilinx/mlir-aie/tree/main/mlir_tutorials)
+- Low-level kernels optimized using the powerful [IRON](https://github.com/Xilinx/mlir-aie/tree/main/programming_guide)+[AIE-MLIR](https://github.com/Xilinx/mlir-aie/tree/main)
