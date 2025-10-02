@@ -62,6 +62,38 @@ Display all available models and locally downloaded models:
 flm list
 ```
 
+Filters flag:
+
+```powershell
+# Show everything
+flm list --filter all
+
+# Only models already installed
+flm list --filter installed
+
+# Only models not yet installed
+flm list --filter not-installed
+```
+
+Quiet mode:
+
+```powershell
+# Default view (pretty, with icons)
+flm list
+
+# Quiet view (no emoji / minimal)
+flm list --quiet
+
+# Show everything
+flm list --filter all --quiet
+
+# Only models already installed
+flm list --filter installed --quiet
+
+# Only models not yet installed
+flm list --filter not-installed --quiet
+```
+
 ---
 
 ### ❌ Remove a Downloaded Model
@@ -143,6 +175,26 @@ Set a custom port at launch:
   ```
 
 > ⚠️ `--port` (`-p`) only affects the **current run**; it won’t change the default port.
+
+---
+
+### 🌐 Cross-Origin Resource Sharing (CORS)
+
+CORS lets browser apps hosted on a different origin call your FLM server safely.
+
+- Enable CORS
+
+```powershell
+flm serve --cors 1
+```
+- Disable CORS
+
+```powershell
+flm serve --cors 0
+```
+
+> ⚠️ **Default:** CORS is **enabled**.  
+> 🔒 **Security tip:** Disable CORS (or restrict at your proxy) if your server is exposed beyond localhost.
 
 ---
 

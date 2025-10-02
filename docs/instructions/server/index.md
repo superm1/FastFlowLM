@@ -15,7 +15,7 @@ Open PowerShell and enter:
 flm serve llama3.2:1b
 ```
 
-You can choose to change the server port (default is 11434) by going to **System Properties** → **Environment Variables**, then modifying the value of `FLM_SERVE_PORT`.
+You can choose to change the server port (default is 52625) by going to **System Properties** → **Environment Variables**, then modifying the value of `FLM_SERVE_PORT`.
 
 > ⚠️ **Be cautious**: If you update this value, be sure to change any higher-level port settings in your application as well to ensure everything works correctly.
 
@@ -79,3 +79,21 @@ To change it at launch, in PowerShell, run:
 ```powershell
 flm serve llama3.2:1b --socket 20
 ```
+
+### Cross-Origin Resource Sharing (CORS)
+
+CORS lets browser apps hosted on a different origin call your FLM server safely.
+
+- Enable CORS
+
+```powershell
+flm serve --cors 1
+```
+- Disable CORS
+
+```powershell
+flm serve --cors 0
+```
+
+> ⚠️ **Default:** CORS is **enabled**.  
+> 🔒 **Security tip:** Disable CORS (or restrict at your proxy) if your server is exposed beyond localhost.
