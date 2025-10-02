@@ -1,5 +1,5 @@
 ---
-title: GPT-OSS
+title: GPT-oss
 nav_order: 6
 parent: Models
 ---
@@ -9,7 +9,7 @@ parent: Models
 - **Type:** Text-to-Text
 - **Think:** Low / Medium / High intensity (reasoning effort) 
 - **Base Model:** [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b)
-- **Max Context Length:** 256k tokens 
+- **Max Context Length:** 128k tokens 
 - **Default Context Length:** 8192 tokens ([change default](https://docs.fastflowlm.com/instructions/cli.html#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://docs.fastflowlm.com/instructions/cli.html#%EF%B8%8F-set-context-length-at-launch)**
 
