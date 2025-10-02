@@ -63,7 +63,7 @@ You should see models like `llama3.2:1b` listed.
 4. In the top bar, select **Add Custom Model**
 5. Enter OpenAI compatible chat completion endpoint URI:
 ```
-http://localhost:11434/v1/chat/completions
+http://localhost:52625/v1/chat/completions
 ```
 Click **Enter**
 6. Enter the exact model name as in the API:

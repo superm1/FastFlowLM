@@ -63,7 +63,7 @@ services:
       - open-webui-data:/app/backend/data
     environment:
       # Point WebUI to FLM's OpenAI-compatible server
-      - OPENAI_API_BASE_URL=http://host.docker.internal:11434/v1
+      - OPENAI_API_BASE_URL=http://host.docker.internal:52625/v1
       - OPENAI_API_KEY=dummy-key
 
       # WebUI settings

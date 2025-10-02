@@ -10,8 +10,8 @@
 
 ## ⚡ FastFlowLM (FLM) — Unlock Ryzen™ AI NPUs
 
-Run large language models — now with **Vision support** — on AMD Ryzen™ AI NPUs in minutes.  
-**No GPU required. Faster and over 10× more power-efficient. Context lengths up to 256k tokens.**
+Run large language models — now with **Vision** and **MoE** support — on **AMD Ryzen™ AI NPUs** in minutes.  
+**No GPU required. Faster and over 10× more power-efficient. Supports context lengths up to 256k tokens. Ultra-Lightweight (14 MB). Installs within 20 seconds.**
 
 📦 **The only out-of-box, NPU-first runtime built exclusively for Ryzen™ AI.**  
 🤝 **Think Ollama — but deeply optimized for NPUs.**  
@@ -61,7 +61,7 @@ To start the local server (**Server Mode**):
 ```powershell
 flm serve llama3.2:1b
 ```
-> The model tag (e.g., `llama3.2:1b`) sets the initial model, which is optional. If another model is requested, FastFlowLM will automatically switch to it. Local server is on port 11434 (default).  
+> The model tag (e.g., `llama3.2:1b`) sets the initial model, which is optional. If another model is requested, FastFlowLM will automatically switch to it. Local server is on port 52625 (default).  
 
 **[![FastFlowLM Docs](https://img.shields.io/badge/FastFlowLM-Detailed%20Instructions-red?style=flat&logo=readthedocs)](https://docs.fastflowlm.com/instructions/)**
 
@@ -69,7 +69,7 @@ flm serve llama3.2:1b
 
 ## 📰 In the News
 
-- 10/01/2025 🎉 FLM was integrated into AMD's **[Lemonade Server 🍋](https://lemonade-server.ai/)**. Watch this **[short demo](https://www.youtube.com/watch?v=w0Tb3h4WUnE)** about using FLM in Lemonade.
+- 10/01/2025 🎉 FLM was integrated into AMD's **[Lemonade Server](https://lemonade-server.ai/)** 🍋. Watch this **[short demo](https://www.youtube.com/watch?v=w0Tb3h4WUnE)** about using FLM in Lemonade.
 
 ---
 
@@ -86,7 +86,8 @@ No model rewrites, no tuning — it just works.
 
 ## ✅ Highlights
 
-- **Runs fully on AMD Ryzen™ AI NPU** — no GPU or CPU load  
+- **Runs fully on AMD Ryzen™ AI NPU** — no GPU or CPU load
+- **Lightweight runtime (14 MB)** — installs within **20 seconds**, easy to integrate    
 - **Developer-first flow** — like Ollama, but optimized for NPU  
 - **Support for long context windows** — up to 256k tokens (e.g., Qwen3-4B-Thinking-2507)  
 - **No low-level tuning required** — You focus on your app, we handle the rest
