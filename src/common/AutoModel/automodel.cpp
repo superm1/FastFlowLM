@@ -2,7 +2,7 @@
 /// \brief automodel class
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the auto_model class
 
 #include "AutoModel/automodel.hpp"
@@ -16,11 +16,13 @@ std::unordered_set<std::string> modelTags = {
         "qwen3-tk", "qwen3-tk:4b",
         "gemma3", "gemma3:270m", "gemma3:1b",
         "gemma3:4b",
-        "medgemma", "medgemma:4b"
+        "medgemma", "medgemma:4b",
+        "gpt-oss", "gpt-oss:20b"
 };
 
-AutoModel::AutoModel(unsigned int device_id) {
+AutoModel::AutoModel(unsigned int device_id, std::string current_model) {
     this->device_id = device_id;
+    this->current_model = current_model;
     this->total_tokens = 0;
     this->profiler_list.resize(PROFILER_TYPE_NUM);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
@@ -28,6 +30,11 @@ AutoModel::AutoModel(unsigned int device_id) {
     }
     this->last_prefill_time = { 0, "us" };
     this->token_history.reserve(MAX_L);
+}
+
+
+std::string AutoModel::get_current_model() {
+    return this->current_model;
 }
 
 /// \brief Setup the tokenizer

@@ -2,13 +2,13 @@
 /// \brief llama3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-04
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the llama3 class
 
 #include "AutoModel/modeling_llama3.hpp"
 
 /************              Llama3 family            **************/
-Llama3::Llama3(unsigned int device_id) : AutoModel(device_id) {}
+Llama3::Llama3(unsigned int device_id) : AutoModel(device_id, "Llama3") {}
 
 void Llama3::load_model(std::string model_path, json model_info, int default_context_length, bool enable_preemption) {
     this->_shared_load_model(model_path, model_info, default_context_length, enable_preemption);

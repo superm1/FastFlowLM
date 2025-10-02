@@ -2,13 +2,13 @@
 /// \brief gemma3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-03
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the gemma3 class
 
 #include "AutoModel/modeling_gemma3_text.hpp"
 
 /************              Gemma3_Text_Only family            **************/
-Gemma3_Text_Only::Gemma3_Text_Only(unsigned int device_id) : AutoModel(device_id) {}
+Gemma3_Text_Only::Gemma3_Text_Only(unsigned int device_id) : AutoModel(device_id, "Gemma3_Text_Only") {}
 
 void Gemma3_Text_Only::load_model(std::string model_path, json model_info, int default_context_length, bool enable_preemption) {
 

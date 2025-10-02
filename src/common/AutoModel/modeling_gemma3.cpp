@@ -2,13 +2,13 @@
 /// \brief gemma3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-03
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the gemma3 class
 
 #include "AutoModel/modeling_gemma3.hpp"
 
 /************              Gemma3 family            **************/
-Gemma3::Gemma3(unsigned int device_id) : AutoModel(device_id) {}
+Gemma3::Gemma3(unsigned int device_id) : AutoModel(device_id, "Gemma3") {}
 
 void Gemma3::load_model(std::string model_path, json model_info, int default_context_length, bool enable_preemption) {
     this->_shared_load_model(model_path, model_info, default_context_length, enable_preemption);

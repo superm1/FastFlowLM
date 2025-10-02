@@ -2,7 +2,7 @@
 /// \brief typedef file for the FastFlowLM project
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This file contains the typedefs for the FastFlowLM project
 
 #pragma once

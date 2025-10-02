@@ -2,7 +2,7 @@
 /// \brief llama3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-04
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the llama3 class
 
 #pragma once
@@ -11,8 +11,6 @@
 /************              llama family            **************/
 class Llama3 : public AutoModel {
 private:
-    std::string current_model = "Llama3";
-
     void setup_tokenizer(std::string model_path);
 
 public:

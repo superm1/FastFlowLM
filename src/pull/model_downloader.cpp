@@ -2,13 +2,28 @@
 /// \brief Model downloader class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.10
+/// \version 0.9.12
 /// \note This class is used to download models from the huggingface
 #include "model_downloader.hpp"
 #include "utils/utils.hpp"
 #include "download_model.hpp"
 #include <sstream>
 #include <iomanip>
+//#include "picosha2.h" 
+//
+///// \brief Calculates the SHA256 hash of a file.
+///// \param file_path The path to the file.
+///// \return A string representing the hex digest of the hash, or an empty string on error.
+//std::string calculate_file_sha256(const std::string& file_path) {
+//    std::ifstream file(file_path, std::ios::binary);
+//    if (!file.is_open()) {
+//        return ""; // 
+//    }
+//
+//    std::vector<unsigned char> hash(picosha2::k_digest_size);
+//    picosha2::hash256(file, hash.begin(), hash.end());
+//    return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+//}
 
 /// \brief Constructor
 /// \param models the model list
@@ -181,41 +196,71 @@ void ModelDownloader::model_not_found(const std::string& model_tag) {
 /// \return the missing files
 std::vector<std::string> ModelDownloader::get_missing_files(const std::string& model_tag) {
     std::vector<std::string> missing_files;
-    
+
     try {
         auto model_info = supported_models.get_model_info(model_tag);
         std::string model_name = model_info["name"];
         std::string model_path = supported_models.get_model_path(model_tag);
-        
+        std::vector<std::string> model_files = model_info["files"];
+
         // Check if this is a VLM model (default to false if key doesn't exist)
-        bool is_vlm = model_info.value("vlm", false);
-        
+
         // Check each required model file
-        for (int i = 0; i < model_list::model_files_count; ++i) {
-            std::string filename = model_list::model_files[i];
+        for (int i = 0; i < model_files.size(); ++i) {
+            std::string filename = model_files[i];
             std::string file_path = get_model_file_path(model_path, filename);
             if (!file_exists(file_path)) {
                 missing_files.push_back(filename);
             }
         }
-        
-        // If it's a VLM model, also check vision model files
-        if (is_vlm) {
-            for (int i = 0; i < model_list::vision_model_files_count; ++i) {
-                std::string filename = model_list::vision_model_files[i];
-                std::string file_path = get_model_file_path(model_path, filename);
-                if (!file_exists(file_path)) {
-                    missing_files.push_back(filename);
-                }
-            }
-        }
-        
     } catch (const std::exception& e) {
         header_print("ERROR", "Error checking missing files: " + std::string(e.what()));
     }
-    
+
     return missing_files;
 }
+//std::vector<std::string> ModelDownloader::get_missing_files(const std::string& model_tag) {
+//    std::vector<std::string> files_to_redownload; 
+//
+//    try {
+//        auto model_info = supported_models.get_model_info(model_tag);
+//        std::string model_path = supported_models.get_model_path(model_tag);
+//
+//        auto check_files = [&](const nlohmann::json& file_list) {
+//            for (const auto& file_meta : file_list) {
+//                std::string filename = file_meta["filename"];
+//                std::string expected_hash = file_meta["sha256"];
+//                std::string file_path = get_model_file_path(model_path, filename);
+//
+//                if (!file_exists(file_path)) {
+//                    files_to_redownload.push_back(filename);
+//                }
+//                else {
+//                    std::string local_hash = calculate_file_sha256(file_path);
+//                    if (local_hash != expected_hash) {
+//                        header_print("FLM", "Hash mismatch for " + filename + ". Expected: " + expected_hash + ", Got: " + local_hash);
+//                        files_to_redownload.push_back(filename);
+//                    }
+//                }
+//            }
+//            };
+//
+//        if (model_info.contains("files")) {
+//            check_files(model_info["files"]);
+//        }
+//
+//        bool is_vlm = model_info.value("vlm", false);
+//        if (is_vlm && model_info.contains("vision_files")) {
+//            check_files(model_info["vision_files"]);
+//        }
+//
+//    }
+//    catch (const std::exception& e) {
+//        header_print("ERROR", "Error checking missing files: " + std::string(e.what()));
+//    }
+//
+//    return files_to_redownload;
+//}
 
 /// \brief Get present files
 /// \param model_tag the model tag
@@ -227,30 +272,18 @@ std::vector<std::string> ModelDownloader::get_present_files(const std::string& m
         auto model_info = supported_models.get_model_info(model_tag);
         std::string model_name = model_info["name"];
         std::string model_path = supported_models.get_model_path(model_tag);
-        
+        std::vector<std::string> model_files = model_info["files"];
+
         // Check if this is a VLM model (default to false if key doesn't exist)
-        bool is_vlm = model_info.value("vlm", false);
         
         // Check each required model file
-        for (int i = 0; i < model_list::model_files_count; ++i) {
-            std::string filename = model_list::model_files[i];
+        for (int i = 0; i < model_files.size(); ++i) {
+            std::string filename = model_files[i];
             std::string file_path = get_model_file_path(model_path, filename);
             if (file_exists(file_path)) {
                 present_files.push_back(filename);
             }
-        }
-        
-        // If it's a VLM model, also check vision model files
-        if (is_vlm) {
-            for (int i = 0; i < model_list::vision_model_files_count; ++i) {
-                std::string filename = model_list::vision_model_files[i];
-                std::string file_path = get_model_file_path(model_path, filename);
-                if (file_exists(file_path)) {
-                    present_files.push_back(filename);
-                }
-            }
-        }
-        
+        }     
     } catch (const std::exception& e) {
         header_print("ERROR", "Error checking present files: " + std::string(e.what()));
     }
@@ -297,17 +330,15 @@ std::vector<std::pair<std::string, std::string>> ModelDownloader::build_download
         auto model_info = supported_models.get_model_info(model_tag);
         std::string base_url = model_info["url"];
         std::string model_name = model_info["name"];
-        
-        // Check if this is a VLM model (default to false if key doesn't exist)
-        bool is_vlm = model_info.value("vlm", false);
+        std::vector<std::string> model_files = model_info["files"];
         
         // Create model directory
         std::string model_path = supported_models.get_model_path(model_tag);
         std::filesystem::create_directories(model_path);
         
         // Build download list for regular model files
-        for (int i = 0; i < model_list::model_files_count; ++i) {
-            std::string filename = model_list::model_files[i];
+        for (int i = 0; i < model_files.size(); ++i) {
+            std::string filename = model_files[i];
             std::string local_path = get_model_file_path(model_path, filename);
             
             // Only add to download list if file doesn't exist
@@ -315,22 +346,7 @@ std::vector<std::pair<std::string, std::string>> ModelDownloader::build_download
                 std::string url = base_url + "/resolve/main/" + filename + "?download=true";
                 downloads.emplace_back(url, local_path);
             }
-        }
-        
-        // If it's a VLM model, also add vision model files to download list
-        if (is_vlm) {
-            for (int i = 0; i < model_list::vision_model_files_count; ++i) {
-                std::string filename = model_list::vision_model_files[i];
-                std::string local_path = get_model_file_path(model_path, filename);
-                
-                // Only add to download list if file doesn't exist
-                if (!file_exists(local_path)) {
-                    std::string url = base_url + "/resolve/main/" + filename + "?download=true";
-                    downloads.emplace_back(url, local_path);
-                }
-            }
-        }
-        
+        }    
     } catch (const std::exception& e) {
         header_print("ERROR", "Error building download list: " + std::string(e.what()));
     }

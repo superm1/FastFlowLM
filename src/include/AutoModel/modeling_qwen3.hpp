@@ -2,7 +2,7 @@
 /// \brief qwen3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-04
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the qwen3 class
 
 #pragma once
@@ -12,7 +12,6 @@
 /************              qwen3            **************/
 class Qwen3 : public AutoModel {
 private:
-    std::string current_model = "Qwen3";
 
     bool enable_think = false;
 

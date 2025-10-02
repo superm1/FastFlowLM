@@ -4,7 +4,7 @@
  * \brief WebServer class and related declarations
  * \author FastFlowLM Team
  * \date 2025-06-24
- * \version 0.9.11
+ * \version 0.9.12
  */
 #include "server.hpp"
 #include "rest_handler.hpp"
@@ -232,8 +232,8 @@ HttpSession::HttpSession(tcp::socket socket, WebServer& server)
 }
 
 ///@brief start
-void HttpSession::start() {
-    read_request();
+void HttpSession::start(bool cors) {
+    read_request(cors);
 }
 
 ///@brief close connection
@@ -251,7 +251,7 @@ void HttpSession::close_connection() {
 }
 
 ///@brief read request
-void HttpSession::read_request() {
+void HttpSession::read_request(bool cors) {
     auto self = shared_from_this();
 
     // Use a parser to control the maximum accepted body size
@@ -259,12 +259,12 @@ void HttpSession::read_request() {
     parser->body_limit(self->server_.get_max_body_size_bytes());
 
     http::async_read(self->socket_, self->buffer_, *parser,
-        [self, parser](beast::error_code ec, std::size_t bytes_transferred) {
+        [self, parser, cors](beast::error_code ec, std::size_t bytes_transferred) {
             if (!ec) {
                 header_print("TCP", "Read " + std::to_string(bytes_transferred) + " bytes from socket");
                 // Move the parsed message into our request object
                 self->req_ = parser->release();
-                self->handle_request();
+                self->handle_request(cors);
                 return;
             }
 
@@ -293,19 +293,51 @@ void HttpSession::read_request() {
 }
 
 ///@brief handle request
-void HttpSession::handle_request() {
+
+void HttpSession::handle_request(bool cors) {
+    // --- BEGIN: Preflight (OPTIONS) request handling ---
+    if (req_.method() == http::verb::options && cors) {
+        header_print("✈️ ", "Handling Preflight (OPTIONS) request");
+
+        // reponse empty body for OPTIONS
+        http::response<http::empty_body> options_res;
+        options_res.version(req_.version());
+        options_res.result(http::status::ok); 
+        options_res.keep_alive(req_.keep_alive());
+
+        options_res.set("Access-Control-Allow-Origin", "*");
+        options_res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        options_res.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+
+        options_res.prepare_payload();
+        auto self = shared_from_this();
+        http::async_write(socket_, options_res,
+            [self, cors](beast::error_code ec, std::size_t) {
+                if (ec) {
+                    return;
+                }
+                // waiting the true response
+                self->read_request(cors);
+            });
+        return;
+    }
+    // --- END: Preflight (OPTIONS) request handling ---
+
+
+    // IF not OPTIONS
+
     // Reset response
     res_ = {};
     res_.version(req_.version());
     res_.keep_alive(req_.keep_alive());
-    
-    
+
+
     // Handle the request through the server
     bool deferred = server_.handle_request(req_, res_, socket_, shared_from_this());
-    
+
     // Clear the buffer after processing to prevent data accumulation
     buffer_.consume(buffer_.size());
-    
+
     if (!is_streaming_ && !deferred) {
         write_response();
     } else {
@@ -338,20 +370,23 @@ void HttpSession::write_response() {
 
     std::cout << "================================================" << std::endl;
 
+    res_.set("Access-Control-Allow-Origin", "*");
+    res_.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res_.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+
+
     http::async_write(socket_, res_,
         [self](beast::error_code ec, std::size_t) {
-            if (!self->req_.keep_alive()) {
-                header_print("🔒  ", "Closing TCP connection (non-keep-alive)");
-                self->socket_.shutdown(tcp::socket::shutdown_both, ec);
-                // Decrement connection counter for non-keep-alive connections
-                self->server_.active_connections_.fetch_sub(1);
-            } else {
-                header_print("TCP", "Keeping TCP connection alive for next request");
-                // Clear the request object before reading the next request
-                self->req_ = {};
-                // For keep-alive connections, read the next request
-                self->read_request();
+            self->socket_.shutdown(tcp::socket::shutdown_both, ec);
+            // Decrement connection counter for non-keep-alive connections
+            self->server_.active_connections_.fetch_sub(1);
+            try {
+                header_print("🔒 ", "TCP connection closed - Remote: " + self->socket_.remote_endpoint().address().to_string() + ":" + std::to_string(self->socket_.remote_endpoint().port()));
             }
+            catch (...) {
+                header_print("🔒 ", "TCP connection closed - Remote endpoint unavailable");
+            }
+
         });
 }
 
@@ -378,10 +413,12 @@ void HttpSession::write_streaming_response(const json& data, bool is_final) {
         // Send headers immediately using raw socket write
         std::string headers = "HTTP/1.1 200 OK\r\n";
         headers += "Content-Type: text/event-stream\r\n";
-        //headers += "Content-Type: application/x-ndjson\r\n";
         headers += "Cache-Control: no-cache\r\n";
         headers += "Connection: keep-alive\r\n";
         headers += "Transfer-Encoding: chunked\r\n";
+        headers += "Access-Control-Allow-Origin: *\r\n";
+        headers += "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n";
+        headers += "Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With\r\n";
         headers += "\r\n";
         
         // Send headers synchronously
@@ -458,7 +495,7 @@ void HttpSession::send_chunk_data(const json& data, bool is_final) {
 
 ///@brief WebServer implementation
 ///@param port the port
-WebServer::WebServer(int port) : acceptor(ioc, {net::ip::make_address("0.0.0.0"), static_cast<unsigned short>(port)}), running(false), port(port) {}
+WebServer::WebServer(int port, bool cors) : acceptor(ioc, {net::ip::make_address("0.0.0.0"), static_cast<unsigned short>(port)}), running(false), port(port), cors(cors) {}
 
 ///@brief destructor
 WebServer::~WebServer() {
@@ -552,7 +589,7 @@ void WebServer::do_accept() {
                     
                     // Create a new session for this connection
                     auto session = std::make_shared<HttpSession>(std::move(socket), *this);
-                    session->start();
+                    session->start(cors);
                 }
             }
             if (running) {
@@ -745,8 +782,8 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
 ///@param default_tag the default tag
 ///@param port the port
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length, bool preemption) {
-    auto server = std::make_unique<WebServer>(port);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length, bool cors, bool preemption) {
+    auto server = std::make_unique<WebServer>(port, cors);
     auto rest_handler = std::make_shared<RestHandler>(models, downloader, default_tag, ctx_length);
     
     // Register Ollama-compatible routes

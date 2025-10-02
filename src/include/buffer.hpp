@@ -2,7 +2,7 @@
 /// \brief Buffer and bytes class for memory management
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This class is used to manage the memory.
 #pragma once
 #include <cstdint>
@@ -80,11 +80,24 @@ public:
     /// \brief constructor
     /// \param size the size
     bytes(size_t size)
-        : owned_data_(size > 0 ? new uint8_t[size] : nullptr), data_(owned_data_.get()), size_(size), is_owner_(true)
+        : size_(size), is_owner_(true)
 #ifdef __XRT__
         , is_bo_owner_(false), bo_(nullptr), owned_bo_(nullptr)
 #endif
-    {}
+    {
+        if (size > 0 && size < 8ull * 1024 * 1024 * 1024){
+            owned_data_ = std::make_unique<uint8_t[]>(size);
+            if (owned_data_ == nullptr){
+                std::cout << "Warning: allocate buffer with size " << size << " failed" << std::endl;
+                exit(1);
+            }
+            data_ = owned_data_.get();
+        }
+        else{
+            std::cout << "Warning: allocate buffer with size 0, input size: " << size << std::endl;
+            exit(1);
+        }
+    }
 
     /// \brief constructor
     /// \param data the data
@@ -112,11 +125,20 @@ public:
     bytes(xrt::device& device, size_t size)
         : owned_data_(nullptr), size_(size), is_owner_(false), is_bo_owner_(true)
     {
-        int padded_size = (size + 4095) / 4096 * 4096; // 4K alignment
-        if (padded_size < 512 * 1024){
-            padded_size = 512 * 1024;
+        if (size > 3ull * 1024 * 1024 * 1024 || size == 0){
+            std::cout << "To large buffer!" << std::endl;
+            exit(1);
         }
+        size_t alignment = 4 * 1024;
+        int padded_size = (size + alignment - 1) / alignment * alignment; // 1MB alignment
+        // if (padded_size < 512 * 1024){
+        //     padded_size = 512 * 1024;
+        // }
         owned_bo_ = std::make_unique<xrt::ext::bo>(device, padded_size);
+        if (owned_bo_ == nullptr){
+            std::cout << "Warning: allocate buffer with size " << size << " failed" << std::endl;
+            exit(1);
+        }
         data_ = owned_bo_->map<uint8_t*>();
         bo_ = owned_bo_.get();
     }

@@ -9,6 +9,17 @@
                 "size": 270000000,
                 "default_context_length": 32768,
 		        "flm_min_version": "0.9.4",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "details": {
                     "format": "NPU2",
                     "family": "gemma3",
@@ -26,6 +37,17 @@
                 "size": 1000000000,
                 "default_context_length": 32768,
 		        "flm_min_version": "0.9.4",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "details": {
                     "format": "NPU2",
                     "family": "gemma3",
@@ -43,6 +65,20 @@
                 "default_context_length": 65536,
 		        "flm_min_version": "0.9.11",
                 "vlm": true,
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json",
+                    "vision_attn.xclbin",
+                    "vision_mm.xclbin",
+                    "vision_weight.q4nx"
+                ],
                 "details": {
                     "format": "NPU2",
                     "family": "gemma3",
@@ -62,6 +98,20 @@
                 "default_context_length": 65536,
                 "vlm": true,
 		        "flm_min_version": "0.9.11",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json",
+                    "vision_attn.xclbin",
+                    "vision_mm.xclbin",
+                    "vision_weight.q4nx"
+                ],
                 "details": {
                     "format": "NPU2",
                     "family": "gemma3_text",
@@ -80,9 +130,16 @@
                 "size": 1000000000,
                 "flm_min_version": "0.1.8",
                 "default_context_length": 131072,
-                "files": [
-                    { "filename": "config.json", "sha256": "ff9d1fc45cd409bb79023ccf889b3af47fafe2d077683a329221f94cec3ad525" },
-                    { "filename": "attn.xclbin", "sha256": "8642c5efe753743be96ca0797cfd5b74017568484c396ccd3398d1841593516e" }
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
                 ],
                 "details": {
                     "format": "NPU2",
@@ -98,6 +155,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 3000000000,
                 "flm_min_version": "0.1.8",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 65536,
                 "details": {
                     "format": "NPU2",
@@ -115,6 +183,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 8000000000,
                 "flm_min_version": "0.1.8",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 16384,
                 "details": {
                     "format": "NPU2",
@@ -132,6 +211,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 8000000000,
                 "flm_min_version": "0.1.8",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 16384,
                 "details": {
                     "format": "NPU2",
@@ -149,6 +239,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 8000000000,
                 "flm_min_version": "0.9.6",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 16384,
                 "details": {
                     "format": "NPU2",
@@ -167,6 +268,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 600000000,
                 "flm_min_version": "0.9.3",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 32768,
                 "details": {
                     "format": "NPU2",
@@ -183,6 +295,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 1700000000,
                 "flm_min_version": "0.9.3",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 32768,
                 "details": {
                     "format": "NPU2",
@@ -199,6 +322,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 4000000000,
                 "flm_min_version": "0.9.3",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 32768,
                 "details": {
                     "format": "NPU2",
@@ -215,6 +349,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 8000000000,
                 "flm_min_version": "0.9.3",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 16384,
                 "details": {
                     "format": "NPU2",
@@ -233,6 +378,17 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 4000000000,
                 "flm_min_version": "0.9.6",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 32768,
                 "details": {
                     "format": "NPU2",
@@ -251,11 +407,53 @@
                 "modified_at": "2025-05-30T00:00:00Z",
                 "size": 4000000000,
                 "flm_min_version": "0.9.6",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
                 "default_context_length": 32768,
                 "details": {
                     "format": "NPU2",
                     "family": "qwen",
                     "think": false,
+                    "think_toggleable": false,
+                    "parameter_size": "4B",
+                    "quantization_level": "Q4_1"
+                }
+            }
+        },
+        "gpt-oss": {
+            "20b": {
+                "name": "GPT-OSS-20B-NPU2",
+                "url": "https://huggingface.co/FastFlowLM/GPT-OSS-20B-NPU2",
+                "modified_at": "2025-05-30T00:00:00Z",
+                "size": 20000000000,
+                "flm_min_version": "0.9.12",
+                "files":[
+                    "attn.xclbin",
+                    "config.json",
+                    "dequant_mxfp4.xclbin",
+                    "dequant_q4_1.xclbin",
+                    "expert.xclbin",
+                    "layer.xclbin",
+                    "lm_head.xclbin",
+                    "mm.xclbin",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
+                "default_context_length": 8192,
+                "details": {
+                    "format": "NPU2",
+                    "family": "gpt-oss",
+                    "think": true,
                     "think_toggleable": false,
                     "parameter_size": "4B",
                     "quantization_level": "Q4_1"
