@@ -1,14 +1,19 @@
+/// \file modeling_gpt_oss.hpp
+/// \brief modeling_gpt_oss class
+/// \author FastFlowLM Team
+/// \date 2025-10-01
+/// \version 0.9.12
+/// \note This is a source file for the gpt-oss class
 #pragma once
 
 #include "AutoModel/automodel.hpp"
 
 class GPT_OSS : public AutoModel {
 private:
-    std::string current_model = "gpt-oss";
 
     bool enable_think = true;
 
-    std::string reasoning_effort = "high";
+    std::string reasoning_effort = "low";
     std::string model_identity = "You are ChatGPT, a large language model trained by OpenAI.";
     std::string role = "developer";
 
@@ -21,4 +26,33 @@ public:
     bool insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) override;
     std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os) override;
     std::string generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os = std::cout) override;
+
+    /// \brief Override configure_parameter to handle GPT-oss-specific parameters
+    bool configure_parameter(std::string parameter_name, const std::any& value) override {
+        if (parameter_name == "reasoning_effort") {
+            try {
+                this->reasoning_effort = std::any_cast<std::string>(value);
+                if (this->reasoning_effort == "high" || this->reasoning_effort == "medium" || this->reasoning_effort == "low")
+                    this->extra_context["reasoning_effort"] = this->reasoning_effort;
+                else
+                    header_print("WARNING", "Reasoning effort must be 'low', 'medium' or 'high'!");
+                return true;
+            }
+            catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+        else if (parameter_name == "system_prompt") {
+            try {
+                this->user_system_prompt = std::any_cast<std::string>(value);
+                this->extra_context["user_system_prompt"] = this->user_system_prompt;
+                return true;
+            }
+            catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+        // Call base class implementation for any unhandled parameters
+        return AutoModel::configure_parameter(parameter_name, value);
+    }
 };

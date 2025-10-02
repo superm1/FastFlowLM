@@ -4,13 +4,14 @@
  * \brief WebServer class and related declarations
  * \author FastFlowLM Team
  * \date 2025-06-24
- * \version 0.9.11
+ * \version 0.9.12
  */
 #pragma once
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
+#include <boost/beast/http/empty_body.hpp>
 #include <boost/asio.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -93,7 +94,7 @@ void brief_print_message_request(nlohmann::json request);
 
 class WebServer {
 public:
-    WebServer(int port);
+    WebServer(int port, bool cors);
     ~WebServer();
 
     void start();
@@ -141,7 +142,8 @@ private:
     bool running;
     ///@brief port
     int port;
-    
+    bool cors;
+
     // Concurrency configuration
     size_t max_connections_ = 10;
     std::chrono::seconds request_timeout_ = std::chrono::seconds(600); // 5 minutes
@@ -166,13 +168,13 @@ private:
 class HttpSession : public std::enable_shared_from_this<HttpSession> {
 public:
     HttpSession(tcp::socket socket, WebServer& server);
-    void start();
+    void start(bool cors);
     void write_streaming_response(const json& data, bool is_final);
     void close_connection();
     void write_response_from_callback();
 private:
-    void read_request();
-    void handle_request();
+    void read_request(bool cors);
+    void handle_request(bool cors);
     void write_response();
     void send_chunk_data(const json& data, bool is_final);
     
@@ -199,7 +201,7 @@ class model_list;
 ///@param models the model list
 ///@param downloader the downloader
 ///@param default_tag the default tag
-///@param port the port to listen on, default is 11434, same with the ollama server
+///@param port the port to listen on, default is 52625, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length = -1, bool preemption = false);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length = -1, bool cors=1, bool preemption = false);
 

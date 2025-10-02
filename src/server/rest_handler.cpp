@@ -4,7 +4,7 @@
  * \brief RestHandler class and related declarations
  * \author FastFlowLM Team
  * \date 2025-08-05
- * \version 0.9.11
+ * \version 0.9.12
  */
 #include "rest_handler.hpp"
 #include "wstream_buf.hpp"
@@ -486,6 +486,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
     try {
         nlohmann::ordered_json messages_openai = request["messages"];
         std::string model = request.value("model", current_model_tag);
+        std::string reasoning_effort = request.value("reasoning_effort", "low");
         bool stream = request.value("stream", false);
 
         // Extract OpenAI-style parameters
@@ -508,6 +509,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
         auto_chat_engine->set_topk(top_k);
         auto_chat_engine->set_frequency_penalty(frequency_penalty);
         auto_chat_engine->configure_parameter("enable_think", enable_thinking);
+        auto_chat_engine->configure_parameter("reasoning_effort", reasoning_effort);
 
         chat_meta_info_t meta_info;
         lm_uniform_input_t uniformed_input;
@@ -606,6 +608,7 @@ void RestHandler::handle_openai_completion(const json& request,
     try {
         std::string prompt = request["prompt"];
         std::string model = request.value("model", current_model_tag);
+        std::string reasoning_effort = request.value("reasoning_effort", "low");
         bool stream = request.value("stream", false);
 
         // Extract OpenAI-style parameters
@@ -619,6 +622,7 @@ void RestHandler::handle_openai_completion(const json& request,
 
         ensure_model_loaded(model);
         auto_chat_engine->configure_parameter("enable_think", enable_thinking);
+        auto_chat_engine->configure_parameter("reasoning_effort", reasoning_effort);
 
         auto_chat_engine->set_temperature(temperature);
         auto_chat_engine->set_topp(top_p);

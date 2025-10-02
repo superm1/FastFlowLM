@@ -2,7 +2,7 @@
 /// \brief all_models class
 /// \author FastFlowLM Team
 /// \date 2025-09-10
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a header file for the all_models class
 #pragma once
 
@@ -12,6 +12,31 @@
 #include "modeling_qwen3.hpp"
 #include "modeling_gpt_oss.hpp"
 
+inline std::string complete_simple_tag(std::string model_tag) {
+    if (model_tag == "llama3.1")
+        return "llama3.1:8b";
+    else if (model_tag == "llama3.2")
+        return "llama3.2:1b";
+    else if (model_tag == "deepseek-r1")
+        return "deepseek-r1:8b";
+    else if (model_tag == "deepseek-r1-0528")
+        return "deepseek-r1-0528:8b";
+    else if (model_tag == "qwen3")
+        return "qwen3:0.6b";
+    else if (model_tag == "qwen3-it")
+        return "qwen3-it:4b";
+    else if (model_tag == "qwen3-tk")
+        return "qwen3-tk:4b";
+    else if (model_tag == "gemma3")
+        return "gemma3:1b";
+    else if (model_tag == "medgemma")
+        return "medgemma:4b";
+    else if (model_tag == "gpt-oss")
+        return "gpt-oss:20b";
+    else
+        return model_tag;
+
+}
 
 
 inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const std::string& model_tag) {
@@ -48,7 +73,7 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
     };
 
     std::unique_ptr<AutoModel> auto_chat_engine = nullptr;
-    std::string new_model_tag = model_tag;
+    std::string new_model_tag = complete_simple_tag(model_tag);
     if (llamaTags.count(model_tag)) // tag
         auto_chat_engine = std::make_unique<Llama3>(0);
     else if (deepseek_r1_0528_Tags.count(model_tag)) 

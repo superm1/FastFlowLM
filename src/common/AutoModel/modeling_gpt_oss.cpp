@@ -1,13 +1,37 @@
+/// \file modeling_gpt_oss.cpp
+/// \brief modeling_gpt_oss class
+/// \author FastFlowLM Team
+/// \date 2025-10-01
+/// \version 0.9.12
+/// \note This is a source file for the gpt-oss class
 #include "AutoModel/modeling_gpt_oss.hpp"
 
-GPT_OSS::GPT_OSS(unsigned int device_id) : AutoModel(device_id) {}
+GPT_OSS::GPT_OSS(unsigned int device_id) : AutoModel(device_id, "gpt-oss") {}
 
 void GPT_OSS::load_model(std::string model_path, json model_info, int default_context_length, bool enable_preemption) {
     this->model_path = model_path;
-    header_print("FLM", "Loading model: " << this->model_path);
+    this->_shared_load_model(model_path, model_info, default_context_length, enable_preemption);
+    this->q4nx = std::make_unique<Q4NX>(this->model_path);
+    this->lm_engine = std::make_unique<gpt_oss_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
+    this->lm_engine->load_weights(*this->q4nx);
+    this->q4nx.reset();
     this->tokenizer = std::make_unique<Tokenizer>(model_path);
 
     this->setup_tokenizer(model_path);
+    this->sampler.reset();
+
+    sampler_config config;
+    config.rep_penalty = 1.1;
+    config.temperature = 0.6;
+    config.top_p = 0.95;
+    config.top_k = 10;
+    config.rep_penalty_window = 1024;
+    config.freq_penalty = 1.1;
+    config.freq_penalty_window = 1024;
+    this->set_sampler(config);
+    for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
+        this->profiler_list[i].reset();
+    }
 }
 
 void GPT_OSS::setup_tokenizer(std::string model_path){
@@ -48,19 +72,18 @@ bool GPT_OSS::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input)
 
     std::vector<int> tokens = this->tokenizer->encode(templated_text);
     this->profiler_list[TKOEN_ENCODE_TIME].stop(tokens.size());
-    for (int val : tokens) {
-        header_print("NNZZHH", val);
-    }
-    
+    return this->_shared_insert(meta_info, tokens);
+
 }
 
 
 std::string GPT_OSS::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os) {
-    std::string a = "nzh";
-    return a;
+    return this->_shared_generate(meta_info, length_limit, os);
 }
 
 std::string GPT_OSS::generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os) {
-    std::string a = "nzh";
-    return a;
+    if (!this->insert(meta_info, input)) {
+        return "";
+    }
+    return this->_shared_generate(meta_info, length_limit, os);
 }

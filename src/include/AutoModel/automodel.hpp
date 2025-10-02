@@ -2,7 +2,7 @@
 /// \brief automodel class
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a header file for the auto_model class
 #pragma once
 
@@ -22,6 +22,7 @@
 #include "qwen/qwen_npu.hpp"
 #include "gemma/gemma_npu.hpp"
 #include "gemma_text/gemma_text_npu.hpp"
+#include "gpt_oss/gpt_oss_npu.hpp"
 #include "tokenizer/tokenizer.hpp"
 #include "modules/sampler.hpp"
 #include "utils/utils.hpp"
@@ -105,7 +106,7 @@ protected:
 	std::unique_ptr<Sampler> sampler = nullptr;
 	std::unique_ptr<Q4NX> q4nx = nullptr;
 	bool is_model_loaded = false;
-	std::string current_model;
+	std::string current_model = "";
 	std::vector<int> token_history;
 	std::unique_ptr<npu_xclbin_manager> npu = nullptr;
 	bool enable_preemption = false;
@@ -152,9 +153,13 @@ public:
 	//************ Shared by all models *************/
 	virtual ~AutoModel() = default;
 
-	AutoModel(unsigned int device_id = 0);
+	AutoModel(unsigned int device_id = 0, std::string current_model = "");
 	/// \brief Clear the context
 	void clear_context();
+
+	/// \brief Get the current model
+	/// \return the current model
+	std::string get_current_model();
 
 	/// \brief Get the current context length
 	/// \return the current context length

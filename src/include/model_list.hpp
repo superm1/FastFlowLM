@@ -2,7 +2,7 @@
 /// \brief model_list class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This class is used to manage the model list.
 #pragma once
 #include "nlohmann/json.hpp"
@@ -12,33 +12,33 @@
 #include <vector>
 #include "utils/utils.hpp"
 
-#define __FLM_VERSION__ "0.9.11"
+#define __FLM_VERSION__ "0.9.12"
 
 /// \note This class is used to manage the model list.
 class model_list {
     public:
         /// \brief files required for the model
-        static constexpr const char* model_files[] = {
-            "config.json",
-            "tokenizer.json",
-            "attn.xclbin",
-            "mm.xclbin",
-            "dequant.xclbin",
-            "layer.xclbin",
-            "lm_head.xclbin",
-            "model.q4nx",
-            "tokenizer_config.json"
-        };
-        static constexpr const char* vision_model_files[] = {
-            "vision_attn.xclbin",
-            "vision_mm.xclbin",
-            "vision_weight.q4nx"
-        };
-        /// \brief number of model files
-        static constexpr int model_files_count = sizeof(model_files) / sizeof(model_files[0]);
-        
-        /// \brief number of vision model files
-        static constexpr int vision_model_files_count = sizeof(vision_model_files) / sizeof(vision_model_files[0]);
+        //static constexpr const char* model_files[] = {
+        //    "config.json",
+        //    "tokenizer.json",
+        //    "attn.xclbin",
+        //    "mm.xclbin",
+        //    "dequant.xclbin",
+        //    "layer.xclbin",
+        //    "lm_head.xclbin",
+        //    "model.q4nx",
+        //    "tokenizer_config.json"
+        //};
+        //static constexpr const char* vision_model_files[] = {
+        //    "vision_attn.xclbin",
+        //    "vision_mm.xclbin",
+        //    "vision_weight.q4nx"
+        //};
+        ///// \brief number of model files
+        //static constexpr int model_files_count = sizeof(model_files) / sizeof(model_files[0]);
+        //
+        ///// \brief number of vision model files
+        //static constexpr int vision_model_files_count = sizeof(vision_model_files) / sizeof(vision_model_files[0]);
 
         /// \brief constructor
         model_list(){}

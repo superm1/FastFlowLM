@@ -2,7 +2,7 @@
 /// \brief Main entry point for the FLM application
 /// \author FastFlowLM Team
 /// \date 2025-08-05
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the main entry point
 #pragma once
 #include "runner.hpp"
@@ -120,13 +120,13 @@ void handle_user_input() {
 ///@brief create_lm_server is used to create the ollama server
 ///@param models the model list
 ///@param default_tag the default tag
-///@param port the port to listen on, default is 11434, same with the ollama server
+///@param port the port to listen on, default is 52625, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length, bool preemption);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, int port, int ctx_length, bool cors, bool preemption);
 
 
 ///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
-///@return the server port, default is 11434 if environment variable is not set
+///@return the server port, default is 52625 if environment variable is not set
 int get_server_port(int user_port) {
     if (user_port > 0 && user_port <= 65535) {
         return user_port;
@@ -149,7 +149,7 @@ int get_server_port(int user_port) {
         }
     }
 
-    return 11434; // Default port
+    return 52625; // Default port
 }
 
 ///@brief get_models_directory gets the models directory from environment variable or defaults to Documents
@@ -207,6 +207,9 @@ int main(int argc, char* argv[]) {
     size_t max_socket_connections = parsed_args.max_socket_connections;
     size_t max_npu_queue = parsed_args.max_npu_queue;
     int user_port = parsed_args.port;
+    bool quiet_list = parsed_args.quiet_list;
+    std::string list_filter = parsed_args.list_filter;
+    bool cors = parsed_args.cors;
 
     // Set process priority to high for better performance
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
@@ -268,7 +271,7 @@ int main(int argc, char* argv[]) {
             check_and_notify_new_version();
             // Create the server
             int port = get_server_port(user_port);
-            auto server = create_lm_server(supported_models, downloader, tag, port, ctx_length);
+            auto server = create_lm_server(supported_models, downloader, tag, port, ctx_length, cors, preemption);
             server->set_max_connections(max_socket_connections);           // Allow up to 10 concurrent connections
             server->set_io_threads(10);          // Allow up to 5 io threads
             server->set_npu_queue_length(max_npu_queue);           // Allow up to 10 concurrent queue
@@ -320,19 +323,24 @@ int main(int argc, char* argv[]) {
         }
         else if (command == "list") {
             // List the models, this will be used to list the models
-            std::cout << "Models:" << std::endl;
-            nlohmann::json models = supported_models.get_all_models();
-            for (const auto& model : models["models"]) {
-                bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>());
-                std::cout << "  - " << model["name"].get<std::string>();
-                if (is_present){
-                    std::cout << " ✅";
+            if (list_filter == "installed" || list_filter == "not-installed" || list_filter == "all") {
+                std::cout << "Models:" << std::endl;
+                nlohmann::json models = supported_models.get_all_models();
+                for (const auto& model : models["models"]) {
+                    bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>());
+                    if ((list_filter == "installed") == is_present || list_filter == "all") {
+                        std::cout << "  - " << model["name"].get<std::string>();
+                        if (!quiet_list) {
+                            std::cout << (is_present ? " ✅" : " ⏬");
+                        }
+                        std::cout << std::endl;
+                    }
                 }
-                else{
-                    std::cout << " ⏬";
-                }
-                std::cout << std::endl;
             }
+            else
+                header_print("Error", "Invalid filter: please use 'all', 'installed', or 'not-installed'");
+
+
         }
         else {
             // Invalid command, this will be used to show the invalid command

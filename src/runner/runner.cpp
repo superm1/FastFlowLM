@@ -4,7 +4,7 @@
 *  \brief Runner implementation for interactive model execution
 *  \author FastFlowLM Team
 *  \date 2025-08-05
-*  \version 0.9.11
+*  \version 0.9.12
 */
 #include "runner.hpp"
 #include <iostream>
@@ -259,25 +259,34 @@ void Runner::cmd_status(std::vector<std::string>& input_list) {
 /// \param input_list, std::vector<std::string>
 void Runner::cmd_load(std::vector<std::string>& input_list) {
     std::string model_name = input_list[1];
+
+    if (!modelTags.count(model_name)) {
+        header_print("ERROR", "Model not found: " << model_name << "; Please check with `/list`");
+        return;
+    }
+    std::pair<std::string, std::unique_ptr<AutoModel>> auto_model = get_auto_model(model_name);
+    model_name = auto_model.first;
+
     if (model_name != this->tag) {
         this->tag = model_name;
-        if (!modelTags.count(tag)) {
-            header_print("ERROR", "Model not found: " << tag << "; Please check with `/list`");
-            return;
-        }
+
         if (!this->downloader.is_model_downloaded(this->tag)) {
             this->downloader.pull_model(this->tag);
         }
         auto_chat_engine.reset();
-        std::pair<std::string, std::unique_ptr<AutoModel>> auto_model = get_auto_model(this->tag);
+        if(model_name=="gpt-oss:20b")
+            std::this_thread::sleep_for(std::chrono::milliseconds(2800));
         this->auto_chat_engine = std::move(auto_model.second);
-        this->tag = auto_model.first;
+
+        nlohmann::json model_info = this->supported_models.get_model_info(this->tag);
+
+        this->auto_chat_engine->load_model(this->supported_models.get_model_path(this->tag), model_info, this->ctx_length, this->preemption);
+        this->auto_chat_engine->configure_parameter("system_prompt", this->system_prompt);
+
     }
+    else
+        header_print("FLM", "Model already loaded: " << model_name);
 
-    nlohmann::json model_info = this->supported_models.get_model_info(this->tag);
-
-    this->auto_chat_engine->load_model(this->supported_models.get_model_path(this->tag), model_info, this->ctx_length, this->preemption);
-    this->auto_chat_engine->configure_parameter("system_prompt", this->system_prompt);
 }
 
 /// \brief Save the history
@@ -356,6 +365,7 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
         std::cout << "  /set sys-msg [value] - set the system message" << std::endl;
         std::cout << "  /set ctx-len [value] - set the max context length" << std::endl;
         std::cout << "  /set gen-lim [value] - Limit tokens generated per round" << std::endl;
+        std::cout << "  /set r-eff [low|medium|high] - set the reasoning effort level (GPT-OSS only, default = low)" << std::endl;
         return;
     }
     
@@ -403,6 +413,12 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
     else if (set_context == "gen-lim"){
         this->generate_limit = std::stoi(set_value);
     }
+    else if (set_context == "r-eff"){
+        if (this->auto_chat_engine->get_current_model() == "gpt-oss")
+            this->auto_chat_engine->configure_parameter("reasoning_effort", set_value);
+        else
+            header_print("WARNING", "Reasoning effort only support for gpt-oss");
+    }
     else{
         std::cout << "Invalid context: " << set_context << std::endl;
         std::cout << "Available parameters: " << std::endl;
@@ -414,6 +430,7 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
         std::cout << "  /set freq-pen [value] - set the frequency penalty" << std::endl;
         std::cout << "  /set sys-msg [value] - set the system message" << std::endl;
         std::cout << "  /set gen-lim [value] - Limit tokens generated per round" << std::endl;
+        std::cout << "  /set r-eff [low|medium|high] - set the reasoning effort level (GPT-OSS only, default = low)" << std::endl;
     }
 }
 

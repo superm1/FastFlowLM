@@ -1,10 +1,10 @@
 /*
 *  Copyright (c) 2025 by Contributors
-*  \file runner.hpp
+*  \file update.hpp
 *  \brief Detect new version
 *  \author FastFlowLM Team
 *  \date 2025-09-24
-*  \version 0.9.11
+*  \version 0.9.12
 */
 
 #include <windows.h>

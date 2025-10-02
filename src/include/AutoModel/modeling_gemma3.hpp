@@ -2,7 +2,7 @@
 /// \brief gemma3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-03
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This is a source file for the gemma3 class
 
 #pragma once
@@ -24,7 +24,6 @@ extern "C" {
 /************              Gemma3_4b            **************/
 class Gemma3 : public AutoModel {
 private:
-    std::string current_model = "Gemma3";
 
     void setup_tokenizer(std::string model_path);
     

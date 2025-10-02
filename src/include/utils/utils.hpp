@@ -2,7 +2,7 @@
 /// \brief utils class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This file contains some utility functions for the FastFlowLM project.
 #pragma once
 

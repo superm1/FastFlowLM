@@ -4,7 +4,7 @@
 
 AppName=flm
 
-AppVersion=0.9.11
+AppVersion=0.9.12
 
 AppPublisher=FastFlowLM
 
@@ -47,6 +47,7 @@ Source: "libcurl.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "llama_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gemma_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gemma_text_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "gpt_oss_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "qwen_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "lm_head.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dequant.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -157,7 +158,7 @@ begin
   end
   else begin
     // FLM_SERVE_PORT doesn't exist, use default port
-    Result := '11434';
+    Result := '52625';
   end;
 end;
 
@@ -173,7 +174,7 @@ begin
   
   PortPage := CreateInputQueryPage(wpSelectDir,
     'Server Port Configuration', 'What port should FLM use for the server?',
-    'Enter the port number for FLM server (default: 11434).' + #13#10 + #13#10 +
+    'Enter the port number for FLM server (default: 52625).' + #13#10 + #13#10 +
     'Existing FLM users -- the current port will be used as default.');
   PortPage.Add('Server port:', False);
   PortPage.Values[0] := GetExistingPort;

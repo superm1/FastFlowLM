@@ -2,7 +2,7 @@
 /// \brief vm_args class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.11
+/// \version 0.9.12
 /// \note This class is used to parse the command line arguments.
 #pragma once
 
@@ -21,16 +21,20 @@ struct ParsedArgs {
     std::string command;
     std::string model_tag;
     std::string power_mode;
+    std::string list_filter;
     bool force_redownload;
     bool version_requested;
     bool port_requested;
+    bool quiet_list;
     bool preemption;
     int ctx_length;
     size_t max_socket_connections;
     size_t max_npu_queue;
     int port;
+    bool cors;
     ParsedArgs() : power_mode("performance"), force_redownload(false), 
-                   version_requested(false), port_requested(false) {}
+                   version_requested(false), port_requested(false),
+                   quiet_list(false) {}
 };
 
 /// \brief parse the options using Boost Program Options with positional arguments
@@ -51,12 +55,17 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
              "Set the server port number (for serve command)")
             ("force", po::bool_switch(&parsed_args.force_redownload),
              "Force re-download even if model exists (for pull command)")
+            ("filter", po::value<std::string>(&parsed_args.list_filter)->default_value("all"),
+             "Show models: all | installed | not-installed")
+            ("quiet", "Hide emojis in the model list (can be used with --filter)")
             ("ctx-len,c", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
              "Set context length")
             ("socket,s", po::value<size_t>(&parsed_args.max_socket_connections)->default_value(10),
             "Set the maximum number of socket connections allowed (for serve command)")
             ("q-len,q", po::value<size_t>(&parsed_args.max_npu_queue)->default_value(10),
             "Set number of max npu queue length (for serve command)")
+            ("cors", po::value<bool>(&parsed_args.cors)->default_value(1),
+             "Enable or disable Cross-Origin Resource Sharing (CORS) (for serve command)")
             ("preemption", po::value<bool>(&parsed_args.preemption)->default_value(false),
              "Enable preemption");
 
@@ -90,7 +99,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             std::cout << std::endl;
             std::cout << "Commands:" << std::endl;
             std::cout << "  run <model_tag>     - Run the model interactively" << std::endl;
-            std::cout << "  serve <model_tag>   - Start the Ollama-compatible server" << std::endl;
+            std::cout << "  serve <model_tag>   - Start the  server" << std::endl;
             std::cout << "  pull <model_tag>    - Download model files if not present" << std::endl;
             std::cout << "  remove <model_tag>  - Remove a model" << std::endl;
             std::cout << "  list                - List all available models" << std::endl;
@@ -107,7 +116,10 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             std::cout << "  " << argv[0] << " serve llama3.2:1b --socket 10" << std::endl;
             std::cout << "  " << argv[0] << " serve llama3.2:1b --q-len 10" << std::endl;
             std::cout << "  " << argv[0] << " serve llama3.2:1b --port 8000" << std::endl;
+            std::cout << "  " << argv[0] << " serve llama3.2:1b --cors 0" << std::endl;
             std::cout << "  " << argv[0] << " list" << std::endl;
+            std::cout << "  " << argv[0] << " list --quiet" << std::endl;
+            std::cout << "  " << argv[0] << " list --filter installed" << std::endl;
             return false; // Exit after showing help
         }
 
@@ -115,7 +127,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             parsed_args.version_requested = true;
             return true; // Exit after showing help
         }
-        
+       
 
         // Extract command and model_tag from positional arguments
         if (vm.count("command")) {
@@ -145,7 +157,10 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --socket 10" << std::endl;
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --q-len 10" << std::endl;
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --port 8000" << std::endl;
+                std::cout << "  " << argv[0] << " serve llama3.2:1b --cors 0" << std::endl;
                 std::cout << "  " << argv[0] << " list" << std::endl;
+                std::cout << "  " << argv[0] << " list --quiet" << std::endl;
+                std::cout << "  " << argv[0] << " list --filter installed" << std::endl;
                 return false; // Exit after showing help
             }
             
@@ -155,6 +170,12 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             }
             if (parsed_args.command == "port") {
                 parsed_args.port_requested = true;
+                return true;
+            }
+            if (parsed_args.command == "list") {
+                if (vm.count("quiet")) {
+                    parsed_args.quiet_list = true;
+                }
                 return true;
             }
         } else {
@@ -188,6 +209,11 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             if (!vm["port"].defaulted())
             {
                 std::cerr << "Error: The port number option is only supported with the serve command! " << std::endl;
+                return false;
+            }
+            if (!vm["cors"].defaulted())
+            {
+                std::cerr << "Error: The cors option is only supported with the serve command! " << std::endl;
                 return false;
             }
         }
