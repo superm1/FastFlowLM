@@ -18,7 +18,7 @@ has_children: false
 
 You must have AMD NPU driver **version 32.0.203.258 or later** installed for FastFlowLM to work correctly.
 
-> ⚙️ **Tip:** Upgrade to NPU Driver **32.0.203.304** for over 5–10% speed boost across all models and context lengths. [Download here](https://ryzenai.docs.amd.com/en/latest/inst.html#install-npu-drivers) *(AMD account required)*  
+> ⚙️ **Tip:** Upgrade to the new NPU Driver **32.0.203.304** for over 5–10% speed boost across all models and context lengths. [Download and Install](https://ryzenai.docs.amd.com/en/latest/inst.html#install-npu-drivers) *(AMD account required)*  
 
 - Check via:  
   **Task Manager → Performance → NPU**  
