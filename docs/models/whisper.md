@@ -47,19 +47,30 @@ Send audio to `POST /v1/audio/transcriptions` via any OpenAI Client or Open WebU
 **Example 1**: OpenAI Client
 
 ```python
+
+# Import the official OpenAI Python SDK (FastFlowLM mirrors the OpenAI API schema)
 from openai import OpenAI
 
+# Initialize the client to point at your local FastFlowLM server
+# - base_url: FastFlowLM's local OpenAI-compatible REST endpoint
+# - api_key: Dummy token; FastFlowLM typically doesn't enforce auth, but the client requires a string
 client = OpenAI(
-    base_url="http://localhost:52625/v1",  # FastFlowLM's local API endpoint
-    api_key="flm",  # Dummy key (FastFlowLM doesn’t require authentication)
+    base_url="http://localhost:52625/v1",  # FastFlowLM local API endpoint
+    api_key="flm",                         # Placeholder key
 )
 
+# Open the audio file in binary mode and create a transcription request
+# - model: name of the speech-to-text model exposed by FLM (e.g., "whisper-v3")
+# - file: file-like object pointing to your audio
 with open("audio.mp3", "rb") as f:
-    resp = client.audio.transcriptions.create(
-        model="whisper-v3",
-        file=f,
-    )
-    print(resp.text)
+    resp = client.audio.transcriptions.create(
+        model="whisper-v3",
+        file=f,
+    )
+
+# Print the transcribed text returned by the server
+print(resp.text)
+
 ```
 
 **Example 2**: Open WebUI
