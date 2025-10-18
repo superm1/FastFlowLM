@@ -10,8 +10,8 @@
 
 ## ⚡ FastFlowLM (FLM) — Unlock Ryzen™ AI NPUs
 
-Run large language models — now with **Vision** and **MoE** support — on **AMD Ryzen™ AI NPUs** in minutes.  
-**No GPU required. Faster and over 10× more power-efficient. Supports context lengths up to 256k tokens. Ultra-Lightweight (14 MB). Installs within 20 seconds.**
+Run large language models — now with **Vision**, **Audio** and **MoE** support — on **AMD Ryzen™ AI NPUs** in minutes.  
+**No GPU required. Faster and over 10× more power-efficient. Supports context lengths up to 256k tokens. Ultra-Lightweight (16 MB). Installs within 20 seconds.**
 
 📦 **The only out-of-box, NPU-first runtime built exclusively for Ryzen™ AI.**  
 🤝 **Think Ollama — but deeply optimized for NPUs.**  
