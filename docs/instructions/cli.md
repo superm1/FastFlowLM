@@ -116,7 +116,7 @@ flm serve llama3.2:1b
 
 ---
 
-## Show Server Port 
+### 🖧 Show Server Port 
 
 Show current FLM port (default) in PowerShell:  
   
@@ -165,7 +165,7 @@ flm serve llama3.2:1b --ctx-len 8192
 
 ---
 
-## Set Server Port at Launch
+### 🖧 Set Server Port at Launch
 
 Set a custom port at launch:
 
@@ -198,7 +198,7 @@ flm serve --cors 0
 
 ---
 
-### Preemption
+### ⏸️ Preemption
 
 Preemption allows high-priority tasks to interrupt ongoing NPU jobs, improving responsiveness for critical workloads. To enable preemption:
 
@@ -213,6 +213,26 @@ flm serve llama3.2:1b --preemption 1
 ```
 
 > ⚠️ Note: Preemption is for **engineering testing/optimization** only. It requires a special driver + toolkit and is **not for public use**.
+
+---
+
+### 🎙️ ASR (Automatic Speech Recognition)
+
+**Requirement:** The ASR model (e.g., `whisper-large-v3-turbo`) must run **with an LLM loaded concurrently**. Enabling `--asr 1` starts Whisper in the background **while** your chosen LLM loads.
+
+#### CLI mode
+```powershell
+flm run gemma3:4b --asr 1  # Load Whisper (whisper-large-v3-turbo) in the background and load the LLM (gemma3:4b) concurrently.
+```
+
+#### Server mode
+```powershell
+flm serve gemma3:4b --asr 1  # Background-load Whisper and initialize the LLM (gemma3:4b) concurrently.
+```
+
+> **Note:** ASR alone isn’t supported—an LLM must be present for end-to-end voice→text→LLM workflows.
+
+See the ASR guide: https://docs.fastflowlm.com/models/whisper.html
 
 ---
 
