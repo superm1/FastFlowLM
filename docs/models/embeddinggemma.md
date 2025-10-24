@@ -6,10 +6,10 @@ parent: Models
 
 ## 🧩 Model Card: embeddinggemma-300m  
 
-- **Type:** Speach-to-Text (ASR: Automatic Speech Recognition)
+- **Type:** Embedding mmodel (Sentence Similarity)
 - **Think:** No
 - **Base Model:** [google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)
-- **Max Context Length:** NA
+- **Max Chunk Size:** 2048
 - **Default Context Length:** NA
 
 ▶️ Run with FastFlowLM in PowerShell:  
