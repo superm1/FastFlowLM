@@ -6,7 +6,7 @@ parent: Models
 
 ## 🧩 Model Card: embeddinggemma-300m  
 
-- **Type:** Embedding mmodel (Sentence Similarity)
+- **Type:** Embedding (Sentence Similarity)
 - **Think:** No
 - **Base Model:** [google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)
 - **Max Chunk Size:** 2048
