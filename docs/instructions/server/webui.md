@@ -43,9 +43,9 @@ Enter **Name**, **Email**, and **Password** to create a local account.
    - **Name:** FastFlowLM
    - **Base URL:** `http://localhost:52625/v1`
    - **API Key:** `DUMMY` (any non-empty value)
-4. Click **Save**. If available, choose **Set as default**.
+4. Click **Save**.
 
-> Tip: In Chat settings, set **Provider** to your new **OpenAI-compatible** connection.
+> ⚠️ Diable `Title Generation`, `Follow Up Generation`, `Tags Generation`, `Retrieval Query Generation`, and `Web Search Query Generation` under **Settings->Interface** for best performance. 
 
 ---
 
