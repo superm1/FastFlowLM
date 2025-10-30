@@ -131,7 +131,7 @@ flm run qwen3-it:4b
 - **Type:** Image-Text-to-Text
 - **Think:** No  
 - **Base Model:** [Qwen/Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
-- **Max Context Length:** 32k tokens  
+- **Max Context Length:** 256k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://docs.fastflowlm.com/instructions/cli.html#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://docs.fastflowlm.com/instructions/cli.html#%EF%B8%8F-set-context-length-at-launch)**
 
