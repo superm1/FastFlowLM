@@ -92,7 +92,7 @@ flm run qwen3:8b
 
 ---
 
-## 🧩 Model Card: Qwen/Qwen3-4B-Thinking-2507
+## 🧩 Model Card: Qwen3-4B-Thinking-2507
 
 - **Type:** Text-to-Text
 - **Think:** Yes  
@@ -109,7 +109,7 @@ flm run qwen3-tk:4b
 
 ---
 
-## 🧩 Model Card: Qwen/Qwen3-4B-Instruct-2507
+## 🧩 Model Card: Qwen3-4B-Instruct-2507
 
 - **Type:** Text-to-Text
 - **Think:** No  
@@ -123,3 +123,25 @@ flm run qwen3-tk:4b
 ```powershell
 flm run qwen3-it:4b
 ```
+
+---
+
+## 🧩 Model Card: Qwen3-VL-4B-Instruct  
+
+- **Type:** Image-Text-to-Text
+- **Think:** No  
+- **Base Model:** [Qwen/Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
+- **Max Context Length:** 32k tokens  
+- **Default Context Length:** 32k tokens ([change default](https://docs.fastflowlm.com/instructions/cli.html#-change-default-context-length-max))  
+- **[Set Context Length at Launch](https://docs.fastflowlm.com/instructions/cli.html#%EF%B8%8F-set-context-length-at-launch)**
+
+▶️ Run with FastFlowLM in PowerShell:  
+
+```powershell
+flm run qwen3vl-it:4b
+```
+
+📝 **Note**
+
+- Image understanding adapts to image size. Image TTFT can range from under 1 second to ~200 seconds depending on resolution. Use lower-resolution images (720p or below) unless high resolution is required (e.g. OCR on small text).
+- Video understanding is not supported yet.
