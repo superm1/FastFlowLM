@@ -1,36 +1,64 @@
 FastFlowLM Proprietary Binary License Agreement
-Version 2.0 – November 2025
 
-IMPORTANT: READ CAREFULLY BEFORE USING THESE BINARIES.
-By installing, copying, or using the binary components provided with this software distribution (the “Binaries”), you agree to be bound by the terms of this License Agreement. If you do not agree to these terms, do not use or distribute the Binaries.
+Version 2.0 — November 2025
 
-LICENSE GRANT
-FastFlowLM Inc. (“Licensor”) hereby grants you a limited, non-exclusive, non-transferable, royalty-free license to use the Binaries for non-commercial, research, academic, or personal purposes. Commercial use is permitted under the conditions set forth in Section 3 (Commercial Use & Revenue Threshold).
+1. IMPORTANT NOTICE
 
-RESTRICTIONS
-You may NOT:
-a. Use the Binaries for any commercial purpose unless you meet the conditions in Section 3 and have obtained a commercial license.
+READ CAREFULLY BEFORE USING THESE BINARIES.
+By installing, copying, or using the binary components provided with this software distribution (the “Binaries”), you agree to be bound by the terms of this License Agreement (“Agreement”).
+If you do not agree to these terms, do not use or distribute the Binaries.
+
+2. LICENSE GRANT
+
+FastFlowLM Inc. (“Licensor”) grants you a limited, non-exclusive, non-transferable, royalty-free license to use the Binaries for non-commercial, research, academic, or personal purposes.
+Commercial use is permitted under the conditions described in Section 4 (Commercial Use & Revenue Threshold).
+
+3. RESTRICTIONS
+
+You may not:
+a. Use the Binaries for any commercial purpose unless you meet the conditions in Section 4 and, if required, have obtained a commercial license.
 b. Modify, reverse-engineer, disassemble, or decompile the Binaries.
-c. Redistribute the Binaries as part of any commercial software or service.
-d. Remove or obscure any copyright, trademark, or patent notices.
+c. Redistribute, publish, upload, or otherwise make the Binaries available to any third party, whether for commercial or non-commercial purposes, without prior written permission from the Licensor.
+d. Remove or obscure any copyright, trademark, or patent notices contained in or on the Binaries.
 
-COMMERCIAL USE & REVENUE THRESHOLD
-You’re free to use the Binaries for commercial purposes until your company’s annual revenue exceeds USD 10 million. Once your company’s annual revenue exceeds USD 10 million, you must obtain a commercial license from the Licensor to continue use.
+Authorized redistribution may occur only through official FastFlowLM distribution channels or mirrors explicitly approved in writing by FastFlowLM Inc.
+
+4. COMMERCIAL USE & REVENUE THRESHOLD
+
+You may use the Binaries for commercial purposes without a separate commercial license until your company’s annual gross revenue exceeds USD 10 million.
+Once your company’s annual revenue exceeds this threshold, you must obtain a commercial license from the Licensor to continue use.
 To request a commercial license, contact: info@fastflowlm.com
 
-INTELLECTUAL PROPERTY
-The Binaries are protected by copyright and by one or more pending patents. You acknowledge that the Binaries and associated intellectual property are owned by FastFlowLM Inc. and are not licensed under the open-source MIT license used in other parts of this repository.
+Use by accredited universities, nonprofit research institutions, and individual researchers for academic research is considered non-commercial under this Agreement.
 
-DISCLAIMER OF WARRANTY
-THE BINARIES ARE PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+5. INTELLECTUAL PROPERTY
 
-LIMITATION OF LIABILITY
-IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY DAMAGES (INCLUDING BUT NOT LIMITED TO LOST PROFITS, BUSINESS INTERRUPTION, OR LOSS OF DATA) ARISING OUT OF THE USE OR INABILITY TO USE THE Binaries, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+The Binaries are protected by copyright and by one or more pending patents.
+You acknowledge that all rights, title, and interest in and to the Binaries, and any associated intellectual property, are owned by FastFlowLM Inc.
+The Binaries are not licensed under the open-source MIT license that applies to other portions of this repository.
 
-TERMINATION
-This license is effective until terminated. It will terminate automatically without notice if you fail to comply with any term herein. Upon termination, you must destroy all copies of the Binaries.
+6. DISCLAIMER OF WARRANTY
 
-GOVERNING LAW
-This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to conflict of laws principles.
+THE BINARIES ARE PROVIDED “AS IS,” WITHOUT WARRANTY OF ANY KIND.
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+7. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY DAMAGES (INCLUDING BUT NOT LIMITED TO LOST PROFITS, BUSINESS INTERRUPTION, OR LOSS OF DATA) ARISING OUT OF THE USE OR INABILITY TO USE THE BINARIES, EVEN IF THE LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+8. TERMINATION
+
+This Agreement remains in effect until terminated.
+It will terminate automatically and without notice if you fail to comply with any term herein.
+Upon termination, you must immediately cease all use of and destroy all copies of the Binaries.
+
+9. SEVERABILITY & VENUE
+
+If any provision of this Agreement is found invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+Any disputes arising under or related to this Agreement shall be resolved exclusively in the state or federal courts located in Delaware, USA.
+
+10. GOVERNING LAW
+
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to its conflict-of-laws principles.
 
 © 2025 FastFlowLM Inc. All rights reserved.
