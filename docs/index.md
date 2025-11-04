@@ -25,8 +25,11 @@ From *idle silicon* to *instant power* — **FastFlowLM makes Ryzen™ AI shine.
 🔑 **Password**: `0000`
 
 > **Note:**
+> - The context length per chat is limited to **4,096 tokens** for test drive.
+> - Only **a small number of models** are offered for test drive (less confusing).
 > - Alternatively, **sign up** with your own credentials instead of using the shared guest account.
 > - Real-time demo powered by **FastFlowLM + Open WebUI** — no downloads, no installs.
+> - **Occasional downtime**: Windows updates, power or connectivity issues. Try again later if happens.
 
 **Also Try:**
 - 🖼️ **Gemma3:4B — the first NPU-only VLM!**  
@@ -44,7 +47,7 @@ Select the `FLM-RAG` model (powered by Qwen3-Thinking-2507-4B) with a knowledge 
 > - Some universities or companies may **block access** to the test drive site. If it doesn't load over Wi-Fi, try switching to a **cellular network**.  
 > - FastFlowLM is designed for **single-user local use**. This remote demo machine may experience short wait times when **multiple users** access it concurrently — please be patient.
 > - When switching models, it may take longer time to replace the model in memory.
-> - Large prompts and VLM (gemma3:4b) may take longer — but it works! 🙂
+> - Large prompts and VLM (gemma3:4b and gwen3vl:4b) may take longer — but it works! 🙂
 
 ---
 

@@ -114,6 +114,9 @@ services:
       - OPENAI_API_BASE_URL=http://host.docker.internal:52625/v1
       - OPENAI_API_KEY=dummy-key
 
+      # Explicitly disable Ollama auto-connect
+      - OLLAMA_BASE_URL=
+
       # WebUI settings
       - WEBUI_AUTH=false
       - WEBUI_SECRET_KEY=dummysecretkey
