@@ -1,5 +1,5 @@
 ---
-title: GPT-oss
+title: gpt-oss
 nav_order: 6
 parent: Models
 ---
