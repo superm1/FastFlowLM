@@ -2,7 +2,7 @@
 /// \brief language_table class
 /// \author FastFlowLM Team
 /// \date 2025-10-17
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a header file for the language_table class
 #pragma once
 #include <string>

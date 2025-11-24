@@ -2,7 +2,7 @@
 /// \brief harmony_filter class
 /// \author FastFlowLM Team
 /// \date 2025-10-10
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This class is used to filter the messages that are sent to the model
 #pragma once
 

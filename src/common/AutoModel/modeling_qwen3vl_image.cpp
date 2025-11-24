@@ -2,7 +2,7 @@
 /// \brief Qwen3VL image processing implementation
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a source file for the Qwen3VL image processing functionality
 
 #include "AutoModel/modeling_qwen3vl.hpp"

@@ -2,7 +2,7 @@
 /// \brief Gemma3 image processing implementation
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a source file for the Gemma3 image processing functionality
 
 #include "AutoModel/modeling_gemma3.hpp"

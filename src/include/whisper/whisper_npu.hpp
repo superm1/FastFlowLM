@@ -2,7 +2,7 @@
 /// \brief whisper_npu class
 /// \author FastFlowLM Team
 /// \date 2025-10-17
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a header file for the whisper_npu class
 #pragma once
 #include "lm_config.hpp"

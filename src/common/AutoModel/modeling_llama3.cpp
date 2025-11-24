@@ -2,7 +2,7 @@
 /// \brief llama3 class
 /// \author FastFlowLM Team
 /// \date 2025-09-04
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a source file for the llama3 class
 
 #include "AutoModel/modeling_llama3.hpp"
@@ -170,5 +170,5 @@ std::string DeepSeek_r1_8b::generate_with_prompt(chat_meta_info_t& meta_info, lm
     if (!this->insert(meta_info, input)) {
         return "";
     }
-    return this->_shared_generate(meta_info, length_limit, os);
+    return this->generate(meta_info, length_limit, os);
 }

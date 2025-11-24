@@ -4,7 +4,7 @@
  * \brief RestHandler class and related declarations
  * \author FastFlowLM Team
  * \date 2025-08-05
- * \version 0.9.20
+ *  \version 0.9.21
  */
 #include "rest_handler.hpp"
 #include "wstream_buf.hpp"
@@ -162,7 +162,13 @@ RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const 
         std::string embed_tag = "embed-gemma:300m";
         ensure_embed_model_loaded(embed_tag);
     }
-    ensure_model_loaded(default_model_tag);
+
+    if (default_model_tag != "model-faker") {
+        ensure_model_loaded(default_model_tag);
+    }
+    else {
+        this->current_model_tag = "model-faker";
+    }
 }
 
 ///@brief RestHandler destructor

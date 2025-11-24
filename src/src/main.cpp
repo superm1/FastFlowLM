@@ -2,7 +2,7 @@
 /// \brief Main entry point for the FLM application
 /// \author FastFlowLM Team
 /// \date 2025-08-05
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a source file for the main entry point
 #pragma once
 #include "runner.hpp"
@@ -218,11 +218,11 @@ int main(int argc, char* argv[]) {
     
     // Handle special case for serve command - use default tag if none provided
     if (command == "serve" && tag.empty()) {
-        tag = "llama3.2:1b"; // Use default tag
+        tag = "model-faker"; // Use default tag
     }
     
     if (command == "run" || command == "serve" || command == "pull" || command == "remove") {
-      if (!modelTags.count(tag)) {
+      if (tag != "model-faker" && (!modelTags.count(tag))) {
             header_print("ERROR", "Model not found: " << tag << "; Please check with `flm list` and try again.");
             return 1;
         }
