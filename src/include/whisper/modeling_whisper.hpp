@@ -2,7 +2,7 @@
 /// \brief modeling_whisper class
 /// \author FastFlowLM Team
 /// \date 2025-10-17
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a header file for the modeling_whisper class
 
 #pragma once

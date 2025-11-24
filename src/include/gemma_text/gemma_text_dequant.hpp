@@ -2,7 +2,7 @@
 /// \brief dequant class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a header file for the dequant class
 #pragma once
 #include "lm_config.hpp"

@@ -2,7 +2,7 @@
 /// \brief automodel class
 /// \author FastFlowLM Team
 /// \date 2025-09-01
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a header file for the auto_model class
 #pragma once
 

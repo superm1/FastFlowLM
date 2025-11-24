@@ -2,7 +2,7 @@
 /// \brief get_auto_embedding_model func
 /// \author FastFlowLM Team
 /// \date 2025-10-23
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a header file for get_auto_embedding_model func
 #pragma once
 

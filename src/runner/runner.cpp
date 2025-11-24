@@ -4,7 +4,7 @@
 *  \brief Runner implementation for interactive model execution
 *  \author FastFlowLM Team
 *  \date 2025-08-05
-* \version 0.9.20
+*  \version 0.9.21
 */
 #include "runner.hpp"
 #include "harmony_filter.hpp"

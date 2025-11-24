@@ -2,7 +2,7 @@
 /// \brief whisper_npu class
 /// \author FastFlowLM Team
 /// \date 2025-10-17
-/// \version 0.9.20
+/// \version 0.9.21
 /// \note This is a source file for the modeling_whisper class
 #include "whisper/modeling_whisper.hpp"
 
