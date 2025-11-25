@@ -14,30 +14,47 @@ parent: Models
 
 ▶️ Run with FastFlowLM in PowerShell:  
 
-> ASR model requires to use with an LLM (load concurrently) for both CLI and Server Modes.
+> ASR model requires to use with an LLM (load concurrently) for CLI Mode.
+> ASR model can be used as an independent ASR model in Server Mode (flm v0.9.21 and after).
 
 ### CLI Mode   
 
-Start with ASR enabled:
+Start with ASR enabled: 
 
+Load the ASR model (whisper-v3:turbo) in the background, with concurrent LLM loading (gemma3:4b).
 ```powershell
 flm run gemma3:4b --asr 1 
-# Load the ASR model (whisper-v3:turbo) in the background, with concurrent LLM loading (gemma3:4b).
+```
+or
+```powershell
+flm run gemma3:4b -a 1 
 ```
 
 Then, type (replace `filename.mp3` with your audio file path):
-
 ```powershell
 /input "path\to\audio_sample.mp3" summarize it
 ```
 
 ### Server Mode 
 
-Start with ASR enabled:
+Start with ASR enabled: 
 
+- Load the ASR model (whisper-v3:turbo) in the background, with concurrent LLM loading (gemma3:4b).
 ```powershell
 flm serve gemma3:4b --asr 1 
-# Load the ASR model (whisper-v3:turbo) in the background, with concurrent LLM loading (gemma3:4b).
+```
+or
+```powershell
+flm serve gemma3:4b -a 1 
+```
+
+- Load the ASR model (whisper-v3:turbo) as a standalone ASR model.
+```powershell
+flm serve --asr 1 
+```
+or
+```powershell
+flm serve -a 1 
 ```
 
 Send audio to `POST /v1/audio/transcriptions` via any OpenAI Client or Open WebUI.
