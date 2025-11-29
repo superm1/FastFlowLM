@@ -9,7 +9,7 @@ nav_order: 2
 This section reports the performance of Qwen 3 on NPU with FastFlowLM (FLM).
 
 > **Note:** 
-- Results are based on FastFlowLM v0.9.19.  
+- Results are based on FastFlowLM v0.9.22.  
 - Under FLM's default NPU power mode (Performance)    
 - Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM.   
 - Newer versions may deliver improved performance.   
@@ -18,12 +18,12 @@ This section reports the performance of Qwen 3 on NPU with FastFlowLM (FLM).
 
 ### 🚀 Decoding Speed (TPS, or Tokens per Second, starting @ different context lengths)
 
-| **Model**        | **Hardware**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**Model**  |
-|------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|---------|
-| **Qwen 3 0.6B**  | NPU (FLM)    | 53.7 |	47.3 |	38.7 |	28.7 |	18.9 |	11.2|**Qwen 3 0.6B**|
-| **Qwen 3 1.7B**  | NPU (FLM)    | 28.4 |	26.8 |	23.9 |	19.6 |	14.5 |	9.5|**Qwen 3 1.7B**  |
-| **Qwen 3 4B**    | NPU (FLM)    | 14.3 |	13.7 |	12.7 |	11.1 |	8.8 |	6.3|**Qwen 3 4B**    | 
-| **Qwen 3 8B**    | NPU (FLM)    | 8.3 |	8.2 |	7.7 |	7.2 |	6.1 |	4.8|**Qwen 3 8B**    |
+| **Model**        | **Hardware**       | **0k** | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**Model**  |
+|------------------|--------------------|--------:|--------:|--------:|--------:|--------:|---------:|---------:|---------|
+| **Qwen 3 0.6B**  | NPU (FLM)    | 80.0	| 66.5	| 57.5	| 44.5	| 31.0	| 19.6	| 14.1|**Qwen 3 0.6B**|
+| **Qwen 3 1.7B**  | NPU (FLM)    | 43.3	| 40.2	| 35.8	| 30.8	| 23.7	| 16.4	| 12.5|**Qwen 3 1.7B**  |
+| **Qwen 3 4B**    | NPU (FLM)    | 21.2	| 19.6	| 18.1	| 16.3	| 13.7	| 10.6	| 8.5|**Qwen 3 4B**    | 
+| **Qwen 3 8B**    | NPU (FLM)    | 12.5	| 11.9	| 11.5	| 11.1	| 10.4	| 8.7	| 7.2|**Qwen 3 8B**    |
 
 ---
 
@@ -38,7 +38,7 @@ This section reports the performance of Qwen 3 on NPU with FastFlowLM (FLM).
 
 ---
 
-### 🚀 Prefill TTFT with Image Input (seconds)
+### 🚀 Prefill TTFT with Image Input (Seconds)
 
 Prefill time-to-first-token (TTFT) for Qwen3-VL-4B on NPU (FastFlowLM) with different image resolutions.
 

@@ -1,5 +1,5 @@
 ---
-title: LFM
+title: LiquidAI/LFM
 nav_order: 7
 parent: Models
 ---
