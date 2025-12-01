@@ -56,41 +56,53 @@ flm pull llama3.2:3b --force
 
 ### 📦 List Supported and Downloaded Models
 
-Display all available models and locally downloaded models:
+**Display all available models and locally downloaded models:**
 
 ```powershell
 flm list
 ```
 
-Filters flag:
+**Filters flag:**
 
+Show everything
 ```powershell
-# Show everything
 flm list --filter all
+```
 
-# Only models already installed
+Only models already installed
+```powershell
 flm list --filter installed
+```
 
-# Only models not yet installed
+Only models not yet installed
+```powershell
 flm list --filter not-installed
 ```
 
-Quiet mode:
+**Quiet mode:**
 
+Default view (pretty, with icons)
 ```powershell
-# Default view (pretty, with icons)
 flm list
+```
 
-# Quiet view (no emoji / minimal)
+Quiet view (no emoji / minimal)
+```powershell
 flm list --quiet
+```
 
-# Show everything
+Show everything
+```powershell
 flm list --filter all --quiet
+```
 
-# Only models already installed
+Only models already installed
+```powershell
 flm list --filter installed --quiet
+```
 
-# Only models not yet installed
+Only models not yet installed
+```powershell
 flm list --filter not-installed --quiet
 ```
 
@@ -175,6 +187,18 @@ Set a custom port at launch:
   ```
 
 > ⚠️ `--port` (`-p`) only affects the **current run**; it won’t change the default port.
+
+---
+
+### 🖥️ Set Host at Launch
+
+Specify a custom host address when starting the server:
+
+  ```powershell
+  flm serve llama3.2:1b --host 127.0.0.1
+  ```
+
+> ⚠️ `--host` only affects the **current run**; it won’t change the default port (deault port is `127.0.0.1`).
 
 ---
 
