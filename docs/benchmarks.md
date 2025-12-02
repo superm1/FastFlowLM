@@ -45,14 +45,14 @@ sections:
   #     - heading: "Laptop-verified"
   #       body: "Instrumentation overlays remain visible from the Ryzen™ AI 9 HX 370 Halo reference design capture."
 
-  # - type: media
-  #   variant: alt
-  #   kicker: "Gemma3 4B Vision"
-  #   title: "Image + text throughput on-device"
-  #   media:
-  #     src: "/assets/bench/gemma3-4b.png"
-  #     alt: "Gemma3 4B benchmark overview for throughput and TTFT"
-  #     title: "Vision + text TTFT and TPS"
+  - type: media
+    variant: alt
+    kicker: "Gemma3 4B Vision"
+    title: "On-device power efficiency (Tokens/s/Watt or Tokens/Joule)"
+    media:
+      src: "/assets/bench/gemma3-4b.png"
+      alt: "Gemma3 4B benchmark overview of power efficiency (TPS/W) for both prefill and decoding"
+      title: "Ultra-high power efficiency"
 
 
   # - type: media

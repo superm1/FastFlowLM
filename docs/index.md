@@ -182,13 +182,13 @@ sections:
     right:
       metric_cards:
         - label: "Llama3.2 1B @ Q4_1 (4-bit with bias)"
-          value: "66 tok/s (generation)"
+          value: "66 tok/s"
           desc: "Ryzen™ AI 9 HX 350 · ms-level latency"
         - label: "Gemma 3 4B Vision"
-          value: "Understand an image in under 4 seconds"
-          desc: "Vision + text pipeline on XDNA2 NPU"
-        - label: "Power draw (chip package)"
-          value: "Less than 2 W (CPU + NPU)"
+          value: "~4 seconds"
+          desc: "Image understanding on XDNA2 NPU"
+        - label: "Power draw (CPU + NPU)"
+          value: "> 2 W"
           desc: "Full assistant stack vs ~25 W GPU baseline"
 
   - type: two_column
