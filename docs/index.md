@@ -185,10 +185,10 @@ sections:
           value: "66 tok/s"
           desc: "Ryzen™ AI 9 HX 350 · ms-level latency"
         - label: "Gemma 3 4B Vision"
-          value: "~4 seconds"
+          value: "~4 sec"
           desc: "Image understanding on XDNA2 NPU"
         - label: "Power draw (CPU + NPU)"
-          value: "> 2 W"
+          value: "< 2 W"
           desc: "Full assistant stack vs ~25 W GPU baseline"
 
   - type: two_column
