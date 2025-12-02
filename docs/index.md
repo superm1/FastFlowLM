@@ -148,7 +148,7 @@ sections:
         title: "Gemma3 · Qwen3-VL · Whisper"
         body: "VLM and audio pipelines run on the NPU, enabling private multimodal assistants."
       - label: "Local private edge database"
-        title: "Retrieval-Augmented Generation (RAG) · EmbeddingGemma"
+        title: "Retrieval-Augmented Generation (RAG) · Embedding Model"
         body: "Build and run a complete RAG workflow fully on the NPU, without relying on the CPU or GPU."
     ctas:
       - label: "Browse models"
