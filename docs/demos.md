@@ -53,16 +53,16 @@ sections:
 
   - type: media
     variant: alt
-    kicker: "Llama 3.2 on WebUI"
+    kicker: "Llama 3.2 on Open WebUI"
     title: "Interact with Llama 3.2-3B through the FastFlowLM WebUI"
     body: |
-      Chat with Llama 3.2-3B in a browser-based UI powered by FastFlowLM, with responses served directly from the
+      Chat with Llama 3.2-3B in a browser-based UI powered by FastFlowLM and Open WebUI, with responses served directly from the
       Ryzen™ AI NPU.
     media:
       src: "/assets/llama-demo.gif"
       alt: "Llama 3.2 chat demo running in the FastFlowLM WebUI"
       href: "https://youtu.be/mPrr9FLd8ps?si=vsyHkmtrBjP4s-dq"
-      kicker: "Llama 3.2 on WebUI"
+      kicker: "Llama 3.2 on Open WebUI"
       body: |
         Explore NPU-backed chat experiences with a modern WebUI, suitable for local copilots, assistants,
         and prototyping interactive products.

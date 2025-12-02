@@ -57,7 +57,7 @@ sections:
     right:
       title: "Need help?"
       body: |
-        Ping `@fastflowlm` in Discord or email [info@fastflowlm.com](mailto:info@fastflowlm.com).
+        Ping us in Discord or email [info@fastflowlm.com](mailto:info@fastflowlm.com).
         We respond within 24 hours.
 ---
 

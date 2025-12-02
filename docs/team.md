@@ -26,7 +26,7 @@ sections:
         - heading: "Kernel research"
           body: "Co-designing fused attention + MoE operators with AMD."
         - heading: "Developer experience"
-          body: "Shipping ergonomic CLI, APIs, and docs inspired by Ollama."
+          body: "Shipping ergonomic CLI, APIs, and docs inspired by llama.cpp and Ollama."
         - heading: "Open community"
           body: "Weekly office hours, demos, and benchmarking nights."
 
@@ -41,10 +41,10 @@ sections:
           Leads the NEXT Lab focused on domain-specific accelerators, reconfigurable computing, and applied ML.
           Guides FastFlowLM kernel strategy and academic collaborations.
         links:
-          - label: "Clemson"
+          - label: "Clemson profile"
             url: "https://www.clemson.edu/cecas/departments/ece/faculty_staff/faculty/twei.html"
-          - label: "Scholar"
-            url: "https://scholar.google.com/citations?user=SsgrItsAAAAJ&hl=en"
+          # - label: "Scholar"
+          #   url: "https://scholar.google.com/citations?user=SsgrItsAAAAJ&hl=en"
       - name: "Ken Qing Yang"
         role: "Distinguished Engineering Professor · University of Rhode Island"
         image: "/assets/kenqingyang.png"
@@ -63,6 +63,9 @@ sections:
         bio: |
           Focused on domain-specific accelerator design, reconfigurable computing, and efficient on-device AI inference.
           Brings deep experience in hardware–software co-optimization across FPGA, CGRA, and emerging AI accelerator architectures.
+        links:
+          - label: "Scholar"
+            url: "https://scholar.google.com/citations?hl=en&user=iuIZeGYAAAAJ&view_op=list_works"
 
   - type: two_column
     variant: alt

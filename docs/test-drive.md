@@ -8,7 +8,7 @@ sections:
     kicker: "Remote access"
     title: "Try FastFlowLM without a Ryzen™ AI laptop"
     body: |
-      Launch our hosted FastFlowLM + Open WebUI environment backed by an AMD Ryzen™ AI box with 96&nbsp;GB RAM.
+      Launch our hosted FastFlowLM + Open WebUI environment backed by an AMD Ryzen™ AI box (Kraken Point) with 96&nbsp;GB RAM.
       Stream tokens, upload images, or run agentic workflows exactly as you would locally.
     ctas:
       - label: "Open test drive"
@@ -34,13 +34,13 @@ sections:
       items:
         - heading: "Models"
           body: |
-            Llama 3.2 3B/8B, Gemma 3 4B Vision, DeepSeek-R1 7B, Whisper, EmbeddingGemma.
+            Llama 3.x, Gemma 3, DeepSeek-R1, Qwen3, Whisper, EmbeddingGemma.
         - heading: "Integrations"
           body: |
-            Open WebUI, REST playground, LangChain quickstart scripts.
+            Open WebUI
         - heading: "Monitoring"
           body: |
-            Live NPU telemetry so you can watch throughput and power draw.
+            Live NPU telemetry so you can watch throughput.
     right:
       title: "Limits"
       items:

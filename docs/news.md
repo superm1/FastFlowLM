@@ -21,7 +21,7 @@ sections:
     right:
       title: "Stay connected"
       body: |
-        Follow FastFlowLM development through GitHub releases, Discord announcements, and our blog.
+        Follow FastFlowLM development through GitHub releases and Discord announcements.
       items:
         - heading: "Release notes"
           body: "Detailed changelogs for every FastFlowLM release."

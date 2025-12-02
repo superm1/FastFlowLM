@@ -9,7 +9,7 @@ sections:
     kicker: "NPU-first runtime"
     title: "The fastest, most efficient LLM inference on NPUs"
     body: |
-      FastFlowLM delivers an Ollama-style developer experience optimized for tile-structured NPU accelerators. Install in seconds, stream tokens instantly, and run context windows up to 256k — all with dramatically better efficiency than GPU-first stacks. Our GA release for AMD Ryzen™ AI NPUs is available today, with betas for Qualcomm Snapdragon and Intel Core Ultra coming soon.
+      FastFlowLM (FLM) delivers an Ollama-style developer experience optimized for tile-structured NPU accelerators. Install in seconds, stream tokens instantly, and run context windows up to 256k — all with dramatically better efficiency than GPU-first stacks. Our GA release for AMD Ryzen™ AI NPUs is available today, with betas for Qualcomm Snapdragon and Intel Core Ultra coming soon.
     ctas:
       - label: "Download FastFlowLM (Windows)"
         href: "https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe"
@@ -98,7 +98,7 @@ sections:
   - type: media
     variant: alt
     kicker: "Llama 3.2 on NPU"
-    title: "Interact with Llama 3.2-3B through the FastFlowLM WebUI"
+    title: "Interact with Llama 3.2-3B via Open WebUI"
     media:
       src: "/assets/llama-demo.gif"
       alt: "Llama 3.2 chat demo running in the FastFlowLM WebUI"
@@ -148,7 +148,7 @@ sections:
         title: "Gemma3 · Qwen3-VL · Whisper"
         body: "VLM and audio pipelines run on the NPU, enabling private multimodal assistants."
       - label: "Local private edge database"
-        title: "Retrieval-Augmented Generation (RAG) · Embedding Model"
+        title: "Retrieval-Augmented Generation (RAG) · EmbeddingGemma"
         body: "Build and run a complete RAG workflow fully on the NPU, without relying on the CPU or GPU."
     ctas:
       - label: "Browse models"
@@ -166,12 +166,12 @@ sections:
       title: "Proof on silicon, not slides"
       body: |
         FastFlowLM is tuned on real Ryzen™ AI hardware with synthetic and application-level workloads.
-        Expect steady 40–80 tok/s on 7B models at < 10 W, plus deterministic latency for agentic chains.
+        Expect steady 20–80 tok/s on models at < 2 W (CPU+NPU), plus deterministic latency for agentic chains.
       items:
         - heading: "Full-stack telemetry"
-          body: "Counters for NPU, CPU, and memory let you see exactly where cycles go."
+          body: "See exactly where compute goes with NPU, CPU, and memory counters."
         - heading: "Scenario-driven suites"
-          body: "Instruction tuning, RAG, chat, and multimodal tests mirror real workloads."
+          body: "Instruction tuning, RAG, chat, and multimodal tests with real workloads."
       ctas:
         - label: "Benchmark details"
           href: "/benchmarks/"
@@ -181,15 +181,15 @@ sections:
           style: ghost
     right:
       metric_cards:
-        - label: "Llama3.2 3B @ 4-bit"
-          value: "72 tok/s"
-          desc: "Ryzen™ AI 9 HX 370 · 8 ms median latency"
+        - label: "Llama3.2 1B @ Q4_1 (4-bit with bias)"
+          value: "66 tok/s (generation)"
+          desc: "Ryzen™ AI 9 HX 350 · ms-level latency"
         - label: "Gemma 3 4B Vision"
-          value: "18 fps"
-          desc: "Vision + text pipeline on XDNA2 with shared memory"
-        - label: "Power draw"
-          value: "9.6 W"
-          desc: "Full assistant stack vs ~45 W GPU baseline"
+          value: "Understand an image in under 4 seconds"
+          desc: "Vision + text pipeline on XDNA2 NPU"
+        - label: "Power draw (chip package)"
+          value: "Less than 2 W (CPU + NPU)"
+          desc: "Full assistant stack vs ~25 W GPU baseline"
 
   - type: two_column
     id: docs
@@ -205,14 +205,12 @@ sections:
       title: "Remote test drive"
       body: |
         No Ryzen™ AI hardware yet? Launch the hosted FastFlowLM + Open WebUI sandbox and stream from a live
-        AMD Ryzen™ AI box with 96 GB RAM.
+        AMD Ryzen™ AI box (Kraken Point).
       items:
         - heading: "Live hardware"
           body: "Same builds we use internally, refreshed with every release."
         - heading: "Guest access"
           body: "Instant login with rotating demo credentials."
-        - heading: "Bring your apps"
-          body: "Point your HTTP client at the public endpoint to try agent flows."
       ctas:
         - label: "Launch test drive"
           href: "/test-drive/"

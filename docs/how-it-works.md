@@ -8,12 +8,11 @@ sections:
     kicker: "Technology deep dive"
     title: "FastFlowLM is built NPU-first"
     body: |
-      FastFlowLM retools the entire inference stack for AMD's XDNA-based Ryzen™ AI silicon.
-      Instead of mirroring GPU kernels, we partition prefill and decoding into tile-sized workloads,
-      keep KV state resident on-chip, and stream attention math through the NPU's 12 TFLOPS bf16 fabric.
+      FastFlowLM rebuilds the entire inference stack for AMD’s XDNA-based Ryzen™ AI NPUs.
+      Instead of porting kernels, we split prefill and decoding into tile-aligned workloads, keep KV state on-chip, and stream attention through the NPU’s 2D-tiled mesh.
 
       The result: up to **5.2× faster prefill** and **4.8× faster decoding** than the iGPU, **33.5× / 2.2×**
-      gains versus the CPU, while drawing **67× / 223× less power**. We also lift the context ceiling from **2K to
+      gains versus the CPU, while drawing **67× / 223× less energy per token**. We also lift the context ceiling from **2K to
       256K tokens** and halve Gemma 3 image TTFT from **8 s down to 4 s** on the same laptop-class part.
     ctas:
       - label: "See benchmarks"
@@ -42,7 +41,6 @@ sections:
       kicker: "Parallel-by-design"
       title: "Fine-grained orchestration on XDNA"
       body: |
-        The Ryzen AI chip blends an iGPU and an always-on NPU, both rated at 12 TFLOPS bf16 compute.
         While the GPU enjoys 125 GB/s of memory bandwidth, the NPU sits at 60 GB/s—so FastFlowLM
         had to attack the problem with software-led tiling, compression, and scheduling.
       items:
@@ -60,14 +58,14 @@ sections:
       panel: true
       title: "Execution phases"
       body: |
-        FastFlowLM dissects inference into deterministic phases so the runtime can pipeline work across CPU, GPU, and NPU.
+        FastFlowLM dissects inference into deterministic phases so the runtime can pipeline work on NPU.
       items:
         - heading: "Prefill turbo"
           body: |
             Token embedding, rotary math, and large matmuls are staged across contiguous tiles for the 5.2× prefill gains.
         - heading: "Token streaming"
           body: |
-            Lightweight decode kernels reuse on-chip KV blocks, hold steady at 4.8× faster than the iGPU, and avoid cache thrash.
+            Lightweight kernels reuse on-chip KV blocks, hold steady at 4.8× faster than the iGPU, and avoid cache thrash.
         - heading: "Vision + multimodal"
           body: |
             Image TTFT drops from 8 s to 4 s by overlapping patch projection with text prefill on separate compute islands.
