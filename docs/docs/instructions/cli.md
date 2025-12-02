@@ -145,7 +145,7 @@ flm serve gemma3:4b --pmode balanced
 
 ### 🎛️ Set Context Length at Launch
 
-The default context length for each model can be found [here](https://docs.fastflowlm.com/models/).   
+The default context length for each model can be found [here](https://fastflowlm.com/docs/models/).   
 
 Set the context length with `--ctx-len` (or `-c`).  
 
@@ -233,7 +233,7 @@ flm serve gemma3:4b --asr 1  # Background-load Whisper and initialize the LLM (g
 
 > **Note:** ASR alone isn’t supported—an LLM must be present for end-to-end voice→text→LLM workflows.
 
-See the ASR guide [here](https://docs.fastflowlm.com/models/whisper.html)
+See the ASR guide [here](https://fastflowlm.com/docs/models/whisper/)
 
 ---
 

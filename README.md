@@ -23,10 +23,10 @@ Run large language models — now with **Vision**, **Audio**, **Embedding** and 
 
 ## 🔗 Quick Links
 
-  🔽 **[Download](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)** | 📊 **[Benchmarks](https://docs.fastflowlm.com/benchmarks/)** | 📦 **[Model List](https://docs.fastflowlm.com/models/)**  
+  🔽 **[Download](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)** | 📊 **[Benchmarks](https://fastflowlm.com/docs/benchmarks/)** | 📦 **[Model List](https://fastflowlm.com/docs/models/)**  
 
 
-  📖 **[Docs](https://docs.fastflowlm.com)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://docs.fastflowlm.com/#-test-drive-remote-demo)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** 
+  📖 **[Docs](https://fastflowlm.com/docs)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://fastflowlm.com/docs/#-test-drive-remote-demo)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** 
 
 ---
 
@@ -69,7 +69,7 @@ flm serve llama3.2:1b
 ```
 > The model tag (e.g., `llama3.2:1b`) sets the initial model, which is optional. If another model is requested, FastFlowLM will automatically switch to it. Local server is on port 52625 (default).  
 
-**[![FastFlowLM Docs](https://img.shields.io/badge/FastFlowLM-Detailed%20Instructions-red?style=flat&logo=readthedocs)](https://docs.fastflowlm.com/instructions/)**
+**[![FastFlowLM Docs](https://img.shields.io/badge/FastFlowLM-Detailed%20Instructions-red?style=flat&logo=readthedocs)](https://fastflowlm.com/docs/instructions/)**
 
 ---
 

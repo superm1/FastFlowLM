@@ -14,7 +14,7 @@ This guide walks you through setting up **Obsidian** (with *AI Providers* and *L
 
 Before starting, ensure you have the following installed:
 - **[Obsidian](https://obsidian.md/)**
-- **[FastFlowLM](https://docs.fastflowlm.com/install.html)**
+- **[FastFlowLM](https://fastflowlm.com/docs/install/)**
 
 ---
 ## 🚀 Quick Start

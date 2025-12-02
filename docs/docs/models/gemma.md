@@ -11,8 +11,8 @@ parent: Models
 - **Think:** No  
 - **Base Model:** [google/gemma-3-1b-it](https://huggingface.co/google/gemma-3-1b-it)
 - **Max Context Length:** 32k tokens  
-- **Default Context Length:** 32k tokens ([change default](https://docs.fastflowlm.com/instructions/cli.html#-change-default-context-length-max))  
-- **[Set Context Length at Launch](https://docs.fastflowlm.com/instructions/cli.html#%EF%B8%8F-set-context-length-at-launch)**
+- **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
+- **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
 
 ▶️ Run with FastFlowLM in PowerShell:  
 
@@ -28,8 +28,8 @@ flm run gemma3:1b
 - **Think:** No  
 - **Base Model:** [google/gemma-3-4b-it](https://huggingface.co/google/gemma-3-4b-it)
 - **Max Context Length:** 128k tokens  
-- **Default Context Length:** 64k tokens ([change default](https://docs.fastflowlm.com/instructions/cli.html#-change-default-context-length-max))  
-- **[Set Context Length at Launch](https://docs.fastflowlm.com/instructions/cli.html#%EF%B8%8F-set-context-length-at-launch)**
+- **Default Context Length:** 64k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
+- **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
 
 ▶️ Run with FastFlowLM in PowerShell:  
 
@@ -51,8 +51,8 @@ flm run gemma3:4b
 - **Think:** No  
 - **Base Model:** [google/gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it)
 - **Max Context Length:** 32k tokens  
-- **Default Context Length:** 32k tokens ([change default](https://docs.fastflowlm.com/instructions/cli.html#-change-default-context-length-max))  
-- **[Set Context Length at Launch](https://docs.fastflowlm.com/instructions/cli.html#%EF%B8%8F-set-context-length-at-launch)**
+- **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
+- **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
 
 ▶️ Run with FastFlowLM in PowerShell:  
 

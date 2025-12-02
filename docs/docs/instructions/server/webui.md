@@ -239,7 +239,7 @@ A step-by-step guide to launching FastFlowLM and interacting with multiple model
 
 ### 🌐 Step 1: Run Open WebUI with FastFlowLM
 
-Follow the quick setup at [here](https://docs.fastflowlm.com/instructions/server/).
+Follow the quick setup at [here](https://fastflowlm.com/docs/instructions/server/webui/).
 
 ---
 

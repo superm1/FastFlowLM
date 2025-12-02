@@ -52,7 +52,7 @@ print(resp.data[0].embedding)
 
 **Example 2**: Open WebUI  
 
-1. Follow **Open WebUI** setup [guide](https://docs.fastflowlm.com/instructions/server/webui.html).  
+1. Follow **Open WebUI** setup [guide](https://fastflowlm.com/docs/instructions/server/webui/).  
 2. In the **bottom-left corner**, click **`User`** icon, then select **`Settings`**.  
 3. In the **bottom panel**, open **`Admin Settings`**.  
 4. In the **left sidebar**, navigate to **Documents**.  
@@ -62,7 +62,7 @@ print(resp.data[0].embedding)
 > API KEY: `flm` (any value works)    
 > Embedding Model: `embed-gemma:300m`     
 7. **Save** the setting.   
-8. Follow the [RAG + FastFlowLM example](https://docs.fastflowlm.com/instructions/server/webui.html#️-example-local-private-database-with-rag--fastflowlm) to launch your **Local Private Database with RAG** all powered by FLM.
+8. Follow the [RAG + FastFlowLM example](https://fastflowlm.com/docs/instructions/server/webui/#️-example-local-private-database-with-rag--fastflowlm) to launch your **Local Private Database with RAG** all powered by FLM.
 
 
 ---

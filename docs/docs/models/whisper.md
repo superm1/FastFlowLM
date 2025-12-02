@@ -93,7 +93,7 @@ print(resp.text)
 
 **Example 2**: Open WebUI
 
-- Follow Open WebUI setup [guide](https://docs.fastflowlm.com/instructions/server/webui.html).
+- Follow Open WebUI setup [guide](https://fastflowlm.com/docs/instructions/server/webui/).
 - In the bottom-left corner, click User icon, then select Settings.
 - In the bottom panel, open Admin Settings.
 - In the left sidebar, navigate to Audio.

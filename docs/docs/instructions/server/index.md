@@ -22,7 +22,7 @@ You can choose to change the server port (default is 52625) by going to **System
 
 ## Set Context Length at Launch
 
-The default context length for each model can be found [here](https://docs.fastflowlm.com/models/). 
+The default context length for each model can be found [here](https://fastflowlm.com/docs/models/). 
 
 To change it at launch, in PowerShell, run:
 
