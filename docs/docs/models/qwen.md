@@ -10,6 +10,7 @@ parent: Models
 - **Type:** Text-to-Text
 - **Think:** Toggleable  
 - **Base Model:** [Qwen/Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B)
+- **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -32,6 +33,7 @@ flm run qwen3:0.6b
 - **Type:** Text-to-Text
 - **Think:** Toggleable  
 - **Base Model:** [Qwen/Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B)
+- **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -54,6 +56,7 @@ flm run qwen3:0.6b
 - **Type:** Text-to-Text
 - **Think:** Toggleable  
 - **Base Model:** [Qwen/Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B)
+- **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -76,6 +79,7 @@ flm run qwen3:4b
 - **Type:** Text-to-Text
 - **Think:** Toggleable  
 - **Base Model:** [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)
+- **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
 - **Default Context Length:** 16k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -98,6 +102,7 @@ flm run qwen3:8b
 - **Type:** Text-to-Text
 - **Think:** Yes  
 - **Base Model:** [Qwen/Qwen3-4B-Thinking-2507](https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507)
+- **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -115,6 +120,7 @@ flm run qwen3-tk:4b
 - **Type:** Text-to-Text
 - **Think:** No  
 - **Base Model:** [Qwen/Qwen3-4B-Instruct-2507](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
+- **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -132,6 +138,7 @@ flm run qwen3-it:4b
 - **Type:** Image-Text-to-Text
 - **Think:** No  
 - **Base Model:** [Qwen/Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
+- **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**

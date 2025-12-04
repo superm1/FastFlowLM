@@ -10,6 +10,7 @@ parent: Models
 - **Type:** Text-to-Text
 - **Think:** No  
 - **Base Model:** [google/gemma-3-1b-it](https://huggingface.co/google/gemma-3-1b-it)
+- **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -27,6 +28,7 @@ flm run gemma3:1b
 - **Type:** Image-Text-to-Text
 - **Think:** No  
 - **Base Model:** [google/gemma-3-4b-it](https://huggingface.co/google/gemma-3-4b-it)
+- **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens  
 - **Default Context Length:** 64k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -50,6 +52,7 @@ flm run gemma3:4b
 - **Type:** Image-Text-to-Text
 - **Think:** No  
 - **Base Model:** [google/gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it)
+- **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
 - **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**

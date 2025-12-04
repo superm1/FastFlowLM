@@ -10,6 +10,7 @@ parent: Models
 - **Type:** Embedding (Sentence Similarity)
 - **Think:** No
 - **Base Model:** [google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)
+- **Quantization:** Q4_1
 - **Max Chunk Size:** 2048
 - **Default Context Length:** NA
 

@@ -10,6 +10,7 @@ parent: Models
 - **Type:** Text-to-Text
 - **Think:** Low / Medium / High (reasoning effort) 
 - **Base Model:** [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b)
+- **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens 
 - **Default Context Length:** 8192 tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
@@ -41,6 +42,7 @@ flm run gpt-oss:20b
 - **Type:** Text-to-Text
 - **Think:** Low / Medium / High (reasoning effort) 
 - **Base Model:** [openai/gpt-oss-safeguard-20b](https://huggingface.co/openai/gpt-oss-safeguard-20b)
+- **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens 
 - **Default Context Length:** 8192 tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**

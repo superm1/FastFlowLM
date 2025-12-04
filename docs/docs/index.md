@@ -60,8 +60,8 @@ Quick 5‑minute setup guide for Windows.
 ### 🛠️ [Instructions](instructions/)
 Run FastFlowLM using the CLI mode or server mode.
 
-### 📊 [Benchmarks](benchmarks/)
-Real-time performance comparisons vs AMD's official stack and other tools.
-
 ### 🧩 [Models](models/)
 Supported models, quantization formats, and compatibility details.
+
+### 📊 [Benchmarks](benchmarks/)
+Real-time performance.

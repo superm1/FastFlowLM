@@ -24,10 +24,14 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 
 ### 🚀 Decoding Speed (TPS, or Tokens per Second, starting @ different context lengths)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**64k** | **128k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|---------:|---------:|
 | **Gemma 3 1B**  | NPU (FLM)    | 40.0	| 39.3	|	38.1	|	35.8	|	32.6	|	26.7|	OOC|	OOC|
 | **Gemma 3 4B**  | NPU (FLM)    | 18.0	| 17.8	| 17.6	| 17.1	| 16.1	| 14.5 |	13.2 |	11.2 |
+
+</div>
 
 > OOC: Out Of Context Length  
 > Each LLM has a maximum supported context window. For example, the gemma3:1b model supports up to 32k tokens.
@@ -36,17 +40,25 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 
 ### 🚀 Prefill Speed (TPS, or Tokens per Second, with different prompt lengths)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **Gemma 3 1B**   | NPU (FLM)    | 1004 |	1321|	1528 |	1645 |	1657 |	1596|
 | **Gemma 3 4B**   | NPU (FLM)    | 528 |	654 |	738 |	754 |	739 |	673|
 
+</div>
+
 ---
 
 ### 🚀 Prefill TTFT with Image (Seconds)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW**       | **Image** |
 |------------------|--------------------|--------:|
 | **Gemma 3 4B**   | NPU (FLM)    | 4.3|
+
+</div>
 
 > This test uses a short prompt: “Describe this image.”

@@ -24,14 +24,22 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 
 ### 🚀 Decoding Speed (TPS, or Tokens per Second, starting @ different context lengths)
 
-| **Model**        | **Hardware**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**64k** | **128k** |
+<div style="overflow-x: auto; white-space: nowrap;">
+
+| **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |**64k** | **128k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|---------:|---------:|
 | **gpt-oss-20b**  | NPU (FLM)    | 18.2|	17.9|	17.3|	16.2|	14.4|	11.8|	8.7|	5.7|
+
+</div>
 
 ---
 
 ### 🚀 Prefill Speed (TPS, or Tokens per Second, with different prompt lengths)
 
-| **Model**        | **Hardware**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
+<div style="overflow-x: auto; white-space: nowrap;">
+
+| **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **gpt-oss-20b**  | NPU (FLM)    | 198|	286|	354|	342|	267|	173|
+
+</div>

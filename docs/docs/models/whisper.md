@@ -65,7 +65,6 @@ Send audio to `POST /v1/audio/transcriptions` via any OpenAI Client or Open WebU
 **Example 1**: OpenAI Client
 
 ```python
-
 # Import the official OpenAI Python SDK (FastFlowLM mirrors the OpenAI API schema)
 from openai import OpenAI
 
@@ -88,7 +87,6 @@ with open("audio.mp3", "rb") as f:
 
 # Print the transcribed text returned by the server
 print(resp.text)
-
 ```
 
 **Example 2**: Open WebUI

@@ -143,7 +143,7 @@ flm serve gemma3:4b --pmode balanced
 
 ---
 
-### 🎛️ Set Context Length at Launch
+### 📏 Set Context Length at Launch
 
 The default context length for each model can be found [here](https://fastflowlm.com/docs/models/).   
 

@@ -19,14 +19,22 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 
 ### 🚀 Decoding Speed (TPS, or Tokens per Second, starting @ different context lengths)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **LFM2-1.2B**  | NPU (FLM)    | 41.5|	40.6|	39.6|	37.1|	33.3|    28|
+
+</div>
 
 ---
 
 ### 🚀 Prefill Speed (TPS, or Tokens per Second, with different prompt lengths)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **LFM2-1.2B**  | NPU (FLM)    | 1384|	 1781|	2038|	1905|	1503|	1024| 
+
+</div>

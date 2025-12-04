@@ -18,11 +18,12 @@ This section will walk you through how to use FastFlowLM with examples.
 
 ## 📚 Sections
 
-- [CLI basics](cli/)
-- [Server basics](server/basics/)
-- [OpenAPI / client usage](server/openapi/)
-- [WebUI](server/webui/)
+- [CLI Mode](cli/)
+- [Server Mode](server/)
+- [Server Basics](server/basics/)
+- [API / Client Usage](server/openapi/)
+- [Open WebUI](server/webui/)
 - [LangChain RAG](server/rag_LangChain/)
 - [LangChain Web Search](server/websearch_LangChain/)
-- [Obsidian integration](server/obsidian/)
+- [Obsidian](server/obsidian/)
 - [Microsoft AI Toolkit](server/msft_AI_toolkit/)

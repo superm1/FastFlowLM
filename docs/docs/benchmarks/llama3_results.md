@@ -24,11 +24,15 @@ This section reports the performance of LLaMA 3.x on NPU with FastFlowLM (FLM).
 
 ### 🚀 Decoding Speed (TPS, or Tokens per Second, starting @ different context lengths)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW** | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** | **64k** | **128k** |
 |------------------|--------------|-------:|-------:|-------:|-------:|--------:|--------:|--------:|---------:|
 | **LLaMA 3.2 1B** | NPU (FLM)    |62.7	| 58.8	| 52.7	| 44.8	| 33.7	| 23.6	| 14.6	  | 10.6    |
 | **LLaMA 3.2 3B** | NPU (FLM)    | 26.2 | 24.6	| 22.1	| 18.3	| 13.7	| 9.1	| 6.8     | OOM      |
 | **LLaMA 3.1 8B** | NPU (FLM)    | 12.7 | 12.4	| 11.6	| 10.4	| 8.6	| 6.3   | OOM     | OOM      |
+
+ </div>
 
 <!-- | **Model**        | **Hardware** | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** | **64k** | **128k** | **Hardware** | **Model**        |
 |------------------|--------------|-------:|-------:|-------:|-------:|--------:|--------:|--------:|---------:|--------------|------------------|
@@ -72,8 +76,12 @@ This section reports the performance of LLaMA 3.x on NPU with FastFlowLM (FLM).
 
 ### 🚀 Prefill Speed (TPS, or Tokens per Second, with different prompt lengths)
 
+<div style="overflow-x: auto; white-space: nowrap;">
+
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **LLaMA 3.2 1B** | NPU (FLM)    |1442	|1766|	1750|	1473|	967|	577|
 | **LLaMA 3.2 3B**  | NPU (FLM)    | 678|	797|	738|	583|	373|	214|
 | **LLaMA 3.1 8B**   | NPU (FLM)    | 384|	447|	426|	376|	267|	167|
+
+ </div>

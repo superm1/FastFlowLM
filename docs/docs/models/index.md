@@ -16,11 +16,11 @@ has_children: true
 ## 📚 Model families
 
 - [LLaMA](llama/)
+- [DeepSeek](deepseek/)
 - [Qwen](qwen/)
 - [Gemma](gemma/)
-- [DeepSeek](deepseek/)
+- [MedGemma](medgemma/)
 - [gpt-oss](gpt-oss/)
 - [LiquidAI/LFM](lfm/)
 - [Whisper](whisper/)
-- [MedGemma](medgemma/)
 - [Embedding Gemma](embeddinggemma/)

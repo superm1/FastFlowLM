@@ -10,6 +10,7 @@ parent: Models
 - **Type:** Image-Text-to-Text
 - **Think:** No  
 - **Base Model:** [google/medgemma-4b-it](https://huggingface.co/google/medgemma-4b-it)
+- **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens 
 - **Default Context Length:** 64k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
 - **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/️#-set-context-length-at-launch)**
