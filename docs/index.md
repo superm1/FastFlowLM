@@ -48,7 +48,7 @@ sections:
                 flm run llama3.2:1b
                 flm list
                 flm serve llama3.2:1b
-          - title: "Unmatched Performance"
+          - title: "Unmatched Performance and Efficiency"
             description: "Ultra‑lightweight runtime with exceptional power efficiency and massive context windows."
             visual:
               type: "metrics"
