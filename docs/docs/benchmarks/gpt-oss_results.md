@@ -32,10 +32,6 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 
 ### 🚀 Prefill Speed (TPS, or Tokens per Second, with different prompt lengths)
 
-<div style="overflow-x: auto; white-space: nowrap;">
-
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **gpt-oss-20b**  | NPU (FLM)    | 198|	286|	354|	342|	267|	173|
-
-</div>
