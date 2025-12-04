@@ -1241,6 +1241,9 @@ body.nav-open .nav__mobile {
   max-width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  /* Slightly smaller, denser typography than marketing pages */
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .docs-content h1,
@@ -1261,13 +1264,15 @@ body.nav-open .nav__mobile {
   padding: 18px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  overflow-x: auto;
   font-family: var(--font-mono);
   max-width: 100%;
   box-sizing: border-box;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  /* Keep code blocks horizontally scrollable and avoid breaking tokens,
+     so indentation-sensitive languages (e.g. Python) render correctly. */
+  overflow-x: auto;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .docs-content pre code {
@@ -1278,8 +1283,86 @@ body.nav-open .nav__mobile {
   font-size: inherit;
   display: block;
   max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+}
+
+.docs-content h1,
+.docs-content h2,
+.docs-content h3,
+.docs-content h4 {
+  position: relative;
+  scroll-margin-top: 110px; /* make anchored headings comfortable below sticky nav */
+}
+
+/* “Copy” button for code blocks in docs */
+.docs-code-block {
+  position: relative;
+}
+
+.docs-code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(3, 6, 18, 0.9);
+  color: var(--text-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease,
+    border-color 0.15s ease, color 0.15s ease;
+}
+
+.docs-code-block:hover .docs-code-copy-btn,
+.docs-code-copy-btn:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.docs-code-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-strong);
+  color: var(--accent);
+}
+
+.docs-code-copy-btn.copied {
+  background: rgba(53, 201, 120, 0.1);
+  border-color: #35c978;
+  color: #8af2b8;
+}
+
+/* Anchor link icon on headings in docs */
+.docs-heading-anchor {
+  position: absolute;
+  left: -1.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  text-decoration: none;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.docs-heading-anchor::before {
+  content: "#";
+}
+
+.docs-content h1:hover .docs-heading-anchor,
+.docs-content h2:hover .docs-heading-anchor,
+.docs-content h3:hover .docs-heading-anchor,
+.docs-content h4:hover .docs-heading-anchor {
+  opacity: 1;
+}
+
+.docs-heading-anchor:hover {
+  color: var(--accent);
 }
 
 .docs-content code {

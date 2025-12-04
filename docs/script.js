@@ -271,6 +271,7 @@
   // Docs search (only active on docs layout)
   const docsSearchInput = document.querySelector("[data-docs-search-input]");
   const docsSearchResults = document.querySelector("[data-docs-search-results]");
+  const docsContent = document.querySelector(".docs-content");
 
   if (docsSearchInput && docsSearchResults) {
     let docsIndex = [];
@@ -416,6 +417,69 @@
         hideResults();
       }
     });
+  }
+
+  // Docs-only enhancements: code copy buttons + heading anchor links
+  if (docsContent) {
+    // Add copy buttons to code blocks
+    const addCopyButtons = () => {
+      const codeBlocks = docsContent.querySelectorAll("pre > code");
+      codeBlocks.forEach((codeEl) => {
+        const pre = codeEl.parentElement;
+        if (!pre || pre.dataset.copyEnhanced === "true") return;
+
+        pre.dataset.copyEnhanced = "true";
+        const wrapper = document.createElement("div");
+        wrapper.className = "docs-code-block";
+
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "docs-code-copy-btn";
+        button.setAttribute("aria-label", "Copy code to clipboard");
+        button.textContent = "Copy";
+
+        button.addEventListener("click", async () => {
+          const text = codeEl.innerText || codeEl.textContent || "";
+          try {
+            await navigator.clipboard.writeText(text);
+            button.classList.add("copied");
+            button.textContent = "Copied";
+            window.setTimeout(() => {
+              button.classList.remove("copied");
+              button.textContent = "Copy";
+            }, 1500);
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Failed to copy code", e);
+          }
+        });
+
+        wrapper.appendChild(button);
+      });
+    };
+
+    // Add anchor links to headings with IDs
+    const addHeadingAnchors = () => {
+      const headings = docsContent.querySelectorAll("h1[id], h2[id], h3[id], h4[id]");
+      headings.forEach((heading) => {
+        if (heading.querySelector(".docs-heading-anchor")) return;
+        const id = heading.id;
+        if (!id) return;
+
+        const anchor = document.createElement("a");
+        anchor.className = "docs-heading-anchor";
+        anchor.href = `#${id}`;
+        anchor.setAttribute("aria-label", "Link to this section");
+
+        heading.insertBefore(anchor, heading.firstChild);
+      });
+    };
+
+    addCopyButtons();
+    addHeadingAnchors();
   }
 })();
 
