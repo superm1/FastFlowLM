@@ -31,6 +31,7 @@ struct ParsedArgs {
     size_t max_socket_connections;
     size_t max_npu_queue;
     int port;
+    std::string host;
     bool cors;
     bool asr;
     bool embed;
@@ -57,6 +58,8 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
              "If load asr model")
             ("embed,e", po::value<bool>(&parsed_args.embed)->default_value(0),
             "If load embed model")
+            ("host", po::value<std::string>(&parsed_args.host)->default_value("127.0.0.1"), 
+             "Set the server address (for serve command)")
             ("port,p", po::value<int>(&parsed_args.port)->default_value(-1), 
              "Set the server port number (for serve command)")
             ("force", po::bool_switch(&parsed_args.force_redownload),

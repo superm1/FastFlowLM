@@ -11,6 +11,7 @@ std::unordered_set<std::string> modelTags = {
         "llama3.1", "llama3.1:8b",
         "llama3.2","llama3.2:1b", "llama3.2:3b",
         "deepseek-r1", "deepseek-r1:8b",
+        "deepseek-r1-0528", "deepseek-r1-0528:8b",
         "qwen3", "qwen3:0.6b", "qwen3:1.7b", "qwen3:4b", "qwen3:8b",
         "qwen3-it", "qwen3-it:4b",
         "qwen3-tk", "qwen3-tk:4b",

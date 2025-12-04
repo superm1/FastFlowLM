@@ -443,7 +443,7 @@ void HttpSession::send_chunk_data(const json& data, bool is_final) {
 
 ///@brief WebServer implementation
 ///@param port the port
-WebServer::WebServer(int port, bool cors) : acceptor(ioc, {net::ip::make_address("0.0.0.0"), static_cast<unsigned short>(port)}), running(false), port(port), cors(cors) {}
+WebServer::WebServer(std::string host, int port, bool cors) : acceptor(ioc, {net::ip::make_address(host), static_cast<unsigned short>(port)}), running(false), port(port), cors(cors) {}
 
 ///@brief destructor
 WebServer::~WebServer() {
@@ -743,8 +743,8 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
 ///@param default_tag the default tag
 ///@param port the port
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int port, int ctx_length, bool cors, bool preemption) {
-    auto server = std::make_unique<WebServer>(port, cors);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, bool cors, bool preemption) {
+    auto server = std::make_unique<WebServer>(host, port, cors);
     auto rest_handler = std::make_shared<RestHandler>(models, downloader, default_tag, asr, embed, ctx_length);
     
     // Register Ollama-compatible routes

@@ -256,7 +256,7 @@ std::string Qwen3_TK::generate_with_prompt(chat_meta_info_t& meta_info, lm_unifo
     if (!this->insert(meta_info, input)) {
         return "";
     }
-    return this->_shared_generate(meta_info, length_limit, os);
+    return this->generate(meta_info, length_limit, os);
 }
 
 /************              DeepSeek_r1_0528_8b family            **************/
