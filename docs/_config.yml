@@ -85,7 +85,7 @@ docs_nav:
     children:
       - label: Overview
         url: "/docs/instructions/"
-      - label: System Command and CLI Mode
+      - label: Sys Command and CLI Mode
         url: "/docs/instructions/cli/"
       - label: Server Mode
         url: "/docs/instructions/server/"  
