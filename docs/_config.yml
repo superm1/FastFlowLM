@@ -72,6 +72,9 @@ cta_links:
   - label: Discord
     url: "https://discord.gg/z24t23HsHF?utm_source=site"
     icon: discord
+  - label: YouTube
+    url: "https://www.youtube.com/@FastFlowLM-YT/playlists"
+    icon: youtube
   - label: Email
     url: "mailto:info@fastflowlm.com"
     icon: mail
