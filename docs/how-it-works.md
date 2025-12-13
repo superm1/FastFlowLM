@@ -33,7 +33,7 @@ sections:
           value: "67× / 223× less"
           desc: "NPU vs iGPU / CPU."
         - label: "Image TTFT"
-          value: "4 s"
+          value: "~3 s"
           desc: "Gemma 3 vision, down from 8 s."
 
   - type: two_column
