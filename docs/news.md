@@ -32,7 +32,7 @@ sections:
 
   - type: one_column
     kicker: The Blog
-    title: Holy wow! NPU Is Now Actually Usable 🚀
+    title: Holy Wow! NPU Is Now Actually Usable 🚀
     body: |
       **Published: December 19, 2025**
       
@@ -51,10 +51,10 @@ sections:
       ---
 
       ### ⚡ The Vision
-      ** FastFlowLM — Real AI. Real Speed. Always On. All Day Power. On Your NPU. **
+      **FastFlowLM — Real AI. Real Speed. Always On. All Day Power. On Your NPU.**
 
-      👉 **See it in action:** [Watch Video](https://youtu.be/zKaaHw_IvsM)   
-      👉 **Learn more:** [fastflowlm.com](https://www.fastflowlm.com)   
+      **See it in action:** [Watch Video](https://youtu.be/zKaaHw_IvsM)   
+      **Learn more:** [fastflowlm.com](https://www.fastflowlm.com)   
       
       ---
 
@@ -90,7 +90,7 @@ sections:
 
       This isn't a "someday" promise. It is working **right now.**
 
-      * **Powering AMD:** FLM is the chosen AI engine inside the official **[AMD Lemonade Server 🍋](https://lemonade-server.ai/)**, bringing production-ready NPU AI capability to developers and partners.
+      * **Powering AMD:** FLM is the chosen AI engine inside the official **[AMD Lemonade Server](https://lemonade-server.ai/)** 🍋, bringing production-ready NPU AI capability to developers and partners.
       * **Expanding Platform Support:** FLM is also prepared for next-generation Qualcomm devices and additional NPU platforms.
 
       ---
