@@ -19,6 +19,22 @@ sections:
         href: "https://github.com/FastFlowLM/FastFlowLM"
         style: ghost
         external: true
+      - label: "Models"
+        href: "/models/"
+        style: ghost
+      - label: "Benchmarks"
+        href: "/benchmarks/"
+        style: ghost
+      - label: "Demos"
+        href: "/demos/"
+        style: ghost
+      - label: "Test Drive"
+        href: "/test-drive/"
+        style: ghost
+      - label: "Discord"
+        href: "https://discord.gg/z24t23HsHF?utm_source=site"
+        style: ghost
+        external: true
     stats:
       - label: "Runtime size"
         value: "~16 MB"
@@ -65,8 +81,9 @@ sections:
               type: "pills"
               pills:
                 - "LLMs"
-                - "VLMs"
+                - "Vision"
                 - "Audio"
+                - "Reasoning"
                 - "Embeddings"
                 - "MoE Support"
 
@@ -82,6 +99,17 @@ sections:
       body: |
         Runs GPT-OSS-20B at 19 TPS (token per second) with 10× GPU efficiency — the fastest MoE on any NPU.
 
+  - type: media
+    variant: alt
+    kicker: "Gemma3 (Vision) on NPU"
+    title: "Gemma3 (Vision) understand and describe the image"
+    media:
+      src: "/assets/gemma3_4b.gif"
+      alt: "Gemma3 vision model understanding an image"
+      href: "https://youtu.be/BLd2j9dPw40?si=5GzOW2FlZgGVp8Xi"
+      kicker: "Gemma3 (Vision) on NPU"
+      body: |
+        Understand and describe images instantly — FastFlowLM runs Google Gemma3 fully on the NPU for fast, private, and efficient vision inference.
 
   - type: media
     variant: alt
@@ -185,7 +213,7 @@ sections:
           value: "66 tok/s"
           desc: "Ryzen™ AI 9 HX 350 · ms-level latency"
         - label: "Gemma 3 4B Vision"
-          value: "~4 sec"
+          value: "~3 sec"
           desc: "Image understanding on XDNA2 NPU"
         - label: "Power draw (CPU + NPU)"
           value: "< 2 W"

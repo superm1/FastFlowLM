@@ -1240,11 +1240,13 @@ body.nav-open .nav__mobile {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   max-width: 100%;
   box-sizing: border-box;
+  /* Clip horizontal overflow to prevent page scrolling, but allow table wrappers to scroll internally */
   overflow-x: hidden;
   /* Slightly smaller, denser typography than marketing pages */
   font-size: 0.95rem;
   line-height: 1.6;
 }
+
 
 .docs-content h1,
 .docs-content h2,
@@ -1284,6 +1286,110 @@ body.nav-open .nav__mobile {
   display: block;
   max-width: 100%;
 }
+
+/* Rouge syntax highlighting styles - dark theme */
+.docs-content .highlight {
+  background: rgba(11, 15, 30, 0.9);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 18px;
+  margin: 1em 0;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.docs-content .highlight pre {
+  background: transparent;
+  padding: 0;
+  border: none;
+  margin: 0;
+  overflow: visible;
+  white-space: pre;
+  word-wrap: normal;
+}
+
+.docs-content .highlight code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Rouge token colors - dark theme matching site aesthetic */
+.docs-content .highlight .c { color: #8b96b0; font-style: italic; } /* Comment */
+.docs-content .highlight .err { color: #ff5f56; } /* Error */
+.docs-content .highlight .k { color: #6ffacf; font-weight: 500; } /* Keyword */
+.docs-content .highlight .l { color: #f8f9fa; } /* Literal */
+.docs-content .highlight .n { color: #f8f9fa; } /* Name */
+.docs-content .highlight .o { color: #58d7ff; } /* Operator */
+.docs-content .highlight .p { color: #c5d1e8; } /* Punctuation */
+.docs-content .highlight .cm { color: #8b96b0; font-style: italic; } /* Comment.Multiline */
+.docs-content .highlight .cp { color: #8b96b0; font-weight: 500; } /* Comment.Preproc */
+.docs-content .highlight .c1 { color: #8b96b0; font-style: italic; } /* Comment.Single */
+.docs-content .highlight .cs { color: #8b96b0; font-weight: 500; font-style: italic; } /* Comment.Special */
+.docs-content .highlight .gd { color: #ff5f56; } /* Generic.Deleted */
+.docs-content .highlight .ge { font-style: italic; } /* Generic.Emph */
+.docs-content .highlight .gr { color: #ff5f56; } /* Generic.Error */
+.docs-content .highlight .gh { color: #58d7ff; font-weight: 500; } /* Generic.Heading */
+.docs-content .highlight .gi { color: #6ffacf; } /* Generic.Inserted */
+.docs-content .highlight .go { color: #8b96b0; } /* Generic.Output */
+.docs-content .highlight .gp { color: #c5d1e8; font-weight: 500; } /* Generic.Prompt */
+.docs-content .highlight .gs { font-weight: 500; } /* Generic.Strong */
+.docs-content .highlight .gu { color: #58d7ff; font-weight: 500; } /* Generic.Subheading */
+.docs-content .highlight .gt { color: #ff5f56; } /* Generic.Traceback */
+.docs-content .highlight .kc { color: #6ffacf; font-weight: 500; } /* Keyword.Constant */
+.docs-content .highlight .kd { color: #6ffacf; font-weight: 500; } /* Keyword.Declaration */
+.docs-content .highlight .kn { color: #58d7ff; } /* Keyword.Namespace */
+.docs-content .highlight .kp { color: #6ffacf; font-weight: 500; } /* Keyword.Pseudo */
+.docs-content .highlight .kr { color: #6ffacf; font-weight: 500; } /* Keyword.Reserved */
+.docs-content .highlight .kt { color: #6ffacf; font-weight: 500; } /* Keyword.Type */
+.docs-content .highlight .ld { color: #f9abff; } /* Literal.Date */
+.docs-content .highlight .m { color: #f9abff; } /* Literal.Number */
+.docs-content .highlight .s { color: #f9abff; } /* Literal.String */
+.docs-content .highlight .na { color: #58d7ff; } /* Name.Attribute */
+.docs-content .highlight .nb { color: #f8f9fa; } /* Name.Builtin */
+.docs-content .highlight .nc { color: #6ffacf; font-weight: 500; } /* Name.Class */
+.docs-content .highlight .no { color: #6ffacf; } /* Name.Constant */
+.docs-content .highlight .nd { color: #58d7ff; } /* Name.Decorator */
+.docs-content .highlight .ni { color: #f8f9fa; } /* Name.Entity */
+.docs-content .highlight .ne { color: #6ffacf; font-weight: 500; } /* Name.Exception */
+.docs-content .highlight .nf { color: #58d7ff; } /* Name.Function */
+.docs-content .highlight .nl { color: #f8f9fa; } /* Name.Label */
+.docs-content .highlight .nn { color: #f8f9fa; } /* Name.Namespace */
+.docs-content .highlight .nx { color: #f8f9fa; } /* Name.Other */
+.docs-content .highlight .py { color: #f8f9fa; } /* Name.Property */
+.docs-content .highlight .nt { color: #6ffacf; } /* Name.Tag */
+.docs-content .highlight .nv { color: #f8f9fa; } /* Name.Variable */
+.docs-content .highlight .ow { color: #58d7ff; } /* Operator.Word */
+.docs-content .highlight .w { color: rgba(255, 255, 255, 0.2); } /* Text.Whitespace */
+.docs-content .highlight .mb { color: #f9abff; } /* Literal.Number.Bin */
+.docs-content .highlight .mf { color: #f9abff; } /* Literal.Number.Float */
+.docs-content .highlight .mh { color: #f9abff; } /* Literal.Number.Hex */
+.docs-content .highlight .mi { color: #f9abff; } /* Literal.Number.Integer */
+.docs-content .highlight .mo { color: #f9abff; } /* Literal.Number.Oct */
+.docs-content .highlight .sa { color: #f9abff; } /* Literal.String.Affix */
+.docs-content .highlight .sb { color: #f9abff; } /* Literal.String.Backtick */
+.docs-content .highlight .sc { color: #f9abff; } /* Literal.String.Char */
+.docs-content .highlight .dl { color: #f9abff; } /* Literal.String.Delimiter */
+.docs-content .highlight .sd { color: #8b96b0; font-style: italic; } /* Literal.String.Doc */
+.docs-content .highlight .s2 { color: #f9abff; } /* Literal.String.Double */
+.docs-content .highlight .se { color: #f9abff; } /* Literal.String.Escape */
+.docs-content .highlight .sh { color: #f9abff; } /* Literal.String.Heredoc */
+.docs-content .highlight .si { color: #f9abff; } /* Literal.String.Interpol */
+.docs-content .highlight .sx { color: #f9abff; } /* Literal.String.Other */
+.docs-content .highlight .sr { color: #f9abff; } /* Literal.String.Regex */
+.docs-content .highlight .s1 { color: #f9abff; } /* Literal.String.Single */
+.docs-content .highlight .ss { color: #f9abff; } /* Literal.String.Symbol */
+.docs-content .highlight .bp { color: #f8f9fa; } /* Name.Builtin.Pseudo */
+.docs-content .highlight .fm { color: #58d7ff; } /* Name.Function.Magic */
+.docs-content .highlight .vc { color: #f8f9fa; } /* Name.Variable.Class */
+.docs-content .highlight .vg { color: #f8f9fa; } /* Name.Variable.Global */
+.docs-content .highlight .vi { color: #f8f9fa; } /* Name.Variable.Instance */
+.docs-content .highlight .vm { color: #f8f9fa; } /* Name.Variable.Magic */
+.docs-content .highlight .il { color: #f9abff; } /* Literal.Number.Integer.Long */
 
 .docs-content h1,
 .docs-content h2,
@@ -1391,16 +1497,76 @@ body.nav-open .nav__mobile {
   table-layout: auto;
 }
 
+/* Scrollable wrapper for tables on mobile */
+.docs-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 24px 0;
+  /* Ensure the wrapper itself can scroll */
+  max-width: 100%;
+  position: relative;
+  /* Extend to edges of content area for better scrolling, but stay within content bounds */
+  margin-left: calc(-1 * var(--space-lg));
+  margin-right: calc(-1 * var(--space-lg));
+  padding-left: var(--space-lg);
+  padding-right: var(--space-lg);
+  width: calc(100% + 2 * var(--space-lg));
+  max-width: calc(100% + 2 * var(--space-lg));
+  /* Ensure wrapper scrolls internally, not causing page scroll */
+  contain: layout;
+}
+
+.docs-table-wrapper table {
+  margin: 0;
+  /* Let table be as wide as it needs to be - don't constrain it */
+  width: max-content;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+.docs-table-wrapper th,
+.docs-table-wrapper td {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  text-overflow: ellipsis;
+  /* Prevent text from breaking vertically */
+  line-height: 1.4;
+}
+
+/* On larger screens, tables can be full width without scrolling */
+@media (min-width: 768px) {
+  .docs-table-wrapper {
+    overflow-x: visible;
+  }
+  
+  .docs-table-wrapper table {
+    width: 100%;
+    white-space: normal;
+  }
+  
+  .docs-table-wrapper th,
+  .docs-table-wrapper td {
+    white-space: normal;
+  }
+}
+
 .docs-content th,
 .docs-content td {
   border: 1px solid var(--border);
   padding: 12px;
   text-align: left;
+  color: var(--text);
+}
+
+/* Only break words in table cells if not in a scrollable wrapper */
+.docs-content table:not(.docs-table-wrapper table) th,
+.docs-content table:not(.docs-table-wrapper table) td {
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
   max-width: 0;
-  color: var(--text);
 }
 
 .docs-content blockquote {

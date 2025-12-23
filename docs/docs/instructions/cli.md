@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: CLI Mode
+title: System Command and CLI Mode
 nav_order: 1
 parent: Instructions
 ---
@@ -9,13 +9,13 @@ parent: Instructions
 
 FLM CLI mode offers a terminal-based interactive experience, similar to Ollama, but fully offline and accelerated exclusively on AMD NPUs. Here are detailed descriptions of commands and setup for CLI mode usage. It includes:
 
-- **[🔧 Pre-Run PowerShell Commands](#-pre-run-powershell-commands)**
+- **[🔧 Pre-Run PowerShell Commands (System)](#-pre-run-powershell-commands)**
 - **[💻 Commands Inside CLI Mode](#-commands-inside-cli-mode)**
 - **[🗂️ Others](#️-others)**
 
 ---
 
-## 🔧 Pre-Run PowerShell Commands
+## 🔧 Pre-Run PowerShell Commands (System)
 
 ### 🆘 Show Help
 

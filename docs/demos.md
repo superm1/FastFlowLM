@@ -37,6 +37,20 @@ sections:
 
   - type: media
     variant: alt
+    kicker: "Gemma3 (Vision) on NPU"
+    title: "Gemma3 (Vision) understand and describe the image"
+    body: |
+      Gemma3 Vision turns your NPU into a visual reasoning engine, delivering instant understanding with near-zero CPU/GPU load.
+    media:
+      src: "/assets/gemma3_4b.gif"
+      alt: "Gemma3 vision model understanding an image"
+      href: "https://youtu.be/BLd2j9dPw40?si=5GzOW2FlZgGVp8Xi"
+      kicker: "Gemma3 (Vision) on NPU"
+      body: |
+        Understand and describe images instantly — FastFlowLM runs Google Gemma3 fully on the NPU for fast, private, and efficient vision inference.
+
+  - type: media
+    variant: alt
     kicker: "Whisper on-device"
     title: "Transcribe and summarize long-form audio locally"
     body: |

@@ -421,19 +421,29 @@
 
   // Docs-only enhancements: code copy buttons + heading anchor links
   if (docsContent) {
-    // Add copy buttons to code blocks
+    // Add copy buttons to code blocks (handles both Rouge-highlighted and plain code)
     const addCopyButtons = () => {
-      const codeBlocks = docsContent.querySelectorAll("pre > code");
-      codeBlocks.forEach((codeEl) => {
+      // Find all code elements, but process them intelligently to avoid duplicates
+      const allCodeElements = docsContent.querySelectorAll("pre > code");
+      
+      allCodeElements.forEach((codeEl) => {
+        // Skip if this code element is already inside a .docs-code-block wrapper
+        if (codeEl.closest(".docs-code-block")) return;
+        
+        // Check if this is inside a Rouge .highlight block
+        const highlightEl = codeEl.closest(".highlight");
+        const containerEl = highlightEl || codeEl.parentElement; // Use .highlight if present, otherwise use pre
         const pre = codeEl.parentElement;
-        if (!pre || pre.dataset.copyEnhanced === "true") return;
-
-        pre.dataset.copyEnhanced = "true";
+        
+        // Skip if container is already enhanced
+        if (containerEl.dataset.copyEnhanced === "true") return;
+        
+        containerEl.dataset.copyEnhanced = "true";
         const wrapper = document.createElement("div");
         wrapper.className = "docs-code-block";
 
-        pre.parentNode.insertBefore(wrapper, pre);
-        wrapper.appendChild(pre);
+        containerEl.parentNode.insertBefore(wrapper, containerEl);
+        wrapper.appendChild(containerEl);
 
         const button = document.createElement("button");
         button.type = "button";
@@ -478,8 +488,24 @@
       });
     };
 
+    // Wrap tables in scrollable containers for mobile
+    const wrapTables = () => {
+      const tables = docsContent.querySelectorAll("table");
+      tables.forEach((table) => {
+        // Skip if already wrapped
+        if (table.parentElement.classList.contains("docs-table-wrapper")) return;
+        
+        const wrapper = document.createElement("div");
+        wrapper.className = "docs-table-wrapper";
+        
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      });
+    };
+
     addCopyButtons();
     addHeadingAnchors();
+    wrapTables();
   }
 })();
 

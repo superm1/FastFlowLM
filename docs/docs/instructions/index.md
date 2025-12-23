@@ -18,7 +18,7 @@ This section will walk you through how to use FastFlowLM with examples.
 
 ## 📚 Sections
 
-- [CLI Mode](cli/)
+- [System Command and CLI Mode](cli/)
 - [Server Mode](server/)
 - [Server Basics](server/basics/)
 - [API / Client Usage](server/openapi/)

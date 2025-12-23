@@ -37,7 +37,7 @@ A packaged FLM Windows installer is available here: [**flm-setup.exe**](https://
 📺 [**Watch the quick start video**](https://www.youtube.com/watch?v=mYOfDNkyBII)
 
 > [!IMPORTANT]  
-> ⚠️ Ensure NPU driver verison is **>= 32.0.203.311** (check via Task Manager→Performance→NPU or Device Manager).  
+> ⚠️ Ensure NPU driver verison is **>= 32.0.203.304** (`.304` is the minimum requirement but `.311` is recommended; check via Task Manager→Performance→NPU or Device Manager).  
 > ⚙️ **Tip:**
 >   * **RECOMMENDED**: Try running **Windows Update** or **[Driver Download](https://www.amd.com/en/support)**.
 >   * **[Official AMD Install Doc](https://ryzenai.docs.amd.com/en/latest/inst.html#install-npu-drivers)** *(AMD account required)*.
@@ -123,4 +123,4 @@ For commercial licensing inquiries, email us: info@fastflowlm.com
 - Inspired by the widely adopted [llama.cpp](https://github.com/ggml-org/llama.cpp) and [Ollama](https://github.com/ollama/ollama)
 - Tokenization accelerated with [MLC-ai/tokenizers-cpp](https://github.com/mlc-ai/tokenizers-cpp)
 - Chat formatting via [Google/minja](https://github.com/google/minja)
-- Low-level kernels optimized using the powerful [IRON](https://github.com/amd/iron)+[AIE-MLIR](https://github.com/Xilinx/mlir-aie/tree/main)
+- Low-level kernels optimized using the powerful [IRON](https://github.com/amd/iron)+[AIE-MLIR](https://github.com/Xilinx/mlir-aie)

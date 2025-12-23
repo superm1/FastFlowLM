@@ -7,6 +7,15 @@ markdown: kramdown
 highlighter: rouge
 permalink: pretty
 
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    span:
+      line_numbers: false
+    block:
+      line_numbers: false
+
 exclude:
   - venv
   - build.py
@@ -63,6 +72,9 @@ cta_links:
   - label: Discord
     url: "https://discord.gg/z24t23HsHF?utm_source=site"
     icon: discord
+  - label: YouTube
+    url: "https://www.youtube.com/@FastFlowLM-YT/playlists"
+    icon: youtube
   - label: Email
     url: "mailto:info@fastflowlm.com"
     icon: mail
@@ -76,7 +88,7 @@ docs_nav:
     children:
       - label: Overview
         url: "/docs/instructions/"
-      - label: CLI Mode
+      - label: Sys Command and CLI Mode
         url: "/docs/instructions/cli/"
       - label: Server Mode
         url: "/docs/instructions/server/"  
