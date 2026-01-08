@@ -85,8 +85,9 @@ bool Llama3::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
 }
 
 
-std::string Llama3::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
-    return this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+std::string Llama3::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
+    //header_print("is_cancelled", is_cancelled);
+    return this->_shared_generate(meta_info, length_limit, os, is_cancelled);
 }
 
 std::string Llama3::generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os) {
@@ -173,9 +174,9 @@ bool DeepSeek_r1_8b::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& inp
     return this->_shared_insert(meta_info, tokens);
 }
 
-std::string DeepSeek_r1_8b::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
+std::string DeepSeek_r1_8b::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
     os << "<think>\n\n";
-    std::string result = this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+    std::string result = this->_shared_generate(meta_info, length_limit, os, is_cancelled);
     result = "<think>\n\n" + result;
     return result;
 }

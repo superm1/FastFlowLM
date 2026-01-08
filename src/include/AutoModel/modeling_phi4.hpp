@@ -1,30 +1,19 @@
-/// \file lfm2.hpp
-/// \brief lfm2 class
+/// \file phi4.hpp
+/// \brief phi4 class
 /// \author FastFlowLM Team
-/// \date 2025-11-03
-/// \version 0.9.15
-/// \note This is a source file for the lfm2 class
-
+/// \date 2025-09-04
+/// \version 0.9.25
+/// \note This is a source file for the phi4 class
 #pragma once
 #include "AutoModel/automodel.hpp"
 
-/************              llama family            **************/
-class LFM2 : public AutoModel {
+/************              phi4 family            **************/
+class Phi4 : public AutoModel {
 private:
     void setup_tokenizer(std::string model_path);
-    inline std::string _replace_space(std::string& text){
-        static std::string to_replace = "Ġ";
-        static std::string replace_with = " ";
-        size_t pos = 0;
-        while ((pos = text.find(to_replace, pos)) != std::string::npos) {
-            text.replace(pos, to_replace.length(), replace_with);
-            pos += replace_with.length();
-        }
-        return text;
-    }
 
 public:
-    LFM2(xrt::device* npu_device_inst);
+    Phi4(xrt::device* npu_device_inst);
 
     void load_model(std::string model_path, json model_inf, int default_context_length = -1, bool enable_preemption = false) override;
     //void toggle_enable_think() override;

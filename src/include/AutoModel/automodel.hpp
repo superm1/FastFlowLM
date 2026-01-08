@@ -24,6 +24,7 @@
 #include "gemma/gemma_npu.hpp"
 #include "gemma_text/gemma_text_npu.hpp"
 #include "lfm2/lfm2_npu.hpp"
+#include "phi4/phi4_npu.hpp"
 #include "gpt_oss/gpt_oss_npu.hpp"
 #include "tokenizer/tokenizer.hpp"
 #include "modules/sampler.hpp"
@@ -156,7 +157,7 @@ protected:
 	nlohmann::json _shared_setup_tokenizer(std::string model_path);
 
 	bool _shared_insert(chat_meta_info_t& meta_info, std::vector<int>& tokens, void* payload = nullptr);
-	std::string _shared_generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token = nullptr);
+	std::string _shared_generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled = [] { return false; });
 
 public:
 	//************ Shared by all models *************/
@@ -267,7 +268,7 @@ public:
 	//************ Unique for each model *************/
 	
 	virtual void load_model(std::string model_path, json model_info, int default_context_length = -1, bool enable_preemption = false) {}
-	virtual std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token = nullptr) = 0;
+	virtual std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled = [] { return false; }) = 0;
 
 	/// \brief Insert the tokens
 	/// \param tokens the tokens

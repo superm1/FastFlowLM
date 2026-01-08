@@ -13,6 +13,7 @@
 #include "modeling_gpt_oss.hpp"
 #include "modeling_qwen3vl.hpp"
 #include "modeling_lfm2.hpp"
+#include "modeling_phi4.hpp"
 
 inline std::string complete_simple_tag(std::string model_tag) {
     if (model_tag == "llama3.1")
@@ -47,6 +48,14 @@ inline std::string complete_simple_tag(std::string model_tag) {
         return "lfm2:1.2b";
     else if (model_tag == "lfm2:2.6b")
         return "lfm2:2.6b";
+    else if (model_tag == "lfm2.5")
+        return "lfm2.5:1.2b";
+    else if (model_tag == "lfm2.5:1.2b")
+        return "lfm2.5:1.2b";
+    else if (model_tag == "phi4-mini-it")
+        return "phi4-mini-it:4b";
+    else if (model_tag == "phi4-mini-it:4b")
+        return "phi4-mini-it:4b";
     else
         return model_tag;
 
@@ -96,7 +105,11 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
         "qwen3vl-it", "qwen3vl-it:4b"
     };
     static std::unordered_set<std::string> lfm2_tags = {
-        "lfm2", "lfm2:1.2b", "lfm2:2.6b"
+        "lfm2", "lfm2:1.2b", "lfm2:2.6b",
+        "lfm2.5", "lfm2.5:1.2b"
+    };
+    static std::unordered_set<std::string> phi4_tags = {
+        "phi4-mini-it", "phi4-mini-it:4b"
     };
 
     std::unique_ptr<AutoModel> auto_chat_engine = nullptr;
@@ -128,6 +141,9 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
     }
     else if (lfm2_tags.count(model_tag)) {
         auto_chat_engine = std::make_unique<LFM2>(npu_device_inst);
+    }
+    else if (phi4_tags.count(model_tag)) {
+        auto_chat_engine = std::make_unique<Phi4>(npu_device_inst);
     }
     else if (embedgemma_tags.count(model_tag)) {
         header_print("Warning", "embed-gemma is not a LLM; Running llama3.2:1b now");

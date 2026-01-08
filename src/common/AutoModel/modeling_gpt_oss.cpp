@@ -78,10 +78,10 @@ bool GPT_OSS::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input)
 }
 
 
-std::string GPT_OSS::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
+std::string GPT_OSS::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
     os << "<|start|>" << std::flush;
     os << "assistant" << std::flush;
-    std::string result = this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+    std::string result = this->_shared_generate(meta_info, length_limit, os, is_cancelled);
     os << "<|end|>" << std::flush;
     return "<|start|>assistant" + result + "<|end|>";
 }

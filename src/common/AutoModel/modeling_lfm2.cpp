@@ -109,8 +109,8 @@ bool LFM2::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
 }
 
 
-std::string LFM2::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
-    return this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+std::string LFM2::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
+    return this->_shared_generate(meta_info, length_limit, os, is_cancelled);
 }
 
 std::string LFM2::generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os) {

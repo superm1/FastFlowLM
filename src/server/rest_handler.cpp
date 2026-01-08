@@ -755,6 +755,27 @@ void RestHandler::handle_openai_chat_completion(const json& request,
             }
         }
 
+        // OpenAI API doesn't put the parameters into options
+        if (request.contains("temperature")) {
+            float temperature = request["temperature"];
+            auto_chat_engine->set_temperature(temperature);
+        }
+        if (request.contains("top_p")) {
+            float top_p = request["top_p"];
+            auto_chat_engine->set_topp(top_p);
+        }
+        if (request.contains("top_k")) {
+            int top_k = request["top_k"];
+            auto_chat_engine->set_topk(top_k);
+        }
+        if (request.contains("frequency_penalty")) {
+            float frequency_penalty = request["frequency_penalty"];
+            auto_chat_engine->set_frequency_penalty(frequency_penalty);
+        }
+        if (request.contains("repetition_penalty")) {
+            float repetition_penalty = request["repetition_penalty"];
+            auto_chat_engine->set_repetition_penalty(repetition_penalty);
+        }
         configure_chat_engine_parameters(options, request);
 
         chat_meta_info_t meta_info;
@@ -763,6 +784,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
         header_print("FLM", "Start generating...");
         if (stream){
             // Create a wrapper callback that passes the pre-formatted SSE string directly
+            cancellation_token->reset();
             auto openai_stream_callback = [&send_streaming_response](const std::string& data, bool is_final) {
                 json data_json = data;
                 send_streaming_response(data_json, is_final);
@@ -775,7 +797,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
                 send_response(error_response);
                 return;
             }
-            auto_chat_engine->generate(meta_info, length_limit, ostream, cancellation_token);
+            auto_chat_engine->generate(meta_info, length_limit, ostream, [&] { return cancellation_token->cancelled(); });
             ostream.finalize(meta_info);
 
             if (meta_info.stop_reason == CANCEL_DETECTED) {

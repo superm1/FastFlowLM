@@ -85,8 +85,8 @@ bool Gemma3_Text_Only::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& i
     return this->_shared_insert(meta_info, tokens);
 }
 
-std::string Gemma3_Text_Only::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
-    return this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+std::string Gemma3_Text_Only::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
+    return this->_shared_generate(meta_info, length_limit, os, is_cancelled);
 }
 
 std::string Gemma3_Text_Only::generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os) {

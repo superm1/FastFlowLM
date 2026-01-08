@@ -181,8 +181,8 @@ bool Qwen3VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
 
 }
 
-std::string Qwen3VL::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
-    return this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+std::string Qwen3VL::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
+    return this->_shared_generate(meta_info, length_limit, os, is_cancelled);
 }
 
 std::string Qwen3VL::generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os) {
@@ -202,10 +202,10 @@ std::string Qwen3VL_Thinking::generate_with_prompt(chat_meta_info_t& meta_info, 
 }
 
 
-std::string Qwen3VL_Thinking::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
+std::string Qwen3VL_Thinking::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
     std::string result;
     os << "<think>\n\n";
-    result = this->_shared_generate(meta_info, length_limit, os, cancellation_token);
+    result = this->_shared_generate(meta_info, length_limit, os, is_cancelled);
     result = "<think>\n\n" + result;
     return result;
 }

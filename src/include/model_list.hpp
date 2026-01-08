@@ -12,7 +12,7 @@
 #include <vector>
 #include "utils/utils.hpp"
 
-#define __FLM_VERSION__ "0.9.24"
+#define __FLM_VERSION__ "0.9.25"
 
 /// \note This class is used to manage the model list.
 class model_list {

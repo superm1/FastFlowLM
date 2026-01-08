@@ -4,7 +4,7 @@
 
 AppName=flm
 
-AppVersion=0.9.24
+AppVersion=0.9.25
 
 AppPublisher=FastFlowLM
 
@@ -50,6 +50,7 @@ Source: "gemma_text_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gemma_embedding.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gpt_oss_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "lfm2_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "phi4_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "qwen_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "qwen3vl_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "lm_head.dll"; DestDir: "{app}"; Flags: ignoreversion

@@ -6,7 +6,6 @@
 /// \note This is a source file for the auto_model class
 
 #include "AutoModel/automodel.hpp"
-#include "../../server/server.hpp"
 
 std::unordered_set<std::string> modelTags = {
         "llama3.1", "llama3.1:8b",
@@ -26,6 +25,8 @@ std::unordered_set<std::string> modelTags = {
         "qwen3vl-it", "qwen3vl-it:4b",
         "qwen3vl-tk", "qwen3vl-tk:4b",
         "lfm2", "lfm2:1.2b", "lfm2:2.6b",
+        "lfm2.5", "lfm2.5:1.2b",
+        "phi4-mini-it", "phi4-mini-it:4b"
 };
 
 AutoModel::AutoModel(xrt::device* npu_device_inst, std::string current_model) {
@@ -156,7 +157,7 @@ bool AutoModel::_shared_insert(chat_meta_info_t& meta_info, std::vector<int>& to
     return true;
 }
 
-std::string AutoModel::_shared_generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::shared_ptr<CancellationToken> cancellation_token) {
+std::string AutoModel::_shared_generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
     std::vector<int> sampled_tokens;
     std::string result;
     if (length_limit > 0){
@@ -187,9 +188,9 @@ std::string AutoModel::_shared_generate(chat_meta_info_t& meta_info, int length_
         return result;
     }
     while (this->total_tokens < this->MAX_L){
-        if (cancellation_token && cancellation_token->cancelled()) {
+        if (is_cancelled()) {
             reason = CANCEL_DETECTED;
-            cancellation_token->reset();
+            //cancellation_token->reset();
             break;
         }
         this->profiler_list[DECODING_TIME].start();
