@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: LFM
+title: Phi
 nav_order: 10
 parent: Models
 ---
