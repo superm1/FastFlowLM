@@ -43,6 +43,15 @@ OpenAI provides [official libraries](https://platform.openai.com/docs/libraries/
 
 These libraries make it easy to send prompts, receive completions, and integrate with local or cloud-based OpenAI-compatible servers.
 
+FLM follows the OpenAI API format in **Server Mode**.  
+
+The following endpoints are actively supported and maintained:
+
+- `v1/models`
+- `v1/chat/completions`
+- `v1/audio/transcriptions`
+- `v1/embeddings`
+
 ---
 
 # 🚀 Quick Test: Use OpenAI SDK with FastFlowLM in Python
@@ -59,7 +68,7 @@ Open PowerShell or terminal and launch the model server:
 flm serve llama3.2:1b
 ```
 
-> 🧠 This loads the model and starts the FastFlowLM OpenAI-compatible API at `http://localhost:52625/v1`.
+> 🧠 This loads the model and starts the FastFlowLM OpenAI-compatible API at `http://127.0.0.1:52625/v1`.
 
 ---
 
@@ -79,7 +88,7 @@ from openai import OpenAI
 
 # Connect to local FastFlowLM server
 client = OpenAI(
-    base_url="http://localhost:52625/v1",  # FastFlowLM's local API endpoint
+    base_url="http://127.0.0.1:52625/v1",  # FastFlowLM's local API endpoint
     api_key="flm"  # Dummy key (FastFlowLM doesn’t require authentication)
 )
 
@@ -134,7 +143,7 @@ messages = [
     {"role": "user", "content": "Write the beginning of a fantasy story."},
 ]
 
-client = OpenAI(base_url="http://localhost:52625/v1", api_key="flm")
+client = OpenAI(base_url="http://127.0.0.1:52625/v1", api_key="flm")
 response = client.chat.completions.create(model="llama3.2:1b", messages=messages)
 print(response.choices[0].message.content)
 
@@ -168,7 +177,7 @@ Display the model’s output as it generates, token-by-token:
 from openai import OpenAI
 import gc, sys
 
-client = OpenAI(base_url="http://localhost:52625/v1/", api_key="flm")
+client = OpenAI(base_url="http://127.0.0.1:52625/v1/", api_key="flm")
 
 stream = client.chat.completions.create(
     model="llama3.2:1b",
@@ -211,7 +220,7 @@ from openai import OpenAI
 with open("C:\\Users\\<username>\\Downloads\\alice_in_wonderland.txt", "r", encoding="utf-8") as f:
     user_prompt = f.read()
 
-client = OpenAI(base_url="http://localhost:52625/v1", api_key="flm")
+client = OpenAI(base_url="http://127.0.0.1:52625/v1", api_key="flm")
 
 response = client.chat.completions.create(
     model="llama3.2:1b",
@@ -245,7 +254,7 @@ prompts = [
     "What are the key themes in ‘To Kill a Mockingbird’?",
 ]
 
-client = OpenAI(base_url="http://localhost:52625/v1", api_key="flm")
+client = OpenAI(base_url="http://127.0.0.1:52625/v1", api_key="flm")
 
 for prompt in prompts:
     response = client.chat.completions.create(
@@ -273,7 +282,7 @@ Control randomness and creativity — for brainstorming or open-ended tasks.
 # Change hyper parameters
 from openai import OpenAI
 
-client = OpenAI(base_url="http://localhost:52625/v1", api_key="flm")
+client = OpenAI(base_url="http://127.0.0.1:52625/v1", api_key="flm")
 
 response = client.chat.completions.create(
     model="llama3.2:1b",
@@ -316,7 +325,7 @@ with open(image_path_1, "rb") as image_file:
     image_1 = base64.b64encode(image_file.read()).decode("utf-8")
 
 # Connect to your local FLM/OpenAI-compatible endpoint
-client = OpenAI(base_url="http://localhost:52625/v1", api_key="dummykey")
+client = OpenAI(base_url="http://127.0.0.1:52625/v1", api_key="dummykey")
 
 # Create a chat completion request with text + two images
 response = client.chat.completions.create(

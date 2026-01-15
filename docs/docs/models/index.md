@@ -22,5 +22,6 @@ has_children: true
 - [MedGemma](medgemma/)
 - [gpt-oss](gpt-oss/)
 - [LiquidAI/LFM](lfm/)
+- [Phi](phi/)
 - [Whisper](whisper/)
 - [Embedding Gemma](embeddinggemma/)

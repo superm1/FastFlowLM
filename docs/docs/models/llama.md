@@ -8,7 +8,8 @@ parent: Models
 ## 🧩 Model Card: [Llama-3.2-1B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct)
 
 - **Type:** Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [meta-llama/Llama-3.2-1B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens  
@@ -26,7 +27,8 @@ flm run llama3.2:1b
 ## 🧩 Model Card: [Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)
 
 - **Type:** Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [meta-llama/Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens  
@@ -44,7 +46,8 @@ flm run llama3.2:3b
 ## 🧩 Model Card: [Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)
 
 - **Type:** Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [meta-llama/Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens  

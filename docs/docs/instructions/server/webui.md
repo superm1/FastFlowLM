@@ -42,7 +42,7 @@ Enter **Name**, **Email**, and **Password** to create a local account.
 2. **Deactivate** the Ollama API.
 3. Under **Manage OpenAI API Connections**, click **+** and fill in:
    - **Name:** FastFlowLM
-   - **Base URL:** `http://localhost:52625/v1`
+   - **Base URL:** `http://127.0.0.1:52625/v1`
    - **API Key:** `DUMMY` (any non-empty value)
 4. Click **Save**.
 
@@ -155,7 +155,7 @@ docker logs -f open-webui
 ### 🌐 Step 4: Access the WebUI (in Browser)
 
 Open browser and go to:  
-**http://localhost:3000**
+**http://127.0.0.1:3000**
 
 You should now see the Open WebUI interface.
 

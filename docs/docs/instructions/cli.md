@@ -207,7 +207,7 @@ flm serve --cors 0
 ```
 
 > ⚠️ **Default:** CORS is **enabled**.  
-> 🔒 **Security tip:** Disable CORS (or restrict at your proxy) if your server is exposed beyond localhost.
+> 🔒 **Security tip:** Disable CORS (or restrict at your proxy) if your server is exposed beyond localhost (127.0.0.1).
 
 ---
 

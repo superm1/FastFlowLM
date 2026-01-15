@@ -23,6 +23,7 @@ This section will walk you through how to use FastFlowLM with examples.
 - [Server Basics](server/basics/)
 - [API / Client Usage](server/openapi/)
 - [Open WebUI](server/webui/)
+- [Tool Calling](server/tool_calling/)
 - [LangChain RAG](server/rag_LangChain/)
 - [LangChain Web Search](server/websearch_LangChain/)
 - [Obsidian](server/obsidian/)

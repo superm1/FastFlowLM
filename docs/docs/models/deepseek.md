@@ -8,7 +8,8 @@ parent: Models
 ## 🧩 Model Card: [DeepSeek-R1-Distill-Llama-8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B)
 
 - **Type:** Text-to-Text
-- **Think:** Yes  
+- **Think:** Yes
+- **Tool Calling Support:** No  
 - **Base Model:** [deepseek-ai/DeepSeek-R1-Distill-Llama-8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens  
@@ -26,7 +27,8 @@ flm run deepseek-r1:8b
 ## 🧩 Model Card: [DeepSeek-R1-0528-Qwen3-8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-0528-Qwen3-8B)
 
 - **Type:** Text-to-Text
-- **Think:** Yes  
+- **Think:** Yes
+- **Tool Calling Support:** No  
 - **Base Model:** [deepseek-ai/DeepSeek-R1-0528-Qwen3-8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-0528-Qwen3-8B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 64k tokens  

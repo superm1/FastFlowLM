@@ -8,7 +8,8 @@ parent: Models
 ## 🧩 Model Card: [gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b)
 
 - **Type:** Text-to-Text
-- **Think:** Low / Medium / High (reasoning effort) 
+- **Think:** Low / Medium / High (reasoning effort)
+- **Tool Calling Support:** No 
 - **Base Model:** [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens 
@@ -40,7 +41,8 @@ flm run gpt-oss:20b
 ## 🧩 Model Card: [gpt-oss-safeguard-20b](https://huggingface.co/openai/gpt-oss-safeguard-20b)
 
 - **Type:** Text-to-Text
-- **Think:** Low / Medium / High (reasoning effort) 
+- **Think:** Low / Medium / High (reasoning effort)
+- **Tool Calling Support:** No 
 - **Base Model:** [openai/gpt-oss-safeguard-20b](https://huggingface.co/openai/gpt-oss-safeguard-20b)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens 

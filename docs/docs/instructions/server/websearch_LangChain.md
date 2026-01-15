@@ -62,7 +62,7 @@ In another terminal:
 flm serve llama3.2:1b
 ```
 
-This starts your FastFlowLM API at: `http://localhost:52625`
+This starts your FastFlowLM API at: `http://127.0.0.1:52625`
 
 ---
 
@@ -89,7 +89,7 @@ warnings.filterwarnings("ignore", category=ResourceWarning)
 # CONFIG
 # ----------------------------
 MODEL_NAME = "llama3.2:1b"
-BASE_URL = "http://localhost:52625"
+BASE_URL = "http://127.0.0.1:52625"
 MAX_RESULTS = 5
 
 
@@ -314,7 +314,7 @@ The retrieved or scraped content is broken into chunks using `RecursiveCharacter
 
 ### 🤖 4. RAG Retrieval with FastFlowLM
 
-A local FastFlowLM model is accessed via `OllamaLLM`, pointing to `http://localhost:52625`. We build a LangChain `RetrievalQA` pipeline:
+A local FastFlowLM model is accessed via `OllamaLLM`, pointing to `http://127.0.0.1:52625`. We build a LangChain `RetrievalQA` pipeline:
 - Queries are matched to relevant chunks from the vector store
 - A prompt template supplies those chunks as **context**
 - FastFlowLM generates an answer based strictly on that context

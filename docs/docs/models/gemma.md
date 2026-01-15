@@ -8,7 +8,8 @@ parent: Models
 ## 🧩 Model Card: [gemma-3-1b-it](https://huggingface.co/google/gemma-3-1b-it)
 
 - **Type:** Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [google/gemma-3-1b-it](https://huggingface.co/google/gemma-3-1b-it)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -26,7 +27,8 @@ flm run gemma3:1b
 ## 🧩 Model Card: [gemma-3-4b-it](https://huggingface.co/google/gemma-3-4b-it)
 
 - **Type:** Image-Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [google/gemma-3-4b-it](https://huggingface.co/google/gemma-3-4b-it)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens  
@@ -50,7 +52,8 @@ flm run gemma3:4b
 ## 🧩 Model Card: [gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it)
 
 - **Type:** Image-Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [google/gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  

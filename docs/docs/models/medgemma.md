@@ -8,7 +8,8 @@ parent: Models
 ## 🧩 Model Card: [medgemma:4b](https://huggingface.co/google/medgemma-4b-it)
 
 - **Type:** Image-Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** No  
 - **Base Model:** [google/medgemma-4b-it](https://huggingface.co/google/medgemma-4b-it)
 - **Quantization:** Q4_1
 - **Max Context Length:** 128k tokens 

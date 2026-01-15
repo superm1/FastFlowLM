@@ -9,6 +9,7 @@ parent: Models
 
 - **Type:** Embedding (Sentence Similarity)
 - **Think:** No
+- **Tool Calling Support:** No
 - **Base Model:** [google/embeddinggemma-300m](https://huggingface.co/google/embeddinggemma-300m)
 - **Quantization:** Q4_1
 - **Max Chunk Size:** 2048
@@ -38,7 +39,7 @@ Send file(s) to `POST /v1/embeddings` via any OpenAI Client or Open WebUI.
 from openai import OpenAI
 
 client = OpenAI(
-   base_url="http://localhost:52625/v1", # FastFlowLM's local API endpoint
+   base_url="http://127.0.0.1:52625/v1", # FastFlowLM's local API endpoint
    api_key="flm", # Dummy key (FastFlowLM doesn't require authentication)
 )
 
@@ -59,7 +60,7 @@ print(resp.data[0].embedding)
 4. In the **left sidebar**, navigate to **Documents**.  
 5. Set **Embedding Model Engine** to **OpenAI**.  
 6. Enter:  
-> API Base URL: `http://localhost:52625/v1` (Open WebUI Desktop) or `http://host.docker.internal:52625/v1` (Open WebUI in Docker)  
+> API Base URL: `http://127.0.0.1:52625/v1` (Open WebUI Desktop) or `http://host.docker.internal:52625/v1` (Open WebUI in Docker)  
 > API KEY: `flm` (any value works)    
 > Embedding Model: `embed-gemma:300m`     
 7. **Save** the setting.   

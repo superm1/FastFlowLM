@@ -8,7 +8,8 @@ parent: Models
 ## 🧩 Model Card: [Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B)
 
 - **Type:** Text-to-Text
-- **Think:** Toggleable  
+- **Think:** Toggleable
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -31,7 +32,8 @@ flm run qwen3:0.6b
 ## 🧩 Model Card: [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B)
 
 - **Type:** Text-to-Text
-- **Think:** Toggleable  
+- **Think:** Toggleable
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -54,7 +56,8 @@ flm run qwen3:0.6b
 ## 🧩 Model Card: [Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B)
 
 - **Type:** Text-to-Text
-- **Think:** Toggleable  
+- **Think:** Toggleable
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -77,7 +80,8 @@ flm run qwen3:4b
 ## 🧩 Model Card: [Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)
 
 - **Type:** Text-to-Text
-- **Think:** Toggleable  
+- **Think:** Toggleable
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -100,7 +104,8 @@ flm run qwen3:8b
 ## 🧩 Model Card: [Qwen3-4B-Thinking-2507](https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507)
 
 - **Type:** Text-to-Text
-- **Think:** Yes  
+- **Think:** Yes
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-4B-Thinking-2507](https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507)
 - **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
@@ -118,7 +123,8 @@ flm run qwen3-tk:4b
 ## 🧩 Model Card: [Qwen3-4B-Instruct-2507](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
 
 - **Type:** Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-4B-Instruct-2507](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507)
 - **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
@@ -136,7 +142,8 @@ flm run qwen3-it:4b
 ## 🧩 Model Card: [Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
 
 - **Type:** Image-Text-to-Text
-- **Think:** No  
+- **Think:** No
+- **Tool Calling Support:** Yes  
 - **Base Model:** [Qwen/Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
 - **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  

@@ -9,6 +9,7 @@ parent: Models
 
 - **Type:** Speach-to-Text (ASR: Automatic Speech Recognition)
 - **Think:** No
+- **Tool Calling Support:** No
 - **Base Model:** [openai/whisper-large-v3-turbo](https://huggingface.co/openai/whisper-large-v3-turbo)
 - **Max Context Length:** NA
 - **Default Context Length:** NA
@@ -72,7 +73,7 @@ from openai import OpenAI
 # - base_url: FastFlowLM's local OpenAI-compatible REST endpoint
 # - api_key: Dummy token; FastFlowLM typically doesn't enforce auth, but the client requires a string
 client = OpenAI(
-    base_url="http://localhost:52625/v1",  # FastFlowLM local API endpoint
+    base_url="http://127.0.0.1:52625/v1",  # FastFlowLM local API endpoint
     api_key="flm",                         # Placeholder key
 )
 
@@ -97,7 +98,7 @@ print(resp.text)
 - In the left sidebar, navigate to Audio.
 - Set Speech-to-Text Engine to OpenAI.
 - Enter:
-> API Base URL: `http://localhost:52625/v1` (Open WebUI Desktop) or `http://host.docker.internal:52625/v1` (Open WebUI in Docker)   
+> API Base URL: `http://127.0.0.1:52625/v1` (Open WebUI Desktop) or `http://host.docker.internal:52625/v1` (Open WebUI in Docker)   
 > API KEY: flm (any value works)    
 > STT Model: whisper-large-v3-turbo (type in the model name; can be different)    
 - Save the setting.

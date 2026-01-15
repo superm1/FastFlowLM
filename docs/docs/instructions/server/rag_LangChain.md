@@ -38,7 +38,7 @@ Launch the server:
 flm serve llama3.2:3b
 ```
 
-> This exposes a REST API at `http://localhost:52625` by default.
+> This exposes a REST API at `http://127.0.0.1:52625` by default.
 
 ---
 
@@ -67,7 +67,7 @@ pip install -U langchain langchain-community langchain-huggingface sentence-tran
 ```
 
 > ✅ We still install `ollama` Python package because **LangChain’s `OllamaLLM` class can be pointed at any local REST backend like FastFlowLM**.  
-> 🔁 `Ollama` and `FastFlowLM` uses the same base URL `base_url="http://localhost:52625"`. Thus, they are interchangable.
+> 🔁 `Ollama` and `FastFlowLM` uses the same base URL `base_url="http://127.0.0.1:52625"`. Thus, they are interchangable.
 
 ---
 
@@ -156,7 +156,7 @@ prompt = PromptTemplate(
 )
 
 # ✅ FastFlowLM via OllamaLLM (optional: custom base_url)
-llm = OllamaLLM(model="llama3.2:3b", base_url="http://localhost:52625")
+llm = OllamaLLM(model="llama3.2:3b", base_url="http://127.0.0.1:52625")
 
 # Build Retrieval-Augmented QA chain
 qa_chain = RetrievalQA.from_chain_type(

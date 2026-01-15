@@ -43,7 +43,7 @@ Run the following command in your powershell to launch the FastFlowLM server:
 2. Under **Community Plugins** section (left), clik **AI Providers**.
 3. Click **➕** to create a new provider.
 4. Set **Provider type** to **OpenAI**.
-5. Enter the **Provider URL**: `http://localhost:52625/v1`.
+5. Enter the **Provider URL**: `http://127.0.0.1:52625/v1`.
 6. Enter a **Provider name** (e.g., `FLM_OpenAI`).
 7. Enter any **API key** (e.g., `flm`).
 8. On the **Model** line, click the **🔄** icon to load available models, then select your preferred modle (e.g. llama3.2:1b).
@@ -55,7 +55,7 @@ Run the following command in your powershell to launch the FastFlowLM server:
 2. Under **Community Plugins** section (left), click **AI Providers**.
 3. Click **➕** to create a new provider.
 4. Set **Provider type** to **Ollama**.
-5. Enter the **Provider URL**: `http://localhost:52625`.
+5. Enter the **Provider URL**: `http://127.0.0.1:52625`.
 6. Enter a **Provider name** (e.g., `FLM_Ollama`).
 7. Enter any **API key** (e.g., `flm`).
 8. On the **Model** line, click the **🔄** icon to load available models, then select your preferred one (e.g. llama3.2:1b).

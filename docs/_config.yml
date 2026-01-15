@@ -98,6 +98,8 @@ docs_nav:
         url: "/docs/instructions/server/openapi/"
       - label: Open WebUI
         url: "/docs/instructions/server/webui/"
+      - label: Tool Calling
+        url: "/docs/instructions/server/tool_calling/"
       - label: LangChain RAG
         url: "/docs/instructions/server/rag_LangChain/"
       - label: LangChain Web Search
@@ -124,6 +126,8 @@ docs_nav:
         url: "/docs/models/gpt-oss/"
       - label: LiquidAI/LFM
         url: "/docs/models/lfm/"
+      - label: Microsoft/Phi
+        url: "/docs/models/phi/"
       - label: Whisper
         url: "/docs/models/whisper/"
       - label: EmbeddingGemma
@@ -142,4 +146,5 @@ docs_nav:
         url: "/docs/benchmarks/gpt-oss_results/"
       - label: LiquidAI/LFM2
         url: "/docs/benchmarks/lfm2_results/"
-
+      - label: Microsoft/Phi4
+        url: "/docs/benchmarks/phi4_results/"
