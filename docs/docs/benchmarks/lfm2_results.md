@@ -10,14 +10,18 @@ nav_order: 5
 This section reports the performance on NPU with FastFlowLM (FLM).
 
 > **Note:** 
-> - Results are based on FastFlowLM v0.9.24.
+> - Results are based on FastFlowLM v0.9.26.
 > - Under FLM's default NPU power mode (Performance)  
-> - Test system spec: AMD Ryzen™ AI 7 350 (Krakan Point) with 32 GB DRAM. 
-> - Newer versions may deliver improved performance. 
+> - Newer versions may deliver improved performance.
+> - Fine-tuned models show performance comparable to their base models (e.g., LFM2-1.2B vs. LFM2.5-Instruct-1.2B, and LFM2-2.6B vs. LFM2-2.6B-Transcript). 
+
+---
+
+**Test system spec:** AMD Ryzen™ AI 7 350 (Kraken Point) with 32 GB DRAM; performance is comparable to other Kraken Point systems.
 
 <div style="display:flex; flex-wrap:wrap;">
-  <img src="/assets/bench/lfm2_decoding.png" style="width:15%; min-width:300px; margin:4px;">
-  <img src="/assets/bench/lfm2_prefill.png" style="width:15%; min-width:300px; margin:4px;">
+  <img src="/assets/bench/lfm2_decoding_krk.png" style="width:15%; min-width:300px; margin:4px;">
+  <img src="/assets/bench/lfm2_prefill_krk.png" style="width:15%; min-width:300px; margin:4px;">
 </div>
 
 ---
@@ -26,8 +30,8 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 
 | **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
-| **LFM2-1.2B**  | NPU (FLM)    | 61.3	|60.5	|57.5	|51.2	|45.3	|35.4|
-| **LFM2-2.6B**  | NPU (FLM)    | 30.3	|29.9	|29.0	|27.3	|24.5	|20.4|
+| **LFM2-1.2B**  | NPU (FLM)    | 62	|61	|59	|56	|52	|46|
+| **LFM2-2.6B**  | NPU (FLM)    | 30	|30	|30	|29	|27	|25|
 
 ---
 
@@ -37,3 +41,32 @@ This section reports the performance on NPU with FastFlowLM (FLM).
 |------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
 | **LFM2-1.2B**  | NPU (FLM)    | 1431	| 1829	| 2032	| 1920	| 1519	|1059 |
 | **LFM2-2.6B**  | NPU (FLM)    | 685	| 881	| 1010	| 1008	| 864	| 654 |
+
+---
+
+**Test system spec:** AMD Ryzen™ AI 9 370 (Strix Point) with 32 GB DRAM; performance is comparable to other Strix Point and Strix Halo Point systems.
+
+<div style="display:flex; flex-wrap:wrap;">
+  <img src="/assets/bench/lfm2_decoding_stx.png" style="width:15%; min-width:300px; margin:4px;">
+  <img src="/assets/bench/lfm2_prefill_stx.png" style="width:15%; min-width:300px; margin:4px;">
+</div>
+
+---
+
+### 🚀 Decoding Speed (TPS, or Tokens per Second, starting @ different context lengths)
+
+| **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
+|------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
+| **LFM2-1.2B**  | NPU (FLM)    | 56	|55	|54	|51	|49	|45|
+| **LFM2-2.6B**  | NPU (FLM)    | 27	|26	|26	|25	|24	|22|
+
+---
+
+### 🚀 Prefill Speed (TPS, or Tokens per Second, with different prompt lengths)
+
+| **Model**        | **HW**       | **1k** | **2k** | **4k** | **8k** | **16k** | **32k** |
+|------------------|--------------------|--------:|--------:|--------:|--------:|---------:|---------:|
+| **LFM2-1.2B**  | NPU (FLM)    | 1487	| 1987	| 2226	| 2137	| 1670	|1132 |
+| **LFM2-2.6B**  | NPU (FLM)    | 715	| 932	| 1099	| 1098	| 941	| 714 |
+
+---
