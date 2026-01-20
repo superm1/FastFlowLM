@@ -86,7 +86,7 @@ flm run lfm2.5-it:1.2b
 ## 🧩 Model Card: [LiquidAI/LFM2.5-1.2B-Thinking](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking)
 
 - **Type:** Text-to-Text
-- **Think:** No
+- **Think:** Yes
 - **Tool Calling Support:** Yes
 - **Base Model:** [LiquidAI/LFM2.5-1.2B-Thinking](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Thinking)
 - **Quantization:** Q4_0
