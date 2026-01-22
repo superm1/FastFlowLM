@@ -25,10 +25,10 @@ sections:
           desc: "AMD Ryzen™ AI 7 350 with 32 GB DRAM"
         - label: "Qwen 3 0.6B"
           value: "80 tps"
-          desc: "Prefill speed: 1,356 tps"
+          desc: "Prefill speed: 1,356 tps with 2K prompt"
         - label: "Gemma3 1B"
-          value: "43 tps"
-          desc: "Prefill speed: 1,657 tps"
+          value: "66 tps"
+          desc: "Prefill speed: 1,657 tps with 16K prompt"
 
   # - type: media
   #   variant: alt
