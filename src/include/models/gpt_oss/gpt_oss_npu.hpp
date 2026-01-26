@@ -1,18 +1,18 @@
-/// \file gemma_npu.hpp
-/// \brief gemma_npu class
+/// \file gpt_oss_npu.hpp
+/// \brief gpt_oss_npu class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.1.0
-/// \note This is a header file for the gemma_npu class
+/// \version 0.9.6
+/// \note This is a header file for the gpt_oss_npu class
 #pragma once
 #include "lm_config.hpp"
 #include "npu_utils/npu_utils.hpp"
 #include "tensor_utils/q4_npu_eXpress.hpp"
-#include "gemma_text/gemma_text_npu_sequence.hpp"
-#include "gemma_text/gemma_text_lm_head.hpp"
+#include "gpt_oss_npu_sequence.hpp"
 #include "modules/embedding.hpp"
-#include "gemma_text/gemma_text_gemm.hpp"
-#include "gemma_text/gemma_text_dequant.hpp"
+#include "modules/lm_head.hpp"
+#include "modules/gemm.hpp"
+#include "modules/dequant.hpp"
 #include "tensor_2d.hpp"
 #include "utils/utils.hpp"
 #include "causal_lm.hpp"
@@ -21,18 +21,19 @@
 #endif
 
 
-class gemma_text_npu : public causal_lm{
+class gpt_oss_npu : public causal_lm{
 public:
-    /// \brief  initialize the gemma_text_npu
+    /// \brief  initialize the gpt_oss_npu
     /// \param config the configuration
     /// \param npu_instance the npu instance
-    gemma_text_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
-    ~gemma_text_npu();
+    gpt_oss_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
+    ~gpt_oss_npu();
 
-    /// \brief forward the gemma_text_npu
+    /// \brief forward the gpt_oss_npu
     /// \param ids the ids
     /// \return the output tensor
     buffer<bf16> forward(int ids) override;
+    buffer<bf16> forward(buffer<bf16>& x);
     buffer<bf16> prefill(std::vector<int>& ids, void* payload = nullptr) override;
 
     /// \brief set the context length

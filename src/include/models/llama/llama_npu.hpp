@@ -8,7 +8,7 @@
 #include "lm_config.hpp"
 #include "npu_utils/npu_utils.hpp"
 #include "tensor_utils/q4_npu_eXpress.hpp"
-#include "llama/llama_npu_sequence.hpp"
+#include "llama_npu_sequence.hpp"
 #include "modules/embedding.hpp"
 #include "modules/lm_head.hpp"
 #include "modules/gemm.hpp"

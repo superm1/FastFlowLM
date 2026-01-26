@@ -93,6 +93,7 @@ target_link_libraries(flm PUBLIC
     dequant
     gemm
     lm_head
+    mha
     npu_utils
     libcurl
     avformat

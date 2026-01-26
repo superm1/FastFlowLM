@@ -4,7 +4,7 @@
 
 AppName=flm
 
-AppVersion=0.9.28
+AppVersion=0.9.29
 
 AppPublisher=FastFlowLM
 
@@ -60,6 +60,7 @@ Source: "gemm.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "npu_utils.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "q4_npu_eXpress.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "mha.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "vcruntime140.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "vcruntime140_1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "abseil_dll.dll"; DestDir: "{app}"; Flags: ignoreversion

@@ -2,17 +2,17 @@
 /// \brief gemma_npu class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.24
+/// \version 0.1.0
 /// \note This is a header file for the gemma_npu class
 #pragma once
 #include "lm_config.hpp"
 #include "npu_utils/npu_utils.hpp"
 #include "tensor_utils/q4_npu_eXpress.hpp"
-#include "gemma/gemma_npu_sequence.hpp"
+#include "gemma_text_npu_sequence.hpp"
+#include "gemma_text_lm_head.hpp"
 #include "modules/embedding.hpp"
-#include "modules/lm_head.hpp"
-#include "modules/gemm.hpp"
-#include "modules/dequant.hpp"
+#include "gemma_text_gemm.hpp"
+#include "gemma_text_dequant.hpp"
 #include "tensor_2d.hpp"
 #include "utils/utils.hpp"
 #include "causal_lm.hpp"
@@ -21,15 +21,15 @@
 #endif
 
 
-class gemma_npu : public causal_lm{
+class gemma_text_npu : public causal_lm{
 public:
-    /// \brief  initialize the gemma_npu
+    /// \brief  initialize the gemma_text_npu
     /// \param config the configuration
     /// \param npu_instance the npu instance
-    gemma_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
-    ~gemma_npu();
+    gemma_text_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
+    ~gemma_text_npu();
 
-    /// \brief forward the gemma_npu
+    /// \brief forward the gemma_text_npu
     /// \param ids the ids
     /// \return the output tensor
     buffer<bf16> forward(int ids) override;

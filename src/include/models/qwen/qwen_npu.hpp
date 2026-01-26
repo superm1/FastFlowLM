@@ -1,14 +1,14 @@
-/// \file phi4_npu.hpp
-/// \brief phi4_npu class
+/// \file qwen_npu.hpp
+/// \brief qwen_npu class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.10
-/// \note This is a header file for the phi4_npu class
+/// \version 0.9.24
+/// \note This is a header file for the qwen_npu class
 #pragma once
 #include "lm_config.hpp"
 #include "npu_utils/npu_utils.hpp"
 #include "tensor_utils/q4_npu_eXpress.hpp"
-#include "phi4/phi4_npu_sequence.hpp"
+#include "qwen_npu_sequence.hpp"
 #include "modules/embedding.hpp"
 #include "modules/lm_head.hpp"
 #include "modules/gemm.hpp"
@@ -21,15 +21,15 @@
 #endif
 
 
-class phi4_npu : public causal_lm{
+class qwen_npu : public causal_lm{
 public:
-    /// \brief  initialize the phi4_npu
+    /// \brief  initialize the qwen_npu
     /// \param config the configuration
     /// \param npu_instance the npu instance
-    phi4_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
-    ~phi4_npu();
+    qwen_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
+    ~qwen_npu();
 
-    /// \brief forward the phi4_npu
+    /// \brief forward the qwen_npu
     /// \param ids the ids
     /// \return the output tensor
     buffer<bf16> forward(int ids) override;
