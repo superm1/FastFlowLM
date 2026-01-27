@@ -401,7 +401,7 @@ bool LFM2_5_TK::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
 std::string LFM2_5_TK::generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled) {
     os << "<think>\n" << std::flush;
     std::string result = this->_shared_generate(meta_info, length_limit, os, is_cancelled);
-    result += "<think>\n";
+    result = "<think>\n" + result;
     return result;
 }
 
@@ -410,6 +410,28 @@ std::string LFM2_5_TK::generate_with_prompt(chat_meta_info_t& meta_info, lm_unif
         return "";
     }
     return this->generate(meta_info, length_limit, os);
+}
+
+NonStreamResult LFM2_5_TK::parse_nstream_content(const std::string response_text) {
+    NonStreamResult result;
+
+    std::string content, reasoning_content;
+
+    std::string think_start_tag = "<think>";
+    std::string think_end_tag = "</think>";
+
+    size_t think_start_pos = response_text.find(think_start_tag);
+    size_t think_end_pos = response_text.find(think_end_tag);
+
+
+    think_start_pos += think_start_tag.length();
+    std::string reasoning_str = response_text.substr(think_start_pos, think_end_pos - think_start_pos);
+    result.reasoning_content = reasoning_str;
+
+    std::string content_str = response_text.substr(think_end_pos + think_end_tag.length());
+    result.content = content_str;
+
+    return result;
 }
 
 StreamResult LFM2_5_TK::parse_stream_content(const std::string content) {

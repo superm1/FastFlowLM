@@ -198,6 +198,35 @@ std::string GPT_OSS::generate_with_prompt(chat_meta_info_t& meta_info, lm_unifor
     return "<|start|>assistant" + result + "<|end|>";
 }
 
+NonStreamResult GPT_OSS::parse_nstream_content(const std::string response_text) {    
+    NonStreamResult result;
+
+    const std::string think_start_tag = "<|start|>assistant<|channel|>analysis<|message|>";
+    const std::string think_end_tag = "<|end|>";
+    const std::string final_start_tag = "<|start|>assistant<|channel|>final<|message|>";
+    const std::string final_end_tag = "<|end|>";
+
+    // --- Parse reasoning content ---
+    size_t t_start = response_text.find(think_start_tag);
+    size_t t_end = response_text.find(think_end_tag, t_start + think_start_tag.size());
+
+    if (t_start != std::string::npos && t_end != std::string::npos) {
+        t_start += think_start_tag.size();
+        result.reasoning_content = response_text.substr(t_start, t_end - t_start);
+    }
+
+    // --- Parse final content ---
+    size_t f_start = response_text.find(final_start_tag);
+    size_t f_end = response_text.find(final_end_tag, f_start + final_start_tag.size());
+
+    if (f_start != std::string::npos && f_end != std::string::npos) {
+        f_start += final_start_tag.size();
+        result.content = response_text.substr(f_start, f_end - f_start);
+    }
+
+    return result;
+}
+
 int GPT_OSS::_sample_in_tool(buffer<bf16>& logits) {
     // to=functions.get_current_weather <|constrain|>json<|message|>{"location":"San Francisco"}<|call|>
     std::vector<int> allowed_tokens;

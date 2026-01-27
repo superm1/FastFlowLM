@@ -45,6 +45,7 @@ public:
     std::vector<int> get_function_name_tokens();
     void update_state(int token_id);
     void mask_logits(buffer<bf16>& logits, const std::vector<int>& allowed_tokens);
+    NonStreamResult parse_nstream_content(const std::string response_text);
     StreamResult parse_stream_content(const std::string content);
 
     /// \brief Override configure_parameter to handle GPT-oss-specific parameters
