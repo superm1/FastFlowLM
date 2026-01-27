@@ -258,7 +258,59 @@ int main(int argc, char* argv[]) {
             std::filesystem::create_directories(models_dir);
         }
 
-        if (command == "run") {
+        if (command == "run" && !parsed_args.input_file_name.empty()) {
+            // this is used for our benchmarking, not for public use.
+            std::ifstream input_file(parsed_args.input_file_name);
+            if (!input_file.is_open()) {
+                header_print("ERROR", "Failed to open input file: " + parsed_args.input_file_name);
+                return 1;
+            }
+            std::stringstream buffer;
+            buffer << input_file.rdbuf();
+            std::string input_text = buffer.str();
+            input_file.close();
+            xrt::device npu_device_inst = xrt::device(0);
+            std::unique_ptr<AutoModel> auto_chat_engine;
+            if (!availble_models.is_model_supported(tag)) {
+                header_print("ERROR", "Model not found: " << tag << "; Please check with `flm list` and try again.");
+                return 1;
+            }
+            auto [new_tag, model_info] = availble_models.get_model_info(tag);
+            std::pair<std::string, std::unique_ptr<AutoModel>> auto_model = get_auto_model(new_tag, availble_models, &npu_device_inst);
+            auto_chat_engine = std::move(auto_model.second);
+            auto_chat_engine->load_model(availble_models.get_model_path(tag), model_info, ctx_length, preemption);
+
+            lm_uniform_input_t uniformed_input;
+            chat_meta_info_t meta_info;
+            uniformed_input.prompt = input_text;
+            
+            auto_chat_engine->start_total_timer();
+            
+            auto_chat_engine->start_ttft_timer();
+            bool success = auto_chat_engine->insert(meta_info, uniformed_input);
+            if (!success){
+                header_print("WARNING", "Max length reached, stopping generation...");
+                return 1;
+            }
+
+            auto_chat_engine->stop_ttft_timer();
+            
+            // Use harmony filter for gpt-oss models
+            if (auto_chat_engine->get_current_model().find("gpt-oss") != std::string::npos) { // contains gpt-oss:20b and gpt-oss
+                cli_harmony_filter harmony_filter_ostream(std::cout);
+                auto_chat_engine->generate(meta_info, 128, harmony_filter_ostream);
+            } else {
+                auto_chat_engine->generate(meta_info, 128, std::cout);
+            }
+            
+            auto_chat_engine->stop_total_timer();
+            std::cout << std::endl;
+            if (1) {
+                auto_chat_engine->verbose();
+            }
+            auto_chat_engine.reset();
+        }
+        else if (command == "run") {
             check_and_notify_new_version();
             Runner runner(availble_models, downloader, tag, asr, embed, ctx_length, preemption);
             runner.run();

@@ -35,6 +35,7 @@ struct ParsedArgs {
     bool cors;
     bool asr;
     bool embed;
+    std::string input_file_name;
     ParsedArgs() : power_mode("performance"), force_redownload(false), 
                    version_requested(false), port_requested(false),
                    quiet_list(false) {}
@@ -76,7 +77,9 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             ("cors", po::value<bool>(&parsed_args.cors)->default_value(1),
              "Enable or disable Cross-Origin Resource Sharing (CORS) (for serve command)")
             ("preemption", po::value<bool>(&parsed_args.preemption)->default_value(false),
-             "Enable preemption");
+             "Enable preemption")
+            ("prompt,i", po::value<std::string>(&parsed_args.input_file_name)->default_value(""),
+             "Direct file input");
 
         // Define positional arguments
         po::positional_options_description pos_desc;
