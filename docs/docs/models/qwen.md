@@ -143,7 +143,7 @@ flm run qwen3-it:4b
 
 - **Type:** Image-Text-to-Text
 - **Think:** No
-- **Tool Calling Support:** Yes  
+- **Tool Calling Support:** No  
 - **Base Model:** [Qwen/Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
 - **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
