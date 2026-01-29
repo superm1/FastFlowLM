@@ -140,25 +140,6 @@ static json normalize_template(json messages) {
     return template_message;
 }
 
-static uint64_t checksum(const void* p, size_t len, uint64_t sum = 0) {
-    const uint8_t* data = reinterpret_cast<const uint8_t*>(p);
-    uint64_t _sum = sum;
-
-    const uint64_t* p64 = reinterpret_cast<const uint64_t*>(data);
-    size_t blocks = len / sizeof(uint64_t);
-    for (size_t i = 0; i < blocks; ++i) {
-        _sum += p64[i];
-    }
-
-    const uint8_t* p8 = data + blocks * sizeof(uint64_t);
-    size_t remain = len % sizeof(uint64_t);
-    for (size_t i = 0; i < remain; ++i) {
-        _sum += p8[i];
-    }
-
-    return _sum;
-}
-
 
 ///@brief RestHandler constructor
 ///@param models the model list
@@ -194,6 +175,7 @@ RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const 
     else {
         this->current_model_tag = "model-faker";
     }
+    this->prompt_cache = PromptCache();
 }
 
 ///@brief RestHandler destructor
@@ -745,6 +727,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
                                                std::function<void(const json&)> send_response,
                                                StreamResponseCallback send_streaming_response,
                                                std::shared_ptr<CancellationToken> cancellation_token) {
+    static std::string model_used_for_last_message = "model-faker";
     try {
         // Extract OpenAI-style parameters
         json current_messages = request["messages"];
@@ -762,51 +745,24 @@ void RestHandler::handle_openai_chat_completion(const json& request,
         current_messages = normalize_messages(current_messages);
         current_messages = normalize_template(current_messages);
         
-        static uint64_t sum_old = 0;
-        static std::string current_model=model;
-        uint64_t sum_new1 = 0;
-        uint64_t sum_new2 = 0;
         json messages;
 
-        // kv-cache
-        if (model != current_model) { // switch models will clear context
-            sum_old++;
-            current_model = model;
+        // see if we can use prompt cache
+        if (model != model_used_for_last_message) { // switch models will clear context
+            this->prompt_cache.update_checksum(current_messages);
+            model_used_for_last_message = model;
+            messages = current_messages;
         }
-        if (current_messages.size() > 2) {
-            for (size_t i = 0; i < current_messages.size(); ++i) {
-                const auto& msg = current_messages[i];
-                const std::string role = msg.value("role", "");
-                const std::string content = msg.value("content", "");
-
-                bool has_tool_call = msg.contains("tool_calls");
-                bool skip_checksum = (role == "tool") || has_tool_call;
-
-                if (skip_checksum) continue;
-                    
-                if(i < current_messages.size()-2)
-                    sum_new1 = checksum(content.data(), content.size(), sum_new1);
-                sum_new2 = checksum(content.data(), content.size(), sum_new2);
-            }
-
-            if (sum_old == sum_new1) {
-                header_print("FLM", "Use cached prompt...");
+        else {
+            if (prompt_cache.can_use_cache(current_messages, auto_chat_engine->get_chat_template_type())) {
+                header_print("FLM", "Use cached prompt!");
+                // only keep the last message for insertion
                 messages.push_back(current_messages.back());
             }
             else {
-                sum_old = 0;
+                // cannot use cache, clear and re-insert all
+                auto_chat_engine->clear_context();
                 messages = current_messages;
-                this->auto_chat_engine->clear_context();
-            }
-            sum_old = sum_new2;
-        }
-        else {
-            sum_old = 0;
-            this->auto_chat_engine->clear_context();
-            messages = current_messages;
-            for (const auto& msg : current_messages) {
-                std::string value = msg.value("content", "");
-                sum_old = checksum(value.data(), value.size(), sum_old);
             }
         }
 
@@ -860,7 +816,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
 
             if (meta_info.stop_reason == CANCEL_DETECTED) {
                 header_print("FLM", "Generation Cancelled!");
-                sum_old++; // make sure checksum doesn't match
+                this->prompt_cache.reset();
             }
         }
         else {

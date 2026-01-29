@@ -17,6 +17,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include "prompt_cache.hpp"
 
 using json = nlohmann::ordered_json;
 
@@ -124,4 +125,5 @@ private:
     int ctx_length;
     std::string last_question;
     bool preemption;
-}; 
+    PromptCache prompt_cache;
+};
