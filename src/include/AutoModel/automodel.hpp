@@ -103,6 +103,12 @@ typedef enum {
 	URL_LINK
 } input_payload_type_t; // so far not used, leave for future use
 
+typedef enum {
+	chat_ml,
+	harmony,
+	unknown_template
+} chat_template_type_t;
+
 struct lm_uniform_input_t {
 	std::string prompt;
 	nlohmann::ordered_json messages;
@@ -286,7 +292,9 @@ public:
 	
 	virtual void load_model(std::string model_path, json model_info, int default_context_length = -1, bool enable_preemption = false) {}
 	virtual std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled = [] { return false; }) = 0;
-
+	virtual chat_template_type_t get_chat_template_type() {
+		return chat_template_type_t::chat_ml;
+	}
 	/// \brief Insert the tokens
 	/// \param tokens the tokens
 	/// \param is_system_prompt the is system prompt
