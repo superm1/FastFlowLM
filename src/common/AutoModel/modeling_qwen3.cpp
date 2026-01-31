@@ -266,10 +266,10 @@ NonStreamResult Qwen3_IT::parse_nstream_content(const std::string response_text)
     size_t start_pos = response_text.find(start_tag);
     size_t end_pos = response_text.find(end_tag);
 
-    // Safety check: if tags are not found
     if (start_pos == std::string::npos || end_pos == std::string::npos) {
-        // error
-        return { name, arguments };
+        // pure content
+        result.content = response_text;
+        return result;
     }
 
     start_pos += start_tag.length();
