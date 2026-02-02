@@ -5,7 +5,7 @@
 /// \version 0.9.24
 /// \note This is a source file for the gpt-oss class
 #include "AutoModel/modeling_gpt_oss.hpp"   
-#include "../../server/server.hpp"
+
 
 GPT_OSS::GPT_OSS(xrt::device* npu_device_inst) : AutoModel(npu_device_inst, "gpt-oss") {}
 

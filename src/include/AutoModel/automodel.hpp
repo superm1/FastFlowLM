@@ -225,6 +225,12 @@ public:
 	/// \brief Verbose
 	void verbose();
 
+	float get_ttft(){
+    	time_utils::time_with_unit ttft_time = this->profiler_list[TTFT_TIME].get_total_time();
+		time_utils::time_with_unit ttft_in_second = time_utils::cast_to_s(ttft_time);
+		return ttft_in_second.first;
+	}
+
 	/// \brief Set the topk
 	/// \param topk the topk
 	void set_topk(int topk);

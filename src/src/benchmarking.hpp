@@ -5,6 +5,14 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <cctype>
+#include <ctime>
+#include <cstring>
+#ifdef _WIN32
+#include <intrin.h>
+#endif
 
 #include "AutoModel/automodel.hpp"
 #include "AutoModel/all_models.hpp"
@@ -48,6 +56,142 @@ struct BenchmarkResults_t {
     std::vector<statistic_t> TTFT;
     std::vector<statistic_t> decoding_speed;
 };
+
+inline std::string sanitize_model_tag_for_filename(const std::string& model_tag) {
+    std::string safe;
+    safe.reserve(model_tag.size());
+    for (unsigned char ch : model_tag) {
+        if (std::isalnum(ch) || ch == '-' || ch == '_' || ch == '.') {
+            safe.push_back(static_cast<char>(ch));
+        } else {
+            safe.push_back('_');
+        }
+    }
+    return safe;
+}
+
+inline std::string format_float_csv(float value, int precision) {
+    std::ostringstream ss;
+    ss << std::fixed << std::setprecision(precision) << value;
+    return ss.str();
+}
+
+inline std::string get_date_yyyymmdd() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(now);
+    std::tm tm_time{};
+#ifdef _WIN32
+    localtime_s(&tm_time, &t);
+#else
+    localtime_r(&t, &tm_time);
+#endif
+    std::ostringstream ss;
+    ss << std::put_time(&tm_time, "%Y%m%d");
+    return ss.str();
+}
+
+inline std::string get_cpu_name() {
+#ifdef _WIN32
+    int cpu_info[4] = {0, 0, 0, 0};
+    char brand[0x40] = {0};
+    __cpuid(cpu_info, 0x80000000);
+    unsigned int max_ex_id = static_cast<unsigned int>(cpu_info[0]);
+    if (max_ex_id >= 0x80000004) {
+        __cpuid(cpu_info, 0x80000002);
+        std::memcpy(brand, cpu_info, sizeof(cpu_info));
+        __cpuid(cpu_info, 0x80000003);
+        std::memcpy(brand + 16, cpu_info, sizeof(cpu_info));
+        __cpuid(cpu_info, 0x80000004);
+        std::memcpy(brand + 32, cpu_info, sizeof(cpu_info));
+    }
+    std::string name(brand);
+    while (!name.empty() && std::isspace(static_cast<unsigned char>(name.front()))) {
+        name.erase(name.begin());
+    }
+    while (!name.empty() && std::isspace(static_cast<unsigned char>(name.back()))) {
+        name.pop_back();
+    }
+    return name;
+#else
+    return {};
+#endif
+}
+
+inline void write_bench_csv(const BenchmarkResults_t& results, const std::string& model_tag, const std::string& output_dir = ".") {
+    std::string safe_tag = sanitize_model_tag_for_filename(model_tag);
+    std::string date_stamp = get_date_yyyymmdd();
+    std::string cpu_name = sanitize_model_tag_for_filename(get_cpu_name());
+    std::string filename = output_dir;
+    if (!filename.empty() && filename.back() != '/' && filename.back() != '\\') {
+        filename += "/";
+    }
+    filename += "bench_" + safe_tag + "_" + date_stamp;
+    if (!cpu_name.empty()) {
+        filename += "_" + cpu_name;
+    }
+    filename += ".csv";
+
+    std::ofstream out(filename, std::ios::out | std::ios::trunc);
+    if (!out.is_open()) {
+        header_print("ERROR", "Failed to open output file: " + filename);
+        return;
+    }
+
+    out << "context_length_k,ttft_avg_s,ttft_std_s,ttft_min_s,ttft_max_s,prefill_avg_toks_per_s,prefill_std_toks_per_s,prefill_min_toks_per_s,prefill_max_toks_per_s,decoding_avg_toks_per_s,decoding_std_toks_per_s,decoding_min_toks_per_s,decoding_max_toks_per_s\n";
+
+    int stages = static_cast<int>(results.decoding_speed.size());
+    for (int i = 0; i < stages; i++) {
+        int context_len_k = 1 << i;
+        std::vector<std::string> fields;
+        fields.reserve(13);
+        fields.push_back(std::to_string(context_len_k));
+
+        if (i < static_cast<int>(results.TTFT.size())) {
+            fields.push_back(format_float_csv(results.TTFT[i].average, 6));
+            fields.push_back(format_float_csv(results.TTFT[i].std_variance, 6));
+            fields.push_back(format_float_csv(results.TTFT[i].min, 6));
+            fields.push_back(format_float_csv(results.TTFT[i].max, 6));
+        } else {
+            fields.push_back("");
+            fields.push_back("");
+            fields.push_back("");
+            fields.push_back("");
+        }
+
+        if (i < static_cast<int>(results.prefill_speed.size())) {
+            fields.push_back(format_float_csv(results.prefill_speed[i].average, 2));
+            fields.push_back(format_float_csv(results.prefill_speed[i].std_variance, 2));
+            fields.push_back(format_float_csv(results.prefill_speed[i].min, 2));
+            fields.push_back(format_float_csv(results.prefill_speed[i].max, 2));
+        } else {
+            fields.push_back("");
+            fields.push_back("");
+            fields.push_back("");
+            fields.push_back("");
+        }
+
+        if (i < static_cast<int>(results.decoding_speed.size())) {
+            fields.push_back(format_float_csv(results.decoding_speed[i].average, 2));
+            fields.push_back(format_float_csv(results.decoding_speed[i].std_variance, 2));
+            fields.push_back(format_float_csv(results.decoding_speed[i].min, 2));
+            fields.push_back(format_float_csv(results.decoding_speed[i].max, 2));
+        } else {
+            fields.push_back("");
+            fields.push_back("");
+            fields.push_back("");
+            fields.push_back("");
+        }
+
+        for (size_t f = 0; f < fields.size(); f++) {
+            if (f > 0) {
+                out << ",";
+            }
+            out << fields[f];
+        }
+        out << "\n";
+    }
+    out.close();
+}
 
 void print_result(const BenchmarkResults_t& results) {
     // Calculate number of stages (1k, 2k, 4k, ...)
@@ -157,43 +301,56 @@ BenchmarkResults_t run_benchmarks(std::string model_tag, std::string bench_confi
     results.TTFT.resize(stages);
     results.decoding_speed.resize(stages);
     results.prefill_speed.resize(stages);
-    for (int bench_len = stages - 1; bench_len >= 0; bench_len--)
-    {
-        header_print("FLM", "Starting benchmark prefill with text of " + std::to_string(1 << (bench_len)) + "k tokens...");
 
-        std::string long_text;
-        long_text.reserve((1 << (bench_len)) * 1024);
-        for (int i = 0; i < (1 << (bench_len)); i++) {
-            long_text = long_text + benchmark_text;
-        }
 
-        std::vector<float> ttft;
-        std::vector<float> prefill_speed;
-        std::vector<float> decoding_speed;
-        
-        lm_uniform_input_t uniformed_input;
-        uniformed_input.prompt = long_text;
-        std::ostream null_stream(0);
+    std::vector<std::vector<float>> ttft;
+    std::vector<std::vector<float>> prefill_speed;
+    std::vector<std::vector<float>> decoding_speed;
+    ttft.resize(stages);
+    prefill_speed.resize(stages);
+    decoding_speed.resize(stages);
+    
+    for (int it = 0; it < bench_config["iterations"]; it++) {
+        for (int bench_len = stages - 1; bench_len >= 0; bench_len--)
+        {
+            header_print("FLM", "Starting benchmark for " + std::to_string((1 << (bench_len))) << "k and iteration " << (it + 1) << "...");
+            std::string long_text;
+            long_text.reserve((1 << (bench_len)) * 1024);
+            for (int i = 0; i < (1 << (bench_len)); i++) {
+                long_text = long_text + benchmark_text;
+            }
+            
+            lm_uniform_input_t uniformed_input;
+            uniformed_input.prompt = long_text;
+            std::ostream null_stream(0);
 
-        for (int it = 0; it < bench_config["iterations"]; it++) {
 
-        chat_meta_info_t meta_info;
+            chat_meta_info_t meta_info;
+            auto_chat_engine->start_ttft_timer();
             auto_chat_engine->insert(meta_info, uniformed_input);
+            auto_chat_engine->stop_ttft_timer();
             auto_chat_engine->generate(meta_info, 32, null_stream);
 
-            ttft.push_back(meta_info.prefill_duration / 1e9); // in second
-            prefill_speed.push_back(meta_info.prompt_tokens / (meta_info.prefill_duration / 1e9)); // in tokens per second
-            decoding_speed.push_back(meta_info.generated_tokens / (meta_info.decoding_duration / 1e9)); // in second
+            ttft[bench_len].push_back((float)auto_chat_engine->get_ttft()); // in second
+            prefill_speed[bench_len].push_back((float)meta_info.prompt_tokens / (meta_info.prefill_duration / 1e9)); // in tokens per second
+            decoding_speed[bench_len].push_back((float)meta_info.generated_tokens / (meta_info.decoding_duration / 1e9)); // in second
+            header_print("FLM", "\tTTFT: " << ttft[bench_len].back() << "s, Prefill Speed: " << prefill_speed[bench_len].back() << " tokens/s, Decoding Speed: " << decoding_speed[bench_len].back() << " tokens/s");
             auto_chat_engine->clear_context();
+            // sleep for 1 second between benchmarks to avoid overheating or memory issues
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        results.TTFT[bench_len].calculate_statistics(ttft);
-        results.prefill_speed[bench_len].calculate_statistics(prefill_speed);
-        results.decoding_speed[bench_len].calculate_statistics(decoding_speed);
+    }
+
+    for (int bench_len = 0; bench_len < stages; bench_len++) {
+        results.TTFT[bench_len].calculate_statistics(ttft[bench_len]);
+        results.prefill_speed[bench_len].calculate_statistics(prefill_speed[bench_len]);
+        results.decoding_speed[bench_len].calculate_statistics(decoding_speed[bench_len]);
     }
 
     auto_chat_engine.reset();
 
     print_result(results);
+    write_bench_csv(results, new_tag, ".");
     return results;
 }
 

@@ -193,6 +193,7 @@ std::string AutoModel::_shared_generate(chat_meta_info_t& meta_info, int length_
     if (this->is_eos(last_sampled_token)){
         return result;
     }
+    this->profiler_list[DECODING_TIME].reset();
     this->profiler_list[TKOEN_DECODE_TIME].reset();
     if (this->total_tokens >= this->MAX_L){
         header_print("WARNING", "Max length reached, stopping generation...");
@@ -220,12 +221,12 @@ std::string AutoModel::_shared_generate(chat_meta_info_t& meta_info, int length_
         last_sampled_token = sampled_token;
 
         this->profiler_list[TKOEN_DECODE_TIME].start();
-        this->profiler_list[TKOEN_DECODE_TIME].stop(1);
         if (this->is_normal_token(sampled_token)){ // filter out special tokens
             std::string token_str = this->tokenizer->run_time_decoder(sampled_token);
             os << token_str << std::flush;
             result += token_str;
         }
+        this->profiler_list[TKOEN_DECODE_TIME].stop(1);
         this->token_history.push_back(sampled_token);
         if (this->is_eos(sampled_token)){
             this->lm_engine->forward(last_sampled_token);
