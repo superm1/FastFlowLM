@@ -614,6 +614,30 @@
                     "quantization_level": "Q4_1"
                 }
             }
+        },
+        "qwen2.5-it": {
+            "3b": {
+                "name": "Qwen2.5-3B-Instruct-NPU2",
+                "url": "https://huggingface.co/FastFlowLM/Qwen2.5-3B-Instruct-NPU2/resolve/main",
+                "file_url": "https://huggingface.co/api/models/FastFlowLM/Qwen2.5-3B-Instruct-NPU2/tree/main",
+                "modified_at": "2025-05-30T00:00:00Z",
+                "size": 3000000000,
+                "flm_min_version": "0.9.32",
+                "files": [
+                    "config.json",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json"
+                ],
+                "default_context_length": 8192,
+                "details": {
+                    "family": "qwen2",
+                    "think": true,
+                    "think_toggleable": false,
+                    "parameter_size": "3B",
+                    "quantization_level": "Q4_1"
+                }
+            }
         }
     }
 }

@@ -20,6 +20,7 @@
 #include "lm_config.hpp"
 #include "models/llama/llama_npu.hpp"
 #include "models/qwen/qwen_npu.hpp"
+#include "models/qwen2/qwen2_npu.hpp"
 #include "models/qwen3vl/qwen3vl_npu.hpp"
 #include "models/gemma/gemma_npu.hpp"
 #include "models/gemma_text/gemma_text_npu.hpp"

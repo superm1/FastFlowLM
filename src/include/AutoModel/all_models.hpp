@@ -14,12 +14,14 @@
 #include "modeling_qwen3vl.hpp"
 #include "modeling_lfm2.hpp"
 #include "modeling_phi4.hpp"
+#include "modeling_qwen2.hpp"
 #include "model_list.hpp"
 #include "nlohmann/json.hpp"
 
 typedef enum {
     llama3,
     deepseek_r1,
+    qwen2,
     qwen3,
     qwen3_it,
     qwen3_tk,
@@ -40,6 +42,7 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
     static const std::map<std::string, SupportedModelFamily> modelFamilyMap = {
         {"llama3", SupportedModelFamily::llama3},
         {"deepseek-r1", SupportedModelFamily::deepseek_r1},
+        {"qwen2", SupportedModelFamily::qwen2},
         {"qwen3", SupportedModelFamily::qwen3},
         {"qwen3-it", SupportedModelFamily::qwen3_it},
         {"qwen3-tk", SupportedModelFamily::qwen3_tk},
@@ -69,6 +72,9 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
             break;
         case SupportedModelFamily::deepseek_r1:
             auto_chat_engine = std::make_unique<DeepSeek_r1_8b>(npu_device_inst);
+            break;
+        case SupportedModelFamily::qwen2:
+            auto_chat_engine = std::make_unique<Qwen2>(npu_device_inst);
             break;
         case SupportedModelFamily::qwen3:
             auto_chat_engine = std::make_unique<Qwen3>(npu_device_inst);
