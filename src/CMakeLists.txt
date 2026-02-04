@@ -31,7 +31,16 @@ else()
     set(XRT_LIB_DIR     /opt/xrt/lib     CACHE PATH   "Where XRT libs live")
 endif()
 
+# ———————————————————————————————————————————————
+# Add tokenizers-cpp subproject
+# ———————————————————————————————————————————————
+# Ensure C++17 is available for tokenizers-cpp
+if(CMAKE_CXX_STANDARD LESS 17)
+    set(CMAKE_CXX_STANDARD 17)
+endif()
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/../third_party/tokenizers-cpp
+                 ${CMAKE_BINARY_DIR}/tokenizers-cpp)
 
 # ———————————————————————————————————————————————
 # Gather your sources
@@ -222,10 +231,15 @@ else()
     endif()
 endif()
 
+# ———————————————————————————————————————————————
+# Link tokenizers-cpp libraries
+# ———————————————————————————————————————————————
+# The tokenizers-cpp subproject provides these targets:
+# - tokenizers_cpp: main tokenizers C++ library
+# - tokenizers_c: tokenizers C FFI bindings  
+# - sentencepiece: sentencepiece tokenizer library
 target_link_libraries(flm PRIVATE
     tokenizers_cpp
-    tokenizers_c
-    sentencepiece
 )
 
 if(WIN32)
