@@ -509,6 +509,18 @@ void AutoModel::set_topp(float topp) {
     this->sampler->top_p = topp;
 }
 
+/// \brief Set the min-p
+/// \param topp the min-p
+/// \note The function will set the min-p
+/// \note The function will check if the min-p is valid
+void AutoModel::set_minp(float minp) {
+    if (minp < 0.0f || minp > 1.0f) {
+        header_print("WARNING", "Min-p must be between 0.0 and 1.0");
+        return;
+    }
+    this->sampler->min_p = minp;
+}
+
 /// \brief Set the temperature
 /// \param temperature the temperature
 /// \note The function will set the temperature
@@ -519,6 +531,18 @@ void AutoModel::set_temperature(float temperature) {
         return;
     }
     this->sampler->temperature = temperature;
+}
+
+/// \brief Set the presence penalty
+/// \param presence_penalty the presence penalty
+/// \note The function will set the presence penalty
+/// \note The function will check if the presence penalty is valid
+void AutoModel::set_presence_penalty(float presence_penalty) {
+    if (presence_penalty < 0.0f) {
+        header_print("WARNING", "Presence penalty must be greater than 0.0");
+        return;
+    }
+    this->sampler->pre_penalty = presence_penalty;
 }
 
 /// \brief Set the repetition penalty
@@ -543,9 +567,6 @@ void AutoModel::set_frequency_penalty(float frequency_penalty) {
         header_print("WARNING", "Frequency penalty must be greater than 0.0");
         return;
     }
-    if (frequency_penalty < 1.0f) {
-        header_print("WARNING", "If Frequency Penalty < 1.0, it will reward previous generated tokens, which may cause infinite loop!");
-    }
     this->sampler->freq_penalty = frequency_penalty;
 }
 
@@ -557,6 +578,13 @@ void AutoModel::set_frequency_penalty_window(int frequency_penalty_window) {
     this->sampler->freq_penalty_window = frequency_penalty_window;
 }
 
+/// \brief Set the penalty window
+/// \param penalty_window the frequency penalty window
+/// \note The function will set the penalty window
+/// \note The function will check if the penalty window is valid
+void AutoModel::set_penalty_window(int penalty_window) {
+    this->sampler->repeat_last_n = penalty_window;
+}
 
 /// \brief Start the ttft timer
 /// \note The function will start the ttft timer

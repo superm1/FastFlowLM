@@ -30,13 +30,11 @@ void Qwen3::load_model(std::string model_path, json model_info, int default_cont
     this->enable_think = (model_info["size"] == 600000000)? false : true;
 
     sampler_config config;
-    config.rep_penalty = 1.1;
-    config.temperature = 0.6;
-    config.top_p = 0.95;
-    config.top_k = 10;
-    config.rep_penalty_window = 1024;
-    config.freq_penalty = 1.1;
-    config.freq_penalty_window = 1024;
+    config.top_k = 40;
+    config.top_p = 0.9;
+    config.min_p = 0.1;
+    config.temperature = 0.8;
+
     this->set_sampler(config);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
         this->profiler_list[i].reset();
@@ -188,13 +186,11 @@ void Qwen3_IT::load_model(std::string model_path, json model_info, int default_c
     this->sampler.reset();
 
     sampler_config config;
-    config.rep_penalty = 1.1;
-    config.temperature = 0.6;
-    config.top_p = 0.95;
-    config.top_k = 10;
-    config.rep_penalty_window = 1024;
-    config.freq_penalty = 1.1;
-    config.freq_penalty_window = 1024;
+    config.top_k = 40;
+    config.top_p = 0.9;
+    config.min_p = 0.1;
+    config.temperature = 0.8;
+
     this->set_sampler(config);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
         this->profiler_list[i].reset();
@@ -380,13 +376,11 @@ void Qwen3_TK::load_model(std::string model_path, json model_info, int default_c
     this->sampler.reset();
 
     sampler_config config;
-    config.rep_penalty = 1.1;
-    config.temperature = 0.6;
-    config.top_p = 0.95;
-    config.top_k = 10;
-    config.rep_penalty_window = 1024;
-    config.freq_penalty = 1.1;
-    config.freq_penalty_window = 1024;
+    config.top_k = 40;
+    config.top_p = 0.9;
+    config.min_p = 0.1;
+    config.temperature = 0.8;
+
     this->set_sampler(config);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
         this->profiler_list[i].reset();
@@ -540,13 +534,11 @@ void DeepSeek_r1_0528_8b::load_model(std::string model_path, json model_info, in
     this->sampler.reset();
 
     sampler_config config;
-    config.rep_penalty = 1.1;
-    config.temperature = 0.6;
-    config.top_p = 0.95;
-    config.top_k = 10;
-    config.rep_penalty_window = 1024;
-    config.freq_penalty = 1.1;
-    config.freq_penalty_window = 1024;
+    config.top_k = 40;
+    config.top_p = 0.9;
+    config.min_p = 0.1;
+    config.temperature = 0.8;
+
     this->set_sampler(config);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
         this->profiler_list[i].reset();

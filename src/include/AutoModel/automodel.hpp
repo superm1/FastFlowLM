@@ -233,9 +233,17 @@ public:
 	/// \param topp the topp
 	void set_topp(float topp);
 
+	/// \brief Set the minp
+	/// \param topp the minp
+	void set_minp(float minp);
+
 	/// \brief Set the temperature
 	/// \param temperature the temperature
 	void set_temperature(float temperature);
+
+	/// \brief Set the presencepenalty
+	/// \param presence_penalty the presence penalty
+	void set_presence_penalty(float presence_penalty);
 
 	/// \brief Set the repetition penalty
 	/// \param repetition_penalty the repetition penalty
@@ -248,6 +256,10 @@ public:
 	/// \brief Set the frequency penalty window
 	/// \param frequency_penalty_window the frequency penalty window
 	void set_frequency_penalty_window(int frequency_penalty_window);
+
+	/// \brief Set the penalty window
+	/// \param penalty_window the penalty window
+	void set_penalty_window(int penalty_window);
 
 	/// \brief Start the ttft timer
 	/// \return the ttft timer

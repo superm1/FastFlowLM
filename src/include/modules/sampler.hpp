@@ -17,16 +17,26 @@
 /// \param freq_penalty the freq penalty
 /// \param rep_penalty_window the rep penalty window
 typedef struct sampler_config_{
-    float temperature = 1.0f;
-    int top_k = 5;
+    int top_k = 40;
     float top_p = 0.9f;
+    float min_p = 0.1f;
+    float temperature = 0.8f;
     float rep_penalty = 1.0f;
-    float freq_penalty = 1.0f;
-    int rep_penalty_window = 1024;
-    int freq_penalty_window = 1024;  // Window size for frequency penalty
+    float freq_penalty = 0.0f;
+    float pre_penalty = 0.0f;
+    int rep_penalty_window = 64;
+    int freq_penalty_window = 64;  // Window size for frequency penalty
+    int repeat_last_n = 64;
 } sampler_config;
 
-typedef std::pair<float, int> logits_t;
+//typedef std::pair<float, int> logits_t;
+
+typedef struct {
+    float logits;
+    int token_id;
+    float prob;
+} logits_t;
+
 typedef std::vector<logits_t> logits_list_t;
 
 class Sampler{
@@ -37,9 +47,11 @@ public:
     logits_list_t top_k_logits;
     float rep_penalty;
     float freq_penalty;
-    float temperature;
+    float pre_penalty;
     int top_k;
     float top_p;
+    float min_p;
+    float temperature;
     int total_tokens;
     std::vector<int> token_positions;
     
@@ -47,6 +59,7 @@ public:
     std::deque<int> token_history;
     size_t freq_penalty_window;
     size_t rep_penalty_window;
+    size_t repeat_last_n;
 
     /// \brief Constructor
     /// \param in_features the input features
@@ -62,6 +75,14 @@ public:
     /// \note The function will reset the token positions
     void reset_penalties();
 
+    void softmax_inplace();
+    void sampler_penalty_apply();
+    void sampler_topk_apply(int k);
+    void sampler_topp_apply(float p);
+    void sampler_minp_apply(float p);
+    void sampler_temp_apply(float temp);
+    int sample_from_probs();
+    void ring_buffer_update(int sampled_index);
     /// \brief Sample the token
     /// \param x the input buffer
     /// \return the sampled token

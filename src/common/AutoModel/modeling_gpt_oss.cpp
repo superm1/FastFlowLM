@@ -22,13 +22,11 @@ void GPT_OSS::load_model(std::string model_path, json model_info, int default_co
     this->sampler.reset();
 
     sampler_config config;
-    config.rep_penalty = 1.1;
-    config.temperature = 0.6;
-    config.top_p = 0.95;
-    config.top_k = 10;
-    config.rep_penalty_window = 1024;
-    config.freq_penalty = 1.1;
-    config.freq_penalty_window = 1024;
+    config.top_k = 40;
+    config.top_p = 0.9;
+    config.min_p = 0.1;
+    config.temperature = 0.8;
+
     this->set_sampler(config);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
         this->profiler_list[i].reset();

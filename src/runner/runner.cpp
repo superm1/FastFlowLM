@@ -417,9 +417,11 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
         std::cout << "Available parameters: " << std::endl;
         std::cout << "  /set topk [value] - set the top-k" << std::endl;
         std::cout << "  /set topp [value] - set the top-p" << std::endl;
+        std::cout << "  /set minp [value] - set the min-p" << std::endl;
         std::cout << "  /set temp [value] - set the temperature" << std::endl;
         std::cout << "  /set rep-pen [value] - set the repetition penalty" << std::endl;
         std::cout << "  /set freq-pen [value] - set the frequency penalty" << std::endl;
+        std::cout << "  /set pres-pen [value] - set the presence penalty" << std::endl;
         std::cout << "  /set sys-msg [value] - set the system message" << std::endl;
         std::cout << "  /set ctx-len [value] - set the max context length" << std::endl;
         std::cout << "  /set gen-lim [value] - Limit tokens generated per round" << std::endl;
@@ -456,6 +458,9 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
     else if (set_context == "topp"){
         this->auto_chat_engine->set_topp(std::stof(set_value));
     }
+    else if (set_context == "minp") {
+        this->auto_chat_engine->set_minp(std::stof(set_value));
+    }
     else if (set_context == "temp"){
         this->auto_chat_engine->set_temperature(std::stof(set_value));
     }
@@ -464,6 +469,9 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
     }
     else if (set_context == "freq-pen"){
         this->auto_chat_engine->set_frequency_penalty(std::stof(set_value));
+    }
+    else if (set_context == "pres-pen") {
+        this->auto_chat_engine->set_presence_penalty(std::stof(set_value));
     }
     else if (set_context == "ctx-len"){
         this->auto_chat_engine->set_max_length(std::stoi(set_value));
@@ -483,9 +491,11 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
         std::cout << "  /set ctx-len [value] - set the max context length" << std::endl;
         std::cout << "  /set topk [value] - set the top-k" << std::endl;
         std::cout << "  /set topp [value] - set the top-p" << std::endl;
+        std::cout << "  /set minp [value] - set the min-p" << std::endl;
         std::cout << "  /set temp [value] - set the temperature" << std::endl;
         std::cout << "  /set rep-pen [value] - set the repetition penalty" << std::endl;
         std::cout << "  /set freq-pen [value] - set the frequency penalty" << std::endl;
+        std::cout << "  /set pres-pen [value] - set the presence penalty" << std::endl;
         std::cout << "  /set sys-msg [value] - set the system message" << std::endl;
         std::cout << "  /set gen-lim [value] - Limit tokens generated per round" << std::endl;
         std::cout << "  /set r-eff [low|medium|high] - set the reasoning effort level (GPT-OSS only, default = medium)" << std::endl;

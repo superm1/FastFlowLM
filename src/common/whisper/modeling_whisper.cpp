@@ -45,14 +45,11 @@ void Whisper::load_model(std::string model_path, nlohmann::ordered_json model_in
     this->sampler.reset();
 
     sampler_config s_config;
-    s_config.rep_penalty = 1.00;
-    s_config.temperature = 0.4;
-    s_config.top_p = 0.95;
     s_config.top_k = 1;
-    s_config.rep_penalty_window = 1024;
-    s_config.freq_penalty = 1.00;
-    s_config.freq_penalty_window = 1024;
-    
+    s_config.top_p = 0.95;
+    s_config.min_p = 0.1;
+    s_config.temperature = 0.4;
+
     this->sampler = std::make_unique<Sampler>(this->lm_config->vocab_size, s_config);
 }
 

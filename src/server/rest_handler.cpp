@@ -779,6 +779,14 @@ void RestHandler::handle_openai_chat_completion(const json& request,
             int top_k = request["top_k"];
             auto_chat_engine->set_topk(top_k);
         }
+        if (request.contains("min_p")) {
+            int min_p = request["min_p"];
+            auto_chat_engine->set_minp(min_p);
+        }
+        if (request.contains("presence_penalty")) {
+            float presence_penalty = request["presence_penalty"];
+            auto_chat_engine->set_presence_penalty(presence_penalty);
+        }
         if (request.contains("frequency_penalty")) {
             float frequency_penalty = request["frequency_penalty"];
             auto_chat_engine->set_frequency_penalty(frequency_penalty);
