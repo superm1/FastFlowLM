@@ -12,6 +12,7 @@
 #include <vector>
 #include <any>
 #include <unordered_set>
+#include <filesystem>
 #include "utils/utils.hpp"
 
 #define __FLM_VERSION__ "0.9.32"
@@ -37,7 +38,8 @@ class model_list {
             this->config = nlohmann::json::parse(config_file);
             // Resolve model_root_path relative to executable directory
             std::string relative_model_path = this->config["model_path"];
-            this->model_root_path = exe_dir + "\\" + relative_model_path;
+            std::filesystem::path root_path = std::filesystem::path(exe_dir) / relative_model_path;
+            this->model_root_path = root_path.string();
             config_file.close();
 
             // Populate all_tags set
@@ -224,8 +226,8 @@ class model_list {
             std::string new_tag = this->rectify_model_tag(tag);
             auto [new_tag_unused, model_info] = this->get_model_info(new_tag);
             std::string model_name = model_info["name"];
-            std::string model_path = this->model_root_path + "\\" + model_name;
-            return model_path;
+            std::filesystem::path full_path = std::filesystem::path(this->model_root_path) / model_name;
+            return full_path.string();
         }
 
         bool is_model_supported(const std::string& tag) {
