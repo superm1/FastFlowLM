@@ -62,6 +62,7 @@ target_compile_definitions(flm PUBLIC
     _CRT_SECURE_NO_WARNINGS
     _CRT_NONSTDC_NO_DEPRECATE
     _IS_WINDOWS_
+    __WINDOWS__
 )
 
 target_link_directories(flm PUBLIC
@@ -95,7 +96,6 @@ target_link_libraries(flm PUBLIC
     gemm
     lm_head
     mha
-    npu_utils
     libcurl
     avformat
     avcodec

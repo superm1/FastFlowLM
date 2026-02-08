@@ -36,7 +36,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
-#ifdef __LINUX__
+#ifndef __WINDOWS__
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -50,27 +50,20 @@
 #include "buffer.hpp"
 #include "utils/debug_utils.hpp"
 #include <cmath>
-#ifdef __LINUX__
 
 #include "xrt/experimental/xrt_kernel.h"
 #include "xrt/experimental/xrt_ext.h"
 #include "xrt/experimental/xrt_module.h"
 #include "xrt/experimental/xrt_elf.h"
-
-#else
-
-#include "xrt/experimental/xrt_kernel.h"
-#include "xrt/experimental/xrt_ext.h"
-#include "xrt/experimental/xrt_module.h"
-#include "xrt/experimental/xrt_elf.h"
-#endif
 
 #include "aiebu/aiebu.h"
+
 #include "npu_instr_utils.hpp"
 
 
 class npu_app_manager;
 class npu_xclbin_manager;
+
 
 ///@brief npu_app, a application that both xclbin and instruction are specified
 ///@param device the pointer to the device
@@ -129,7 +122,7 @@ private:
         this->kernel = std::make_unique<xrt::ext::kernel>(*this->context, *this->module, this->kernel_name);
         this->module_valid = true;
         this->module_version = this->ctrl_seq->sequence_version();
-        
+
         free((void*)elf_buf);
     }
 
@@ -274,7 +267,6 @@ public:
     }
 };
 
-
 class npu_app_manager {
 private:
     npu_device device_gen;
@@ -383,6 +375,13 @@ public:
         this->device = device;
         this->xclbin_name = xclbin_name;
         this->enable_preemption = enable_preemption;
+        #ifndef __WINDOWS__
+        if (this->enable_preemption){
+            header_print("warning", "Preemption is not supported on Linux host currently.");
+            header_print("warning", "Preemption is set as disabled for NPU.");
+            this->enable_preemption = false;
+        }
+        #endif
         LOG_VERBOSE(2, "Loading xclbin: " << xclbin_name);
         auto this_xclbin = xrt::xclbin(xclbin_name);
         // int verbosity = VERBOSE;
@@ -419,10 +418,14 @@ public:
     ///@see buffer
     template<typename T>
     buffer<T> create_bo_buffer(size_t size){
+        #ifdef __WINDOWS__
         assert(this->xclbin_valid);
         assert(size > 0);
         LOG_VERBOSE(2, "Creating buffer buffer with size: " << size);
         return buffer<T>(*this->device, size);
+        #else
+        throw std::runtime_error("Buffer can only be create from an app (kernel) on linux host.");
+        #endif
     }
 
     ///@brief Get the name of the xclbin
@@ -535,16 +538,20 @@ public:
     ///@see buffer
     template<typename T>
     buffer<T> create_bo_buffer(size_t size){
+        #ifdef __WINDOWS__
         assert(size > 0);
         LOG_VERBOSE(2, "Creating buffer buffer with size: " << size);
         return buffer<T>(*this->device, size);
+        #else
+        throw std::runtime_error("Buffer can only be create from an app (kernel) on linux host.");
+        #endif
     }
 
     inline bool is_preemption_enabled(){
         return this->enable_preemption;
     }
 
-    #ifdef __LINUX__
+    #ifndef __WINDOWS__
     ///@brief print the npu information
     ///@note The function will print the npu version, clock frequency, column count, row count, core info, mem info, shim info.
     ///@note The information is read via the IOCTL interface.
