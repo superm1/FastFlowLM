@@ -140,6 +140,8 @@ docs_nav:
         url: "/docs/benchmarks/llama3_results/"
       - label: Gemma3
         url: "/docs/benchmarks/gemma3_results/"
+      - label: Qwen2.5
+        url: "/docs/benchmarks/qwen2.5_results/"
       - label: Qwen3
         url: "/docs/benchmarks/qwen3_results/"
       - label: gpt-oss
@@ -148,5 +150,3 @@ docs_nav:
         url: "/docs/benchmarks/lfm2_results/"
       - label: Microsoft/Phi4
         url: "/docs/benchmarks/phi4_results/"
-      - label: Qwen2.5
-        url: "/docs/benchmarks/qwen2.5_results/"
