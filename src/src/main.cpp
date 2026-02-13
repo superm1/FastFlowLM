@@ -115,50 +115,6 @@ void handle_user_input() {
 std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, bool cors, bool preemption);
 
 
-///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
-///@return the server port, default is 52625 if environment variable is not set
-int get_server_port(int user_port) {
-    if (user_port > 0 && user_port <= 65535) {
-        return user_port;
-    }
-    else {
-        char* port_env = nullptr;
-        size_t len = 0;
-        if (_dupenv_s(&port_env, &len, "FLM_SERVE_PORT") == 0 && port_env != nullptr) {
-            try {
-                int port = std::stoi(port_env);
-                free(port_env);
-                if (port > 0 && port <= 65535) {
-                    return port;
-                }
-            }
-            catch (const std::exception&) {
-                free(port_env);
-                // Invalid port number, use default
-            }
-        }
-    }
-
-    return 52625; // Default port
-}
-
-///@brief get_models_directory gets the models directory from environment variable or defaults to Documents
-///@return the models directory path
-std::string get_models_directory() {
-    char* model_path_env = nullptr;
-    size_t len = 0;
-    if (_dupenv_s(&model_path_env, &len, "FLM_MODEL_PATH") == 0 && model_path_env != nullptr) {
-        std::string custom_path(model_path_env);
-        free(model_path_env);
-        if (!custom_path.empty()) {
-            return custom_path;
-        }
-    }
-    // Fallback to Documents directory if environment variable is not set
-    std::string documents_dir = get_user_documents_directory();
-    return documents_dir + "/flm/models";
-}
-
 ///@brief main function
 ///@param argc the number of arguments
 ///@param argv the arguments
@@ -178,7 +134,7 @@ int main(int argc, char* argv[]) {
     std::string exe_dir = utils::get_executable_directory();
     std::string config_path = exe_dir + "/model_list.json";
     // Get the models directory from environment variable or default
-    std::string models_dir = get_models_directory();
+    std::string models_dir = utils::get_models_directory();
 
     
     model_list availble_models(config_path, models_dir);
@@ -191,7 +147,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (parsed_args.port_requested) {
-        std::cout << "Default server port: " << get_server_port(-1) << std::endl;
+        std::cout << "Default server port: " << utils::get_server_port(-1) << std::endl;
         return 0;
     }
 
@@ -270,7 +226,7 @@ int main(int argc, char* argv[]) {
         } else if (command == "serve") {
             check_and_notify_new_version();
             // Create the server
-            int port = get_server_port(user_port);
+            int port = utils::get_server_port(user_port);
             auto server = create_lm_server(availble_models, downloader, tag, asr, embed, user_host, port, ctx_length, cors, preemption);
             server->set_max_connections(max_socket_connections);           // Allow up to 10 concurrent connections
             server->set_io_threads(10);          // Allow up to 5 io threads
