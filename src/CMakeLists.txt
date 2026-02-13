@@ -27,8 +27,8 @@ if(WIN32)
     set(XRT_INCLUDE_DIR C:/dev/XRT/src/runtime_src/core/include CACHE PATH   "Where XRT headers live")
     set(XRT_LIB_DIR     C:/dev/xrtNPUfromDLL     CACHE PATH   "Where XRT libs live")
 else()
-    set(XRT_INCLUDE_DIR /opt/xrt/include CACHE PATH   "Where XRT headers live")
-    set(XRT_LIB_DIR     /opt/xrt/lib     CACHE PATH   "Where XRT libs live")
+    set(XRT_INCLUDE_DIR /opt/xilinx/xrt/include CACHE PATH   "Where XRT headers live")
+    set(XRT_LIB_DIR     /opt/xilinx/xrt/lib     CACHE PATH   "Where XRT libs live")
 endif()
 
 # ———————————————————————————————————————————————
@@ -50,20 +50,20 @@ file(GLOB HEADERS "include/*.hpp" "runner/*.hpp" "common/*.hpp" "common/*/*.hpp"
 
 # Exclude files that depend on missing libraries for Linux
 if(NOT WIN32)
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma3\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma3_image\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma3_text\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gpt_oss\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_lfm2\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_phi4\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen2\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen3\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen3vl\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen3vl_image\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_whisper\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_whisper_audio\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma_embedding\\.cpp$")
-    list(FILTER SOURCES EXCLUDE REGEX ".*auto_embedding_model\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma3\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma3_image\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma3_text\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gpt_oss\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_lfm2\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_phi4\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen2\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen3\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen3vl\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_qwen3vl_image\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_whisper\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_whisper_audio\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*modeling_gemma_embedding\\.cpp$")
+    # list(FILTER SOURCES EXCLUDE REGEX ".*auto_embedding_model\\.cpp$")
 
     set_source_files_properties(
         ${CMAKE_SOURCE_DIR}/common/image_process_utils/imageprocAVX512.cpp
@@ -156,6 +156,7 @@ endif()
 # Link your custom libraries (these may still be DLLs if no static versions available)
 target_link_libraries(flm PUBLIC
     xrt_coreutil
+    aiebu
     q4_npu_eXpress
     llama_npu
     qwen2_npu

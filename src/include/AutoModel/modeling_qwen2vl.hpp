@@ -28,47 +28,6 @@ extern "C" {
 }
 
 
-//Parameter for QWEN2IMAGE 
-constexpr unsigned int QWEN2_PATCH_SIZE = 14;
-constexpr unsigned int QWEN2_IMAGE_MERGE_SIZE=2;
-constexpr unsigned int QWEN2_SPATIAL_MERGE_SIZE=2;
-constexpr unsigned int QWEN2_SHORTEST_EDGE = 3136;
-constexpr unsigned int QWEN2_LONGEST_EDGE = 12845056;
-constexpr float QWEN2_VISION_RESCALE_FACTOR = 0.00392156862745098;
-constexpr float QWEN2_VISION_RESCALE_IMAGE_MEAN_R = 0.48145466f;
-constexpr float QWEN2_VISION_RESCALE_IMAGE_MEAN_G =  0.4578275f;
-constexpr float QWEN2_VISION_RESCALE_IMAGE_MEAN_B = 0.40821073f;
-constexpr float QWEN2_VISION_RESCALE_IMAGE_STD_R = 0.26862954f;
-constexpr float QWEN2_VISION_RESCALE_IMAGE_STD_G = 0.26130258f;
-constexpr float QWEN2_VISION_RESCALE_IMAGE_STD_B = 0.27577711f;
-constexpr unsigned int QWEN2_WINDOW_ATTENTION_PIXEL_SIZE = 122;
-constexpr unsigned int QWEN2_TEMPORAL_PATCH_SIZE = 2;
-constexpr unsigned int QWEN2_MERGE_SIZE = 2;
-
-
-typedef struct {
-    int height;
-    int width;
-    int height_resized;  // assigned by image preprocessing
-    int width_resized;
-    int grid_h;
-    int grid_w;
-
-    std::vector<uint8_t> _data;
-
-} qwen2vl_image_t;
-
-
-
-typedef struct {
-    std::vector<qwen2vl_image_t> images;
-    std::vector<bf16> _data__processed;    
-    unsigned int num_images;
-}qwen2vl_image_payload_t;
-
-
-
-
 /************              Qwen2VL_4b            **************/
 class Qwen2VL : public AutoModel {
 private:

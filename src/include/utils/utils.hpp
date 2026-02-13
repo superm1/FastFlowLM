@@ -401,7 +401,6 @@ inline std::string path_join(fileName&&... args){
     return path;
 }
 
-
 ///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
 ///@return the server port, default is 52625 if environment variable is not set
 inline int get_server_port(int user_port) {
@@ -409,6 +408,7 @@ inline int get_server_port(int user_port) {
         return user_port;
     }
     else {
+#ifdef _WIN32
         char* port_env = nullptr;
         size_t len = 0;
         if (_dupenv_s(&port_env, &len, "FLM_SERVE_PORT") == 0 && port_env != nullptr) {
@@ -424,6 +424,20 @@ inline int get_server_port(int user_port) {
                 // Invalid port number, use default
             }
         }
+#else
+        const char* port_env = std::getenv("FLM_SERVE_PORT");
+        if (port_env && *port_env) {
+            try {
+                int port = std::stoi(port_env);
+                if (port > 0 && port <= 65535) {
+                    return port;
+                }
+            }
+            catch (const std::exception&) {
+                // Invalid port number, use default
+            }
+        }
+#endif
     }
 
     return 52625; // Default port
@@ -432,6 +446,7 @@ inline int get_server_port(int user_port) {
 ///@brief get_models_directory gets the models directory from environment variable or defaults to Documents
 ///@return the models directory path
 inline std::string get_models_directory() {
+#ifdef _WIN32
     char* model_path_env = nullptr;
     size_t len = 0;
     if (_dupenv_s(&model_path_env, &len, "FLM_MODEL_PATH") == 0 && model_path_env != nullptr) {
@@ -441,6 +456,12 @@ inline std::string get_models_directory() {
             return custom_path;
         }
     }
+#else
+    const char* model_path_env = std::getenv("FLM_MODEL_PATH");
+    if (model_path_env && *model_path_env) {
+        return std::string(model_path_env);
+    }
+#endif
     // Fallback to Documents directory if environment variable is not set
     std::string documents_dir = get_user_documents_directory();
     return documents_dir + "/flm/models";
