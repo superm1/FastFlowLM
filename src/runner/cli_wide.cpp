@@ -15,6 +15,7 @@
 #include <locale>
 #include <codecvt>
 
+#ifdef _WIN32
 /// \brief Constructor - Initialize console
 CLIWide::CLIWide() {
     // Get console handles
@@ -242,7 +243,7 @@ void CLIWide::move_cursor_to_column(int column) {
         COORD pos = {static_cast<SHORT>(column), csbi.dwCursorPosition.Y};
         SetConsoleCursorPosition(hConsoleOutput, pos);
     }
-}
+} 
 
 /// \brief Clear line from cursor to end
 void CLIWide::clear_line_from_cursor() {
@@ -1274,4 +1275,6 @@ void CLIWide::handle_backspace_with_wrapping(InputState& state) {
             SetConsoleCursorPosition(hConsoleOutput, cursor_pos);
         }
     }
-} 
+}
+
+#endif

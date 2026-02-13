@@ -15,6 +15,10 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <shlobj.h>
+#else
+#include <unistd.h>
+#include <limits.h>
+#include <cstdlib>
 #endif
 
 namespace time_utils {
@@ -145,6 +149,7 @@ inline time_with_unit re_unit(time_with_unit time){
 
 namespace utils {
 
+#ifdef _WIN32
 inline void enable_ansi_on_windows_once() {
     static bool done = false;
     if (done) return;
@@ -156,6 +161,9 @@ inline void enable_ansi_on_windows_once() {
     SetConsoleMode(hOut, mode);
     done = true;
 }
+#else
+inline void enable_ansi_on_windows_once() {}
+#endif
 
 /// \brief get a random float
 /// \param min the minimum value
@@ -332,21 +340,29 @@ inline bool check_file_exists(std::string name) {
 }
 
 
-#ifdef _WIN32
 /// \brief get the user's Documents directory on Windows
 /// \return the user's Documents directory path
 inline std::string get_user_documents_directory() {
+#ifdef _WIN32
     char buffer[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, buffer))) {
         return std::string(buffer);
     }
     // Fallback to current directory if Documents folder cannot be found
     return ".";
+#else
+    const char* home = std::getenv("HOME");
+    if (home && *home) {
+        return std::string(home) + "/Documents";
+    }
+    return ".";
+#endif
 }
 
 ///@brief get_executable_directory gets the directory where the executable is located
 ///@return the executable directory path
 inline std::string get_executable_directory() {
+#ifdef _WIN32
     char buffer[MAX_PATH];
     GetModuleFileNameA(NULL, buffer, MAX_PATH);
     std::string exe_path(buffer);
@@ -355,8 +371,20 @@ inline std::string get_executable_directory() {
         return exe_path.substr(0, last_slash);
     }
     return ".";
-}
+#else
+    char buffer[PATH_MAX] = {0};
+    ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+    if (len > 0) {
+        buffer[len] = '\0';
+        std::string exe_path(buffer);
+        size_t last_slash = exe_path.find_last_of("/");
+        if (last_slash != std::string::npos) {
+            return exe_path.substr(0, last_slash);
+        }
+    }
+    return ".";
 #endif
+}
 
 template<typename... fileName>
 inline std::string path_join(fileName&&... args){

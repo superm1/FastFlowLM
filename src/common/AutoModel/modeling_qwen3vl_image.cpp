@@ -172,7 +172,9 @@ qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
                 if (frame) av_frame_free(&frame);
                 if (packet) av_packet_free(&packet);
                 if (codecContext) {
+#if LIBAVCODEC_VERSION_MAJOR < 59
                     avcodec_close(codecContext);
+#endif
                     avcodec_free_context(&codecContext);
                 }
                 return empty_result;
@@ -229,7 +231,9 @@ qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
                 if (frame) av_frame_free(&frame);
                 if (packet) av_packet_free(&packet);
                 if (codecContext) {
+#if LIBAVCODEC_VERSION_MAJOR < 59
                     avcodec_close(codecContext);
+#endif
                     avcodec_free_context(&codecContext);
                 }
                 return result;
@@ -254,7 +258,9 @@ qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
             av_packet_free(&packet);
         }
         if (codecContext) {
+#if LIBAVCODEC_VERSION_MAJOR < 59
             avcodec_close(codecContext);
+#endif
             avcodec_free_context(&codecContext);
         }
 
@@ -369,7 +375,9 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
                 if (frame) av_frame_free(&frame);
                 if (packet) av_packet_free(&packet);
                 if (codecContext) {
+#if LIBAVCODEC_VERSION_MAJOR < 59
                     avcodec_close(codecContext);
+#endif
                     avcodec_free_context(&codecContext);
                 }
                 return empty_result;
@@ -426,7 +434,9 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
                 if (frame) av_frame_free(&frame);
                 if (packet) av_packet_free(&packet);
                 if (codecContext) {
+#if LIBAVCODEC_VERSION_MAJOR < 59
                     avcodec_close(codecContext);
+#endif
                     avcodec_free_context(&codecContext);
                 }
                 return result;

@@ -12,6 +12,7 @@
 #include <immintrin.h>
 #include <math.h>
 #include <codecvt>
+#include <locale>
 #include "biovault_bfloat16.h"
 
 typedef float f32;
@@ -141,5 +142,10 @@ inline std::wstring utf8_to_wstring(const std::string& str) {
     std::wstring wstr(size_needed, 0);
     MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), &wstr[0], size_needed);
     return wstr;
+}
+#else
+inline std::wstring utf8_to_wstring(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    return conv.from_bytes(str);
 }
 #endif

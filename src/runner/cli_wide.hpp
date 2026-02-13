@@ -1,7 +1,7 @@
 /*!
  *  Copyright (c) 2025 by Contributors
  * \file cli_wide.hpp
- * \brief CLI interactive input handling using Windows Console API
+ * \brief CLI interactive input handling
  * \author FastFlowLM Team
  * \date 2025-06-24
  *  \version 0.9.24
@@ -10,9 +10,11 @@
 #include <vector>
 #include <deque>
 #include <string>
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
-/// \brief CLIWide class for interactive input handling using Windows Console API
+/// \brief CLIWide class for interactive input handling
 class CLIWide {
     public:
         CLIWide();
@@ -25,16 +27,17 @@ class CLIWide {
         void add_to_history(const std::string& command);
         
     private:
+        // Command history for arrow key navigation
+        std::deque<std::string> command_history;
+        int history_index = -1;
+        static constexpr size_t max_history_size = 100;
+
+#ifdef _WIN32
         // Console handles
         HANDLE hConsoleInput;
         HANDLE hConsoleOutput;
         DWORD originalInputMode;
         DWORD originalOutputMode;
-        
-        // Command history for arrow key navigation
-        std::deque<std::string> command_history;
-        int history_index = -1;
-        static constexpr size_t max_history_size = 100;
         
         /// \brief Input state structure
         struct InputState {
@@ -92,4 +95,5 @@ class CLIWide {
         /// \brief Console input utilities
         bool read_console_input(INPUT_RECORD& inputRecord);
         bool is_paste_operation();
+#endif
 }; 

@@ -8,7 +8,9 @@
 */
 #include "runner.hpp"
 #include "harmony_filter.hpp"
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
 #include "AutoEmbeddingModel/all_embedding_model.hpp"
+#endif
 #include <iostream>
 #include <sstream>
 #include <filesystem>
@@ -45,6 +47,7 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         header_print("Warning", "Embed model not supported in CLI; Use 'flm serve -e 1'");
     }
 
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
     if (this->asr) {
         // load asr model
         std::string whisper_tag = "whisper-v3:turbo";
@@ -56,6 +59,11 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         std::string whisper_model_path = this->supported_models.get_model_path(new_whisper_tag);
         this->whisper_engine->load_model(whisper_model_path, whisper_model_info, this->preemption);
     }
+#else
+    if (this->asr) {
+        header_print("Error", "ASR models are not supported in this build");
+    }
+#endif
 
     if (ctx_length != -1) {
         this->ctx_length = ctx_length >= 512 ? ctx_length : 512;
@@ -231,6 +239,7 @@ void Runner::run() {
                     uniformed_input.image_payload_types.push_back(FILE_NAME);
                 }
                 else if (filename.find(".wav") != std::string::npos || filename.find(".mp3") != std::string::npos || filename.find(".ogg") != std::string::npos || filename.find(".m4a") != std::string::npos) {
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
                     if (this->asr) {
                         // check if the file exists
                         if (!std::filesystem::exists(filename)) {
@@ -249,11 +258,15 @@ void Runner::run() {
                         header_print("Warning", "No asr model loaded, cannot load audio file");
                         continue;
                     }
+#else
+                    header_print("Warning", "ASR models are not supported in this build");
+                    continue;
+#endif
 
                 }
                 else{
+#ifdef _WIN32
                     std::wifstream file(utf8_to_wstring(filename));
-                    //std::ifstream file(filename);
                     if (!file.is_open()) {
                         header_print("FLM", "Error: Could not open file: " << filename);
                         header_print("FLM", "Please check if the file exists and is readable.");
@@ -263,6 +276,16 @@ void Runner::run() {
                     std::wstring file_content_original((std::istreambuf_iterator<wchar_t>(file)), std::istreambuf_iterator<wchar_t>());
                     std::string file_content = utf8conv.to_bytes(file_content_original);
                     file.close();
+#else
+                    std::ifstream file(filename);
+                    if (!file.is_open()) {
+                        header_print("FLM", "Error: Could not open file: " << filename);
+                        header_print("FLM", "Please check if the file exists and is readable.");
+                        continue;
+                    }
+                    std::string file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+                    file.close();
+#endif
                     input = file_content + "\n";
                     std::cout << std::endl;
                 }
@@ -353,16 +376,28 @@ void Runner::cmd_save(std::vector<std::string>& input_list) {
     std::pair<std::string, std::vector<int>> history = this->auto_chat_engine->get_history();
     // Get the FLM_MODEL_PATH environment variable for the history directory
     std::string history_dir;
+    const char* path_sep = "/";
+#ifdef _WIN32
+    path_sep = "\\";
     char* model_path_env = nullptr;
     size_t len = 0;
     if (_dupenv_s(&model_path_env, &len, "FLM_MODEL_PATH") == 0 && model_path_env != nullptr) {
-        history_dir = std::string(model_path_env) + "\\history";
+        history_dir = std::string(model_path_env) + path_sep + "history";
         free(model_path_env);
     } else {
         // Fallback to Documents directory if environment variable is not set
         std::string documents_dir = utils::get_user_documents_directory();
-        history_dir = documents_dir + "\\flm\\history";
+        history_dir = documents_dir + path_sep + "flm" + path_sep + "history";
     }
+#else
+    const char* model_path_env = std::getenv("FLM_MODEL_PATH");
+    if (model_path_env && *model_path_env) {
+        history_dir = std::string(model_path_env) + path_sep + "history";
+    } else {
+        std::string documents_dir = utils::get_user_documents_directory();
+        history_dir = documents_dir + path_sep + "flm" + path_sep + "history";
+    }
+#endif
     
     // Create the history directory if it doesn't exist
     if (!std::filesystem::exists(history_dir)) {
@@ -387,7 +422,7 @@ void Runner::cmd_save(std::vector<std::string>& input_list) {
     std::string date_str = date_ss.str();
 
     // 2) build filename in the history directory
-    std::string file_name = history_dir + "\\history_" + date_str + ".txt";
+    std::string file_name = history_dir + path_sep + "history_" + date_str + ".txt";
     std::ofstream file(file_name);
     if (file.is_open()) {
         file << history.first << std::endl;

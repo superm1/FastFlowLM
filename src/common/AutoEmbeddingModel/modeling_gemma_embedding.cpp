@@ -27,7 +27,7 @@ std::vector<float> Gemma_Embedding::embed(std::string& text, embedding_task_type
         tokens[2047] = 1;
     }
     
-    buffer<bf16> y = this->embedding_model->embed(tokens);
+    buffer<bf16> y = this->embedding_model_impl->embed(tokens);
     std::vector<float> result(y.size());
     for (int i = 0; i < y.size(); i++) {
         result[i] = static_cast<float>(y[i]);

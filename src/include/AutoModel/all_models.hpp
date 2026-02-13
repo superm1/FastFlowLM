@@ -6,15 +6,17 @@
 /// \note This is a header file for the all_models class
 #pragma once
 
+#include "modeling_llama3.hpp"
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
 #include "modeling_gemma3.hpp"
 #include "modeling_gemma3_text.hpp"
-#include "modeling_llama3.hpp"
 #include "modeling_qwen3.hpp"
 #include "modeling_gpt_oss.hpp"
 #include "modeling_qwen3vl.hpp"
 #include "modeling_lfm2.hpp"
 #include "modeling_phi4.hpp"
 #include "modeling_qwen2.hpp"
+#endif
 #include "model_list.hpp"
 #include "nlohmann/json.hpp"
 
@@ -70,6 +72,7 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
         case SupportedModelFamily::llama3:
             auto_chat_engine = std::make_unique<Llama3>(npu_device_inst);
             break;
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
         case SupportedModelFamily::deepseek_r1:
             auto_chat_engine = std::make_unique<DeepSeek_r1_8b>(npu_device_inst);
             break;
@@ -106,6 +109,7 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
         case SupportedModelFamily::phi4:
             auto_chat_engine = std::make_unique<Phi4>(npu_device_inst);
             break;
+#endif
         case SupportedModelFamily::error_whiper:
         case SupportedModelFamily::error_embedding:
         default:

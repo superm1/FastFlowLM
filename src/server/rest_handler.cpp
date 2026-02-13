@@ -156,6 +156,7 @@ RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const 
         this->ctx_length = -1;
     }
     // Initialize chat bot with default model
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
     if (this->asr) {
         std::string whisper_tag = "whisper-v3:turbo";
         ensure_asr_model_loaded(whisper_tag);
@@ -164,6 +165,14 @@ RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const 
         std::string embed_tag = "embed-gemma:300m";
         ensure_embed_model_loaded(embed_tag);
     }
+#else
+    if (this->asr) {
+        header_print("Error", "ASR models are not supported in this build");
+    }
+    if (this->embed) {
+        header_print("Error", "Embedding models are not supported in this build");
+    }
+#endif
 
     if (default_model_tag != "model-faker") {
         if (!supported_models.is_model_supported(default_model_tag)) {
@@ -206,6 +215,7 @@ void RestHandler::ensure_model_loaded(const std::string& model_tag) {
 ///@brief Ensure the asr model is loaded
 ///@param model_tag the model tag
 void RestHandler::ensure_asr_model_loaded(const std::string& model_tag) {
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
     std::string ensure_tag = model_tag;
     if (!downloader.is_model_downloaded(ensure_tag)) {
         downloader.pull_model(ensure_tag);
@@ -214,11 +224,15 @@ void RestHandler::ensure_asr_model_loaded(const std::string& model_tag) {
     auto [new_ensure_tag, whisper_model_info] = this->supported_models.get_model_info(ensure_tag);
     std::string whisper_model_path = this->supported_models.get_model_path(new_ensure_tag);
     this->whisper_engine->load_model(whisper_model_path, whisper_model_info, this->preemption);
+#else
+    throw std::runtime_error("ASR models are not supported in this build");
+#endif
 }
 
 ///@brief Ensure the embed model is loaded
 ///@param model_tag the model tag
 void RestHandler::ensure_embed_model_loaded(const std::string& model_tag) {
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
     std::string ensure_tag = model_tag;
     if (!this->downloader.is_model_downloaded(ensure_tag)) {
         this->downloader.pull_model(ensure_tag);
@@ -228,6 +242,9 @@ void RestHandler::ensure_embed_model_loaded(const std::string& model_tag) {
     auto [new_embedding_model_tag, embedding_model_info] = this->supported_models.get_model_info(embedding_model_tag);
     std::string embedding_model_path = this->supported_models.get_model_path(new_embedding_model_tag);
     this->auto_embedding_engine->load_model(embedding_model_path, embedding_model_info, this->preemption);
+#else
+    throw std::runtime_error("Embedding models are not supported in this build");
+#endif
 }
 
 ///@brief Configure chat engine parameters from options and request
@@ -531,8 +548,13 @@ void RestHandler::handle_embeddings(const json& request,
         
         json response;
         if (this->embed) {
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
             std::cout << "Embedding input: " << input << std::endl;
             std::vector<float> embedding_result = this->auto_embedding_engine->embed(input, embedding_task_type_t::task_query);
+#else
+            throw std::runtime_error("Embedding models are not supported in this build");
+            std::vector<float> embedding_result;
+#endif
             
             response = {
                 {"object", "list"},
@@ -889,13 +911,18 @@ void RestHandler::handle_openai_audio_transcriptions(const json& request,
         bool stream = request.value("stream", false);
         json response;
         if (this->asr) {
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
             this->whisper_engine->load_audio(audio_raw);
             header_print("FLM", "Transforming audio to text...");
-            // Show text 
+            // Show text
             std::cout << "Audio content: " << std::flush;
             std::pair<std::string, std::string> audio_result = this->whisper_engine->generate(Whisper::whisper_task_type_t::e_transcribe, true, false, std::cout);
             std::string audio_context = audio_result.first;
             std::cout << std::endl;
+#else
+            throw std::runtime_error("ASR models are not supported in this build");
+            std::string audio_context;
+#endif
 
             response = {
                 {"model", model},

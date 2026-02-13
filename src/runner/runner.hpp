@@ -14,8 +14,10 @@
 #include "model_downloader.hpp"
 #include "cli_wide.hpp"
 #include "image/image_reader.hpp"
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
 #include "whisper/modeling_whisper.hpp"
 #include "AutoEmbeddingModel/all_embedding_model.hpp"
+#endif
 #include <codecvt>
 #include <vector>
 
@@ -50,8 +52,10 @@ class Runner {
         model_list supported_models;
         ModelDownloader& downloader;
         std::unique_ptr<AutoModel> auto_chat_engine;
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
         std::unique_ptr<Whisper> whisper_engine;
         std::unique_ptr<AutoEmbeddingModel> auto_embedding_engine;
+#endif
         int generate_limit;
         int ctx_length;
         std::string system_prompt;

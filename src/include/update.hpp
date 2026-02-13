@@ -7,9 +7,13 @@
 *  \version 0.9.21
 */
 
+#ifdef _WIN32
 #include <windows.h>
 #include <winhttp.h>
 #pragma comment(lib, "winhttp.lib")
+#else
+#include <curl/curl.h>
+#endif
 
 #include <optional>
 #include <string>
@@ -52,6 +56,8 @@ static int compare_semver(std::string a, std::string b) {
 }
 
 static bool g_vercheck_warned_timeout = false;
+
+#ifdef _WIN32
 
 static bool is_timeout_error(DWORD err) {
     return err == ERROR_WINHTTP_TIMEOUT                  // 12002
@@ -214,4 +220,76 @@ static void check_and_notify_new_version() {
         header_print("FLM", "Download link: https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe");
     }
 }
+#else
+static size_t curl_write_cb(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    auto* out = static_cast<std::string*>(userdata);
+    out->append(ptr, size * nmemb);
+    return size * nmemb;
+}
+
+// FastFlowLM/FastFlowLM (non-Windows)
+static std::optional<std::string> http_get_latest_tag_from_github(bool& timed_out) {
+    timed_out = false;
+    auto fetch_url = [&](const char* url) -> std::optional<std::string> {
+        CURL* curl = curl_easy_init();
+        if (!curl) return std::nullopt;
+        std::string body;
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "flm/1.0");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_cb);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &body);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 800L);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 800L);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        CURLcode res = curl_easy_perform(curl);
+        if (res == CURLE_OPERATION_TIMEDOUT) {
+            timed_out = true;
+        }
+        curl_easy_cleanup(curl);
+        if (res != CURLE_OK || body.empty()) {
+            return std::nullopt;
+        }
+        return body;
+    };
+
+    if (auto body = fetch_url("https://api.github.com/repos/FastFlowLM/FastFlowLM/releases/latest")) {
+        try {
+            auto j = nlohmann::json::parse(*body);
+            if (j.contains("tag_name") && j["tag_name"].is_string()) {
+                return j["tag_name"].get<std::string>();
+            }
+        } catch (...) {}
+    }
+
+    if (auto body = fetch_url("https://api.github.com/repos/FastFlowLM/FastFlowLM/tags?per_page=1")) {
+        try {
+            auto j = nlohmann::json::parse(*body);
+            if (j.is_array() && !j.empty() && j[0].contains("name") && j[0]["name"].is_string()) {
+                return j[0]["name"].get<std::string>();
+            }
+        } catch (...) {}
+    }
+
+    return std::nullopt;
+}
+
+static void check_and_notify_new_version() {
+    bool timed_out = false;
+    auto latest_opt = http_get_latest_tag_from_github(timed_out);
+
+    if (timed_out && !g_vercheck_warned_timeout) {
+        g_vercheck_warned_timeout = true;
+        header_print("Warning", "Version check timed out; continuing without update info.");
+    }
+
+    if (!latest_opt.has_value()) return;
+
+    const std::string current = __FLM_VERSION__;
+    const std::string latest = latest_opt.value();
+    if (compare_semver(latest, current) > 0) {
+        header_print("FLM", "New version detected! (current v" << current << ", latest " << latest << ")");
+        header_print("FLM", "Download link: https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe");
+    }
+}
+#endif
 

@@ -48,7 +48,7 @@ extern std::unordered_set<std::string> embeddingModelTags;
 class AutoEmbeddingModel {
 protected:
 	std::string model_path = "";
-	std::unique_ptr<embedding_model> embedding_model = nullptr;
+	std::unique_ptr<embedding_model> embedding_model_impl = nullptr;
 	std::unique_ptr<Tokenizer> tokenizer = nullptr;
 	std::unique_ptr<Q4NX> q4nx = nullptr;
 	bool is_model_loaded = false;

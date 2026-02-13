@@ -9,8 +9,10 @@
 #pragma once
 
 #include "AutoModel/all_models.hpp"
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
 #include "whisper/modeling_whisper.hpp"
 #include "AutoEmbeddingModel/all_embedding_model.hpp"
+#endif
 #include "model_list.hpp"
 #include "model_downloader.hpp"
 #include <nlohmann/json.hpp>
@@ -111,8 +113,10 @@ private:
 
 
     std::unique_ptr<AutoModel> auto_chat_engine;
+#ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
     std::unique_ptr<Whisper> whisper_engine;
     std::unique_ptr<AutoEmbeddingModel> auto_embedding_engine;
+#endif
     xrt::device npu_device_inst;
     model_list& supported_models;
     ModelDownloader& downloader;

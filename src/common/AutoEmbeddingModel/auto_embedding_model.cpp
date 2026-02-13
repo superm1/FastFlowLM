@@ -69,17 +69,17 @@ void AutoEmbeddingModel::_shared_load_model(std::string model_path, json model_i
     this->is_model_loaded = true;
     this->tokenizer = std::make_unique<Tokenizer>(this->model_path);
 
-    this->embedding_model = std::make_unique<gemma_embedding>(*this->lm_config, this->npu.get());
+    this->embedding_model_impl = std::make_unique<gemma_embedding>(*this->lm_config, this->npu.get());
 
     this->q4nx = std::make_unique<Q4NX>(this->model_path);
 
-    this->embedding_model->load_weights(*this->q4nx);
+    this->embedding_model_impl->load_weights(*this->q4nx);
 
     this->q4nx.reset();
 }
 
 buffer<bf16> AutoEmbeddingModel::_shared_embed(std::vector<int>& tokens) {
-    buffer<bf16> y = this->embedding_model->embed(tokens);
+    buffer<bf16> y = this->embedding_model_impl->embed(tokens);
     return y;
 }
 
