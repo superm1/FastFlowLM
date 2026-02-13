@@ -8,7 +8,7 @@
 xrt::device npu_device_global;
 
 // Model-specific factory function for Qwen family and DeepSeek_r1_0528_8b
-inline std::pair<std::string, std::unique_ptr<AutoModel>> get_qwen_model(const std::string& model_tag) {
+inline std::unique_ptr<AutoModel> get_qwen_model(const std::string& model_tag) {
     static std::unordered_set<std::string> qwen3_Tags = {
         "qwen3", "qwen3:0.6b", "qwen3:1.7b", "qwen3:4b", "qwen3:8b"
     };
@@ -38,41 +38,44 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_qwen_model(const s
         auto_chat_engine = std::make_unique<Qwen3>(&npu_device_global);
     }
   
-    return std::make_pair(new_model_tag, std::move(auto_chat_engine));
+    return std::move(auto_chat_engine);
 }
 
 int main(int argc, char* argv[]) {
-    // SetConsoleOutputCP(CP_UTF8);
-    // SetConsoleCP(CP_UTF8);
+    #ifdef __WINDOWS__
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    // Set thread priority to low
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+    #endif
+    
     arg_utils::po::options_description desc("Allowed options");
     arg_utils::po::variables_map vm;
-    arg_utils::add_default_options(desc);
     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");
     desc.add_options()("Short,s", arg_utils::po::value<bool>()->default_value(true), "Short Prompt");
     desc.add_options()("Preemption,p", arg_utils::po::value<bool>()->default_value(false), "Preemption");
-    arg_utils::parse_options(argc, argv, desc, vm);
+    arg_utils::po::store(arg_utils::po::parse_command_line(argc, argv, desc), vm);
 
     std::string tag = vm["model"].as<std::string>();
     bool short_prompt = vm["Short"].as<bool>();
     bool preemption = vm["Preemption"].as<bool>();
     std::cout << "Model: " << tag << std::endl;
-    std::string model_list_path = "model_list.json";
-    std::string exe_dir = ".";
-    model_list model_list(model_list_path, exe_dir);
+    std::string exe_dir = utils::get_executable_directory();
+    std::string model_dir = utils::get_models_directory();
+    std::string model_list_path = exe_dir + "/model_list.json";
+    model_list model_list(model_list_path, model_dir);
+
+
    
     header_print("info", "Initializing chat model...");
     std::string model_path = model_list.get_model_path(tag);
-    nlohmann::json model_info = model_list.get_model_info(tag);
+    std::pair<std::string, nlohmann::json> model_info_pair = model_list.get_model_info(tag);
+    nlohmann::json model_info = model_info_pair.second;
+    std::cout << "Model path: " << model_path << std::endl;
+    npu_device_global = xrt::device(0); 
 
-    npu_device_global = xrt::device(0);
+    std::unique_ptr<AutoModel> chat = get_qwen_model(tag);
 
-    // Use model-specific factory
-    auto [actual_tag, chat] = get_qwen_model(tag);
-    if (actual_tag != tag) {
-        std::cout << "Model tag adjusted to: " << actual_tag << std::endl;
-        model_path = model_list.get_model_path(actual_tag);
-        model_info = model_list.get_model_info(actual_tag);
-    }
    
     chat->load_model(model_path, model_info, -1, preemption);
     // chat->set_topk(1);
@@ -88,7 +91,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Prompt: " << uniformed_input.prompt << std::endl;
         std::cout << "Response: ";
         chat->start_total_timer();
-        std::string response = chat->generate_with_prompt(meta_info, uniformed_input, 32, std::cout);
+        std::string response = chat->generate_with_prompt(meta_info, uniformed_input, 1024, std::cout);
         chat->stop_total_timer();
         std::cout << std::endl;
         std::cout << std::endl;
@@ -97,7 +100,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Prompt: " << uniformed_input.prompt << std::endl;
         std::cout << "Response: " << std::endl;
         chat->start_total_timer();
-        response = chat->generate_with_prompt(meta_info, uniformed_input, 32, std::cout);
+        response = chat->generate_with_prompt(meta_info, uniformed_input, 1024, std::cout);
         chat->stop_total_timer();
         std::cout << std::endl;
         std::cout << std::endl;

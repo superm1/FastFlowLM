@@ -29,20 +29,21 @@ inline std::pair<std::string, std::unique_ptr<AutoEmbeddingModel>> get_gemma_emb
 int main(int argc, char* argv[]) {
     arg_utils::po::options_description desc("Allowed options");
     arg_utils::po::variables_map vm;
-    arg_utils::add_default_options(desc);
     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");
     desc.add_options()("Short,s", arg_utils::po::value<bool>()->default_value(true), "Short Prompt");
     desc.add_options()("Preemption,p", arg_utils::po::value<bool>()->default_value(false), "Preemption");
-    arg_utils::parse_options(argc, argv, desc, vm);
+    
+    arg_utils::po::store(arg_utils::po::parse_command_line(argc, argv, desc), vm);
 
     std::string tag = vm["model"].as<std::string>();
     bool short_prompt = vm["Short"].as<bool>();
     bool preemption = vm["Preemption"].as<bool>();
 
     std::cout << "Model: " << tag << std::endl;
-    std::string model_list_path = "model_list.json";
-    std::string exe_dir = ".";
-    model_list model_list(model_list_path, exe_dir);
+    std::string exe_dir = utils::get_executable_directory();
+    std::string model_dir = utils::get_models_directory();
+    std::string model_list_path = exe_dir + "/model_list.json";
+    model_list model_list(model_list_path, model_dir);
    
     header_print("info", "Initializing embedding model...");
     std::string model_path = model_list.get_model_path(tag);
@@ -53,14 +54,11 @@ int main(int argc, char* argv[]) {
     auto npu_device_global = xrt::device(0);
 
     // Use model-specific factory
-    auto [actual_tag, embedding] = get_gemma_embedding_model(tag, &npu_device_global);
-    if (actual_tag != tag) {
-        std::cout << "Model tag adjusted to: " << actual_tag << std::endl;
-        model_path = model_list.get_model_path(actual_tag);
-        model_info = model_list.get_model_info(actual_tag);
-    }
+    std::unique_ptr<AutoEmbeddingModel> embedding = std::make_unique<Gemma_Embedding>(&npu_device_global);
+    model_path = model_list.get_model_path(tag);
+    model_info = model_list.get_model_info(tag);
 
-    embedding->load_model(model_path, model_info);
+    embedding->load_model(model_path, model_info, preemption);
 
     std::string text = "Alice's Adventures in Wonderland ALICE'S ADVENTURES IN WONDERLAND Lewis Carroll THE MILLENNIUM FULCRUM EDITION 3.0 CHAPTER I Down the Rabbit-HoleAlice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do:  once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, and what is the use of a book,'thought Alice without pictures or conversation?' So she was considering in her own mind (as well as she could, for the hot day made her feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies, when suddenly a White Rabbit with pink eyes ran close by her. There was nothing so VERY remarkable in that; nor did Alice think it so VERY much out of the way to hear the Rabbit say to itself, `Oh dear!  Oh dear!  I shall be late!'";
 
@@ -72,14 +70,8 @@ int main(int argc, char* argv[]) {
     }
     time_utils::time_point end_time = time_utils::now();
     std::cout << "Time: " << time_utils::duration_ms(start_time, end_time).first << "ms" << std::endl;
-    std::cout << "Result: " << result << std::endl;
     utils::print_matrix(y_bf16, 128);
 
-    // buffer<bf16> embed_ref = buffer<bf16>(768);
-    // embed_ref.from_file(model_path + "/final_output.bin");
-    // // buffer<bf16> useful_buf = buffer<bf16>(this->residual_buffer.data(), L * D);
-    // header_print("info", "error");
-    // print_error_metrics(get_error_metrics(y, embed_ref));
 
     return 0;
 }

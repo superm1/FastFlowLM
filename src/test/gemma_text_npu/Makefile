@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/gemma_text_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -124,7 +124,7 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_gemma_text_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
 	cp ../../external_libs/*.dll $(BIN_DIR)
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_gemma_text_npu.exe -m gemma3:270m -s 1 -p 0"

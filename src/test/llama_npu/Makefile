@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/llama_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -104,8 +104,6 @@ else
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
 
-SOURCES := $(wildcard ../../detail/llama_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/llama_npu/*.cpp)
 SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
 SOURCES += $(wildcard ../../common/AutoModel/modeling_llama3.cpp)
 SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
@@ -123,10 +121,10 @@ host: $(BIN_DIR)/test_llama_npu.exe
 directories:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 $(BIN_DIR)/test_llama_npu.exe: $(SOURCES)
-	make -C ../../detail/llama_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/llama_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_llama_npu_target"
 
@@ -135,11 +133,12 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_llama_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
 	cp $(LIB_DIR)/llama_npu.dll $(BIN_DIR)
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
+	cp -r ../../xclbins/Llama* $(BIN_DIR)/xclbins/
+	cp -r ../../xclbins/Deepseek-R1-Distill* $(BIN_DIR)/xclbins/
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_llama_npu.exe -m llama3.2:1b -s 1 -p 0"
-#	cd $(BIN_DIR) && ${PWSH} -Command ".\test_llama_npu.exe -m deepseek-r1 -s 1 -p 0"
 
 .PHONY: all clean test directories
 

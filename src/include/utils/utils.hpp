@@ -373,4 +373,49 @@ inline std::string path_join(fileName&&... args){
     return path;
 }
 
+
+///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
+///@return the server port, default is 52625 if environment variable is not set
+inline int get_server_port(int user_port) {
+    if (user_port > 0 && user_port <= 65535) {
+        return user_port;
+    }
+    else {
+        char* port_env = nullptr;
+        size_t len = 0;
+        if (_dupenv_s(&port_env, &len, "FLM_SERVE_PORT") == 0 && port_env != nullptr) {
+            try {
+                int port = std::stoi(port_env);
+                free(port_env);
+                if (port > 0 && port <= 65535) {
+                    return port;
+                }
+            }
+            catch (const std::exception&) {
+                free(port_env);
+                // Invalid port number, use default
+            }
+        }
+    }
+
+    return 52625; // Default port
+}
+
+///@brief get_models_directory gets the models directory from environment variable or defaults to Documents
+///@return the models directory path
+inline std::string get_models_directory() {
+    char* model_path_env = nullptr;
+    size_t len = 0;
+    if (_dupenv_s(&model_path_env, &len, "FLM_MODEL_PATH") == 0 && model_path_env != nullptr) {
+        std::string custom_path(model_path_env);
+        free(model_path_env);
+        if (!custom_path.empty()) {
+            return custom_path;
+        }
+    }
+    // Fallback to Documents directory if environment variable is not set
+    std::string documents_dir = get_user_documents_directory();
+    return documents_dir + "/flm/models";
+}
+
 } // end of namespace utils

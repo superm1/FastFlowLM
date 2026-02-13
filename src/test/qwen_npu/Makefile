@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/qwen_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -111,11 +111,10 @@ all: directories test
 
 directories:
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 $(BIN_DIR)/test_qwen_npu.exe: ${SOURCES}
-	make -C ../../detail/qwen_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/qwen_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_qwen_npu_target"
 
@@ -124,8 +123,9 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_qwen_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
-	cp $(LIB_DIR)/qwen_npu.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
+	cp -r ../../xclbins/Qwen* $(BIN_DIR)/xclbins/
+	cp -r ../../xclbins/DeepSeek-R1-0528* $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_qwen_npu.exe -m deepseek-r1-0528 -s 1 -p 0"
 

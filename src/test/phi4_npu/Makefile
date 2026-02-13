@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/phi4_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -89,7 +89,6 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 test: $(BIN_DIR)/test_phi4_npu
-	make -C ../../detail/phi4_npu
 	cp $(LIB_DIR)/libphi4_npu.so $(BIN_DIR)
 	cp ../../../model_list_linux.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_phi4_npu --model phi4-mini-it -s 0
@@ -111,10 +110,9 @@ all: directories test
 directories:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
-SOURCES := $(wildcard ../../detail/phi4_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/phi4_npu/*.cpp)
 SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
 SOURCES += $(wildcard ../../common/AutoModel/modeling_phi4.cpp)
 SOURCES += $(wildcard ../../include/AutoModel/automodel.hpp)
@@ -125,7 +123,6 @@ SOURCES += $(wildcard ../../common/modules/sampler.cpp)
 SOURCES += $(wildcard test.cpp)
 
 $(BIN_DIR)/test_phi4_npu.exe: $(SOURCES)
-	make -C ../../detail/phi4_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/phi4_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_phi4_npu_target"
 
@@ -134,8 +131,8 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_phi4_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
-	cp $(LIB_DIR)/phi4_npu.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
+	cp -r ../../xclbins/Phi4* $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_phi4_npu.exe -m phi4-mini-it -s 1 -p 0"
 

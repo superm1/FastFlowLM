@@ -30,119 +30,44 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_lfm2_model(const s
 }
 
 
-// int main(int argc, char* argv[]) {
-//     // Set thread priority to low
-//     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
-    
-//     arg_utils::po::options_description desc("Allowed options");
-//     arg_utils::po::variables_map vm;
-//     arg_utils::add_default_options(desc);
-//     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");
-//     desc.add_options()("Short,s", arg_utils::po::value<bool>()->default_value(true), "Short Prompt");
-//     desc.add_options()("Preemption,p", arg_utils::po::value<bool>()->default_value(false), "Preemption");
-//     arg_utils::parse_options(argc, argv, desc, vm);
-
-//     std::string tag = vm["model"].as<std::string>();
-//     bool short_prompt = vm["Short"].as<bool>();
-//     bool preemption = vm["Preemption"].as<bool>();
-//     std::cout << "Model: " << tag << std::endl;
-//     std::string model_list_path = "model_list.json";
-//     std::string exe_dir = ".";
-//     model_list model_list(model_list_path, exe_dir);
-   
-//     header_print("info", "Initializing chat model...");
-//     std::string model_path = model_list.get_model_path(tag);
-//     nlohmann::json model_info = model_list.get_model_info(tag);
-
-//     LM_Config config;
-//     config.from_pretrained(model_path);
-//     npu_device_global = xrt::device(0);
-    
-//     npu_xclbin_manager npu = npu_xclbin_manager(npu_device::device_npu2, &npu_device_global, preemption);
-//     // Use model-specific factory
-//     auto [actual_tag, chat] = get_lfm2_model(tag);
-//     if (actual_tag != tag) {
-//         std::cout << "Model tag adjusted to: " << actual_tag << std::endl;
-//         model_path = model_list.get_model_path(actual_tag);
-//         model_info = model_list.get_model_info(actual_tag);
-//     }
-   
-
-//     // std::ifstream file(model_path + "/output_sequence.bin", std::ios::binary);
-//     std::ifstream file(model_path + "/output.bin", std::ios::binary);
-//     if (!file.is_open()) {
-//         std::cout << "Failed to open output file" << std::endl;
-//         return 1;
-//     }
-//     file.seekg(0, std::ios::end);
-//     size_t size = file.tellg();
-//     file.seekg(0, std::ios::beg);
-//     buffer<bf16> reference(size / sizeof(bf16));
-//     file.read(reinterpret_cast<char*>(reference.data()), size);
-//     tensor_2d<bf16> reference_tensor(reference, 2048);
-//     lfm2_npu lfm2_npu_engine(config, &npu, 8192);
-//     std::unique_ptr<Q4NX> q4nx = std::make_unique<Q4NX>(model_path);
-//     lfm2_npu_engine.load_weights(*q4nx);
-//     std::vector<int> tokens = {1,     6,  6423,   708,  7347,   975,  2793,   803,  6586,   988,
-//         779,  4632,  7349,  1090, 15195,   523,  4112,  1014,  1112,   936,
-//         797,  8682,  9629,   523,  5947,  1517, 57015,   523,  1517,   997,
-//       20954,   511,   875,  5019,   597,   523,     7,   708,     6, 64015,
-//         708};
-    
-//     int L_got = size / sizeof(bf16) / 2048;
-//     buffer<bf16> y = lfm2_npu_engine.prefill(tokens, nullptr);
-//     tensor_2d<bf16> y_tensor(y, 2048);
-//     buffer<float> errors(L_got);
-//     for (int i = 0; i < L_got; i++){
-//         auto error_metrics = get_error_metrics(y_tensor[i], reference_tensor[i]);
-//         errors[i] = error_metrics.CosineSimilarity;
-//     }
-//     std::cout << "Cosine Similarity: " << std::endl;
-//     utils::print_matrix(errors, 1, 64);
-
-//     return 0;
-// }
-
-// Wait for final test
 
 int main(int argc, char* argv[]) {
+    #ifdef __WINDOWS__
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
     // Set thread priority to low
-    // SetConsoleOutputCP(CP_UTF8);
-    // SetConsoleCP(CP_UTF8);
-    // SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+    #endif
     
     arg_utils::po::options_description desc("Allowed options");
     arg_utils::po::variables_map vm;
-    arg_utils::add_default_options(desc);
     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");
     desc.add_options()("Short,s", arg_utils::po::value<bool>()->default_value(true), "Short Prompt");
     desc.add_options()("Preemption,p", arg_utils::po::value<bool>()->default_value(false), "Preemption");
-    arg_utils::parse_options(argc, argv, desc, vm);
+    arg_utils::po::store(arg_utils::po::parse_command_line(argc, argv, desc), vm);
 
     std::string tag = vm["model"].as<std::string>();
     bool short_prompt = vm["Short"].as<bool>();
     bool preemption = vm["Preemption"].as<bool>();
     std::cout << "Model: " << tag << std::endl;
-    std::string model_list_path = "model_list.json";
-    std::string exe_dir = ".";
-    model_list model_list(model_list_path, exe_dir);
+    std::string exe_dir = utils::get_executable_directory();
+    std::string model_dir = utils::get_models_directory();
+    std::string model_list_path = exe_dir + "/model_list.json";
+    model_list model_list(model_list_path, model_dir);
 
 
    
     header_print("info", "Initializing chat model...");
     std::string model_path = model_list.get_model_path(tag);
-    nlohmann::json model_info = model_list.get_model_info(tag);
+    std::pair<std::string, nlohmann::json> model_info_pair = model_list.get_model_info(tag);
+    nlohmann::json model_info = model_info_pair.second;
+    std::cout << "Model path: " << model_path << std::endl;
+
+    std::unique_ptr<AutoModel> chat = std::make_unique<LFM2>(&npu_device_global);
 
     npu_device_global = xrt::device(0); 
-    // Use model-specific factory
-    auto [actual_tag, chat] = get_lfm2_model(tag);
-    if (actual_tag != tag) {
-        std::cout << "Model tag adjusted to: " << actual_tag << std::endl;
-        model_path = model_list.get_model_path(actual_tag);
-        model_info = model_list.get_model_info(actual_tag);
-    }
    
-    chat->load_model(model_path, model_info, 131072, preemption);
+    chat->load_model(model_path, model_info, -1, preemption);
     chat->set_topk(1);
     chat_meta_info_t meta_info;
     lm_uniform_input_t uniformed_input;

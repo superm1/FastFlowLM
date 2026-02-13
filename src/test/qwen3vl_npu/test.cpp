@@ -26,37 +26,41 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_qwen3vl_model(cons
 }
 
 int main(int argc, char* argv[]) {
+    #ifdef __WINDOWS__
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    // Set thread priority to low
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+    #endif
+    
     arg_utils::po::options_description desc("Allowed options");
     arg_utils::po::variables_map vm;
-    arg_utils::add_default_options(desc);
     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");
     desc.add_options()("Short,s", arg_utils::po::value<bool>()->default_value(true), "Short Prompt");
     desc.add_options()("Preemption,p", arg_utils::po::value<bool>()->default_value(false), "Preemption");
-    arg_utils::parse_options(argc, argv, desc, vm);
+    arg_utils::po::store(arg_utils::po::parse_command_line(argc, argv, desc), vm);
 
     std::string tag = vm["model"].as<std::string>();
     bool short_prompt = vm["Short"].as<bool>();
     bool preemption = vm["Preemption"].as<bool>();
     std::cout << "Model: " << tag << std::endl;
-    std::string model_list_path = "model_list.json";
-    std::string exe_dir = ".";
-    model_list model_list(model_list_path, exe_dir);
+    std::string exe_dir = utils::get_executable_directory();
+    std::string model_dir = utils::get_models_directory();
+    std::string model_list_path = exe_dir + "/model_list.json";
+    model_list model_list(model_list_path, model_dir);
+
+
    
     header_print("info", "Initializing chat model...");
     std::string model_path = model_list.get_model_path(tag);
-    nlohmann::json model_info = model_list.get_model_info(tag);
+    std::pair<std::string, nlohmann::json> model_info_pair = model_list.get_model_info(tag);
+    nlohmann::json model_info = model_info_pair.second;
+    std::cout << "Model path: " << model_path << std::endl;
 
-    npu_device_global = xrt::device(0);
-
-    // Use model-specific factory
-    auto [actual_tag, chat] = get_qwen3vl_model(tag);
-    if (actual_tag != tag) {
-        std::cout << "Model tag adjusted to: " << actual_tag << std::endl;
-        model_path = model_list.get_model_path(actual_tag);
-        model_info = model_list.get_model_info(actual_tag);
-    }
+    std::unique_ptr<AutoModel> chat = std::make_unique<Qwen3VL>(&npu_device_global);
+    npu_device_global = xrt::device(0); 
    
-    chat->load_model(model_path, model_info, 65536, preemption);
+    chat->load_model(model_path, model_info, -1, preemption);
     header_print("info", "Model loaded");
     chat_meta_info_t meta_info;
     lm_uniform_input_t uniformed_input;

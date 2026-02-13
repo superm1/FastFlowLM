@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/gemma_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -116,10 +116,10 @@ all: directories test
 directories:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 $(BIN_DIR)/test_gemma_npu.exe: $(SOURCES)
-	make -C ../../detail/gemma_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/gemma_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_gemma_npu_target"
 
@@ -128,8 +128,9 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_gemma_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
-	cp ../../external_libs/*.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
+	cp -r ../../xclbins/Gemma3-4B-NPU2 $(BIN_DIR)/xclbins/
+	cp -r ../../xclbins/Medgemma-4B-NPU2 $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_gemma_npu.exe -m gemma3:4b -s 1 -p 0"
 

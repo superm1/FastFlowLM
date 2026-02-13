@@ -37,10 +37,6 @@ set(XRT_LIB_DIR     C:/dev/xrtNPUfromDLL     CACHE PATH   "Where XRT libs live")
 set(TEST_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/../../build/phi4_npu/test/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TEST_OUTPUT_DIR})
 
-# Define headers for test (only phi4-specific headers)
-set(HEADERS
-    "${CMAKE_SOURCE_DIR}/../../detail/phi4_npu/phi4_npu_detail.hpp"
-)
 
 # Create test executable with basic settings
 add_executable(test_phi4_npu
@@ -86,7 +82,7 @@ target_include_directories(test_phi4_npu PUBLIC
 
 # Basic link settings for test
 target_link_directories(test_phi4_npu PUBLIC
-    ${CMAKE_SOURCE_DIR}/../../build/lib
+    ${CMAKE_SOURCE_DIR}/../../lib
     ${XRT_LIB_DIR}
     ${CMAKE_SOURCE_DIR}/../../external_libs
     ${CMAKE_SOURCE_DIR}/../../build/tokenizer/lib

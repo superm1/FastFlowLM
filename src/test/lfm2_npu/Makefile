@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/lfm2_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -109,6 +109,7 @@ all: directories test
 directories:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 SOURCES := $(wildcard ../../detail/lfm2_npu/*.hpp)
@@ -123,7 +124,6 @@ SOURCES += $(wildcard ../../common/modules/sampler.cpp)
 SOURCES += $(wildcard test.cpp)
 
 $(BIN_DIR)/test_lfm2_npu.exe: $(SOURCES)
-	make -C ../../detail/lfm2_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/lfm2_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_lfm2_npu_target"
 
@@ -132,8 +132,9 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_lfm2_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
 	cp $(LIB_DIR)/lfm2_npu.dll $(BIN_DIR)
+	cp -r ../../xclbins/LFM* $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_lfm2_npu.exe -m lfm2.5-tk:1.2b -s 1 -p 0"
 

@@ -52,6 +52,7 @@ target_compile_definitions(test_gemma_embedding PUBLIC
     DISABLE_ABI_CHECK=1
     USEAVX2=1
     _ENABLE_EXTENDED_ALIGNED_STORAGE
+    __WINDOWS__
 )
 
 target_compile_options(test_gemma_embedding PUBLIC
@@ -75,7 +76,7 @@ target_include_directories(test_gemma_embedding PUBLIC
 
 # Basic link settings for test
 target_link_directories(test_gemma_embedding PUBLIC
-    ${CMAKE_SOURCE_DIR}/../../build/lib
+    ${CMAKE_SOURCE_DIR}/../../lib
     ${XRT_LIB_DIR}
     ${CMAKE_SOURCE_DIR}/../../build/tokenizer/lib
     C:/dev/boost_1_88_0/stage/lib
@@ -85,10 +86,8 @@ target_link_directories(test_gemma_embedding PUBLIC
 target_link_libraries(test_gemma_embedding PUBLIC
     gemma_embedding
     q4_npu_eXpress
-    lm_head
     dequant
     gemm
-    npu_utils
     xrt_coreutil
 )
 target_link_libraries(test_gemma_embedding PRIVATE

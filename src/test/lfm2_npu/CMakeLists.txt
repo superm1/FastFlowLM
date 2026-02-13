@@ -37,10 +37,6 @@ set(XRT_LIB_DIR     C:/dev/xrtNPUfromDLL     CACHE PATH   "Where XRT libs live")
 set(TEST_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/../../build/lfm2_npu/test/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TEST_OUTPUT_DIR})
 
-# Define headers for test (only lfm2-specific headers)
-set(HEADERS
-    "${CMAKE_SOURCE_DIR}/../../detail/lfm2_npu/lfm2_npu_detail.hpp"
-)
 
 # Create test executable with basic settings
 add_executable(test_lfm2_npu
@@ -86,7 +82,7 @@ target_include_directories(test_lfm2_npu PUBLIC
 
 # Basic link settings for test
 target_link_directories(test_lfm2_npu PUBLIC
-    ${CMAKE_SOURCE_DIR}/../../build/lib
+    ${CMAKE_SOURCE_DIR}/../../lib
     ${XRT_LIB_DIR}
     ${CMAKE_SOURCE_DIR}/../../external_libs
     ${CMAKE_SOURCE_DIR}/../../build/tokenizer/lib

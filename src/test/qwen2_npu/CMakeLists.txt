@@ -76,7 +76,7 @@ target_include_directories(test_qwen2_npu PUBLIC
 
 # Basic link settings for test
 target_link_directories(test_qwen2_npu PUBLIC
-    ${CMAKE_SOURCE_DIR}/../../build/lib
+    ${CMAKE_SOURCE_DIR}/../../lib
     ${XRT_LIB_DIR}
     ${CMAKE_SOURCE_DIR}/../../build/tokenizer/lib
     C:/dev/boost_1_88_0/stage/lib

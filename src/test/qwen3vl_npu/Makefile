@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/qwen3vl_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -116,11 +116,10 @@ all: directories test
 
 directories:
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 $(BIN_DIR)/test_qwen3vl_npu.exe: $(SOURCES)
-	make -C ../../detail/qwen3vl_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/qwen3vl_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_qwen3vl_npu"
 
@@ -129,8 +128,8 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_qwen3vl_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
-	cp $(LIB_DIR)/qwen3vl_npu.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
+	cp -r ../../xclbins/Qwen3-VL* $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_qwen3vl_npu.exe -m qwen3vl-it:4b -s 1 -p 0"
 

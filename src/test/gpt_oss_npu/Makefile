@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/gpt_oss_npu/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -69,8 +69,6 @@ TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
 TEST_SOURCES += ../../common/modules/sampler.cpp
 
 
-HEADERS += ../../include/llama/gpt_oss_npu.hpp
-HEADERS += ../../include/llama/gpt_oss_npu_sequence.hpp
 HEADERS += ../../include/modules/embedding.hpp
 HEADERS += ../../include/modules/lm_head.hpp
 HEADERS += ../../include/modules/gemm.hpp
@@ -122,10 +120,10 @@ all: directories test
 directories:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 $(BIN_DIR)/test_gpt_oss_npu.exe: $(SOURCES)
-	make -C ../../detail/gpt_oss_npu
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/gpt_oss_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_gpt_oss_npu_target"
 
@@ -134,9 +132,9 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_gpt_oss_npu.exe
-	cp ../../build/lib/*.dll $(BIN_DIR)
-	cp $(LIB_DIR)/gpt_oss_npu.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
+	cp -r ../../xclbins/GPT* $(BIN_DIR)/xclbins/
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_gpt_oss_npu.exe -m gpt-oss -s 1 -p 0"
 
 .PHONY: all clean test directories

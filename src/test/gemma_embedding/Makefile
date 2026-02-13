@@ -22,7 +22,7 @@ else
 endif
 
 BUILD_DIR := ../../build/gemma_embedding/test
-LIB_DIR := $(BUILD_DIR)/../lib
+LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
 # Linux build environment
@@ -113,10 +113,10 @@ all: directories test
 directories:
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
 $(BIN_DIR)/test_gemma_embedding.exe: $(SOURCES) $(HEADERS)
-	cd ../../detail/gemma_embedding && make
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/gemma_embedding"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_gemma_embedding_target"
 
@@ -125,9 +125,8 @@ clean:
 
 
 test: directories $(BIN_DIR)/test_gemma_embedding.exe
-	make -C ../../detail/gemma_embedding
-	cp ../../build/lib/*.dll $(BIN_DIR)
-	cp ../../external_libs/*.dll $(BIN_DIR)
+	cp ../../lib/*.dll $(BIN_DIR)
+	cp -r ../../xclbins/Embedding-Gemma-300M-NPU2 $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
 	cd $(BIN_DIR) && ${PWSH} -Command ".\test_gemma_embedding.exe -m embed-gemma:300m -s 1 -p 0"
 
