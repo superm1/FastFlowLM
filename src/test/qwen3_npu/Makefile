@@ -1,11 +1,11 @@
 # =============================================================================
-# Qwen NPU Library Makefile
+# qwen3 NPU Library Makefile
 # =============================================================================
 #
 # Author: Zhenyu Xu (zxu3@clemson.edu)
 # Created: 2024
 #
-# This Makefile is used to build the Qwen NPU library components.
+# This Makefile is used to build the qwen3 NPU library components.
 #
 # Usage:
 #   make        - Build all targets
@@ -21,7 +21,7 @@ else
 	WSL := 1
 endif
 
-BUILD_DIR := ../../build/qwen_npu/test
+BUILD_DIR := ../../build/qwen3_npu/test
 LIB_DIR := ../../lib
 BIN_DIR := $(BUILD_DIR)/bin
 ifeq ($(WSL), 0)
@@ -30,7 +30,7 @@ ifeq ($(WSL), 0)
 
 COMMON_LIB_DIR := ../../build/common/lib
 
-TARGET = $(LIB_DIR)/libqwen_npu.so
+TARGET = $(LIB_DIR)/libqwen3_npu.so
 
 CXX := g++-13
 CXX_FLAGS := -std=c++20 -fPIC -Wall -DUSEAVX2=1
@@ -57,35 +57,35 @@ LDFLAGS += -L$(LIB_DIR) -Wl,-rpath,$(LIB_DIR)
 LDFLAGS += -L../../build/lib
 LDFLAGS += -L../../build/tokenizer/lib
 LDFLAGS += -ltokenizers_cpp -ltokenizers_c -l sentencepiece
-LDFLAGS += -lqwen_npu -ldequant -lgemm -llm_head -lq4_npu_eXpress -lmha
+LDFLAGS += -lqwen3_npu -ldequant -lgemm -llm_head -lq4_npu_eXpress -lmha
 
 TEST_SOURCES += test.cpp
 TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_qwen3.cpp
+TEST_SOURCES += ../../common/AutoModel/modeling_qwen33.cpp
 TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
 TEST_SOURCES += ../../common/modules/sampler.cpp
 
-HEADERS += ../../include/qwen/qwen_npu_sequence.hpp
-HEADERS += ../../include/qwen/qwen_npu.hpp
+HEADERS += ../../include/qwen3/qwen3_npu_sequence.hpp
+HEADERS += ../../include/qwen3/qwen3_npu.hpp
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
-all: directories $(BIN_DIR)/test_qwen_npu
+all: directories $(BIN_DIR)/test_qwen3_npu
 
 directories:
 	mkdir -p $(BIN_DIR)
 
-$(BIN_DIR)/test_qwen_npu: $(TEST_SOURCES) $(TEST_DEPS)
+$(BIN_DIR)/test_qwen3_npu: $(TEST_SOURCES) $(TEST_DEPS)
 	$(CXX) $(TEST_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-test: directories $(BIN_DIR)/test_qwen_npu
-	make -C ../../detail/qwen_npu
+test: directories $(BIN_DIR)/test_qwen3_npu
+	make -C ../../detail/qwen3_npu
 	cp $(LIB_DIR)/*.so $(BIN_DIR)
 	cp ../../model_list_linux.json $(BIN_DIR)/model_list.json
-	cd $(BIN_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_qwen_npu --model qwen3:8b -s 1
+	cd $(BIN_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_qwen3_npu --model qwen33:8b -s 1
 
 -include $(TEST_DEPS)
 .PHONY: all clean test directories
@@ -97,15 +97,13 @@ else
 PWSH := powershell.exe
 
 
-SOURCES := $(wildcard ../../detail/qwen_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/qwen_npu/*.cpp)
 SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen3.cpp)
+SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen33.cpp)
 SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
 SOURCES += $(wildcard ../../common/modules/sampler.cpp)
 SOURCES += $(wildcard test.cpp)
 
-TARGET = $(BUILD_DIR)/qwen_npu.dll
+TARGET = $(BUILD_DIR)/qwen3_npu.dll
 
 all: directories test
 
@@ -114,20 +112,20 @@ directories:
 	mkdir -p $(BIN_DIR)/xclbins
 	mkdir -p $(LIB_DIR)
 
-$(BIN_DIR)/test_qwen_npu.exe: ${SOURCES}
-	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/qwen_npu"
-	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_qwen_npu_target"
+$(BIN_DIR)/test_qwen3_npu.exe: ${SOURCES}
+	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/qwen3_npu"
+	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_qwen3_npu_target"
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 
-test: directories $(BIN_DIR)/test_qwen_npu.exe
+test: directories $(BIN_DIR)/test_qwen3_npu.exe
 	cp ../../lib/*.dll $(BIN_DIR)
-	cp -r ../../xclbins/Qwen* $(BIN_DIR)/xclbins/
+	cp -r ../../xclbins/Qwen3* $(BIN_DIR)/xclbins/
 	cp -r ../../xclbins/DeepSeek-R1-0528* $(BIN_DIR)/xclbins/
 	cp ../../model_list.json $(BIN_DIR)/model_list.json
-	cd $(BIN_DIR) && ${PWSH} -Command ".\test_qwen_npu.exe -m deepseek-r1-0528 -s 1 -p 0"
+	cd $(BIN_DIR) && ${PWSH} -Command ".\test_qwen3_npu.exe -m deepseek-r1-0528 -s 1 -p 0"
 
 .PHONY: all clean test directories
 

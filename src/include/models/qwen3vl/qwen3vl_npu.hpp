@@ -20,6 +20,41 @@
 #endif
 
 
+//Parameter for QWEN3IMAGE 
+constexpr unsigned int QWEN3_PATCH_SIZE = 16;
+constexpr unsigned int QWEN3_IMAGE_MERGE_SIZE=2;
+constexpr unsigned int QWEN3_SPATIAL_MERGE_SIZE=2;
+constexpr unsigned int QWEN3_SHORTEST_EDGE = 65536;
+constexpr unsigned int QWEN3_LONGEST_EDGE = 16777216;
+constexpr float QWEN3_VISION_RESCALE_FACTOR = 0.00392156862745098;
+constexpr float QWEN3_VISION_RESCALE_IMAGE_MEAN = 0.5f;
+constexpr float QWEN3_VISION_RESCALE_IMAGE_STD = 0.5f;
+constexpr unsigned int QWEN3_TEMPORAL_PATCH_SIZE = 2;
+constexpr unsigned int QWEN3_MERGE_SIZE = 2;
+
+
+typedef struct {
+    int height;
+    int width;
+    int height_resized;  // assigned by image preprocessing
+    int width_resized;
+    int grid_h;
+    int grid_w;
+
+    std::vector<uint8_t> _data;
+
+} qwen3vl_image_t;
+
+
+
+typedef struct {
+    std::vector<qwen3vl_image_t> images;
+    std::vector<bf16> _data__processed;    
+    unsigned int num_images;
+}qwen3vl_image_payload_t;
+
+
+
 class qwen3vl_npu : public causal_lm{
 public:
     /// \brief  initialize the qwen3vl_npu

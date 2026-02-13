@@ -1,24 +1,24 @@
-/// \file qwen_npu_sequence.hpp
-/// \brief qwen_npu_sequence class
+/// \file qwen3_npu_sequence.hpp
+/// \brief qwen3_npu_sequence class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
 /// \version 0.9.24
-/// \note This is a header file for the qwen_npu_sequence class
+/// \note This is a header file for the qwen3_npu_sequence class
 #pragma once
 #include "npu_utils/npu_instr_utils.hpp"
 #include "lm_config.hpp"
 
-/// \brief qwen_npu_sequence class
-/// \note This is a class for the qwen_npu_sequence
-class qwen_npu_sequence{
+/// \brief qwen3_npu_sequence class
+/// \note This is a class for the qwen3_npu_sequence
+class qwen3_npu_sequence{
 public:
-    qwen_npu_sequence(){}
+    qwen3_npu_sequence(){}
 
     /// \brief Constructor
     /// \param config the configuration
     /// \param MAX_L the max length
-    qwen_npu_sequence(LM_Config config, uint32_t MAX_L);
-    ~qwen_npu_sequence();
+    qwen3_npu_sequence(LM_Config config, uint32_t MAX_L);
+    ~qwen3_npu_sequence();
 
     /// \brief Generate the rtp sequence
     /// \param seq the sequence

@@ -17,7 +17,7 @@ void Qwen3::load_model(std::string model_path, json model_info, int default_cont
     
     this->q4nx = std::make_unique<Q4NX>(this->model_path);
     // lm_config->model_type == qwen3
-    this->lm_engine = std::make_unique<qwen_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
+    this->lm_engine = std::make_unique<qwen3_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
 
     this->lm_engine->load_weights(*this->q4nx);
 
@@ -177,7 +177,7 @@ void Qwen3_IT::load_model(std::string model_path, json model_info, int default_c
     this->q4nx = std::make_unique<Q4NX>(this->model_path);
 
     // lm_config->model_type == qwen3
-    this->lm_engine = std::make_unique<qwen_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
+    this->lm_engine = std::make_unique<qwen3_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
 
     this->lm_engine->load_weights(*this->q4nx);
 
@@ -369,7 +369,7 @@ void Qwen3_TK::load_model(std::string model_path, json model_info, int default_c
     this->q4nx = std::make_unique<Q4NX>(this->model_path);
 
     // lm_config->model_type == qwen3
-    this->lm_engine = std::make_unique<qwen_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
+    this->lm_engine = std::make_unique<qwen3_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
 
     this->lm_engine->load_weights(*this->q4nx);
 
@@ -529,7 +529,7 @@ void DeepSeek_r1_0528_8b::load_model(std::string model_path, json model_info, in
     
     this->q4nx = std::make_unique<Q4NX>(this->model_path);
     // model_type == llama
-    this->lm_engine = std::make_unique<qwen_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
+    this->lm_engine = std::make_unique<qwen3_npu>(*this->lm_config, this->npu.get(), this->MAX_L);
 
     this->lm_engine->load_weights(*this->q4nx);
 

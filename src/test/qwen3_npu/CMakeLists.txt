@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(qwen_npu VERSION 1.0.0 LANGUAGES CXX)
+project(qwen3_npu VERSION 1.0.0 LANGUAGES CXX)
 
 # Set build type to Release
 set(CMAKE_BUILD_TYPE Release)
@@ -15,9 +15,9 @@ if(WIN32)
 endif()
 
 # Set output directories
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../build/qwen_npu/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../build/qwen_npu/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../build/qwen_npu/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../build/qwen3_npu/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../build/qwen3_npu/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../../build/qwen3_npu/lib)
 
 # Force output directories to be absolute
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -34,11 +34,11 @@ set(XRT_LIB_DIR     C:/dev/xrtNPUfromDLL     CACHE PATH   "Where XRT libs live")
 # Test executable target
 # ———————————————————————————————————————————————
 # Set test output directory
-set(TEST_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/../../build/qwen_npu/test/bin)
+set(TEST_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/../../build/qwen3_npu/test/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TEST_OUTPUT_DIR})
 
 # Create test executable with basic settings
-add_executable(test_qwen_npu
+add_executable(test_qwen3_npu
     test.cpp
     ${HEADERS}
     ${CMAKE_SOURCE_DIR}/../../common/AutoModel/automodel.cpp
@@ -49,33 +49,33 @@ add_executable(test_qwen_npu
 
 # add_subdirectory(${CMAKE_SOURCE_DIR}/../../tokenizer_cpp tokenizers EXCLUDE_FROM_ALL)
 # Apply the same AVX2 settings to the test executable
-target_compile_definitions(test_qwen_npu PUBLIC
+target_compile_definitions(test_qwen3_npu PUBLIC
     DISABLE_ABI_CHECK=1
     USEAVX2=1
     _ENABLE_EXTENDED_ALIGNED_STORAGE
     __WINDOWS__
 )
 
-target_compile_options(test_qwen_npu PUBLIC
+target_compile_options(test_qwen3_npu PUBLIC
     $<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2 /O2 /fp:fast>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-mavx2 -mfma -march=native -O2>
 )
 
 if(MSVC)
-    set_target_properties(test_qwen_npu PROPERTIES
+    set_target_properties(test_qwen3_npu PROPERTIES
         LINK_FLAGS "/MACHINE:X64"
     )
 endif()
 
 # Basic include directories for test
-target_include_directories(test_qwen_npu PUBLIC
+target_include_directories(test_qwen3_npu PUBLIC
     ${CMAKE_SOURCE_DIR}/../../include
     ${XRT_INCLUDE_DIR}
     C:/dev/boost_1_88_0
 )
 
 # Basic link settings for test
-target_link_directories(test_qwen_npu PUBLIC
+target_link_directories(test_qwen3_npu PUBLIC
     ${CMAKE_SOURCE_DIR}/../../lib
     ${XRT_LIB_DIR}
     ${CMAKE_SOURCE_DIR}/../../build/tokenizer/lib
@@ -83,8 +83,8 @@ target_link_directories(test_qwen_npu PUBLIC
     C:/dev/vcpkg/installed/x64-windows/lib
 )
 
-target_link_libraries(test_qwen_npu PUBLIC
-    qwen_npu
+target_link_libraries(test_qwen3_npu PUBLIC
+    qwen3_npu
     q4_npu_eXpress
     lm_head
     dequant
@@ -96,7 +96,7 @@ target_link_libraries(test_qwen_npu PUBLIC
     swscale
     zlib
 )
-target_link_libraries(test_qwen_npu PRIVATE
+target_link_libraries(test_qwen3_npu PRIVATE
     tokenizers_cpp
     tokenizers_c
     sentencepiece
@@ -105,8 +105,8 @@ target_link_libraries(test_qwen_npu PRIVATE
 )
 
 # Add test target
-add_custom_target(test_qwen_npu_target
-    DEPENDS test_qwen_npu
-    COMMENT "Building test_qwen_npu executable"
+add_custom_target(test_qwen3_npu_target
+    DEPENDS test_qwen3_npu
+    COMMENT "Building test_qwen3_npu executable"
 )
 

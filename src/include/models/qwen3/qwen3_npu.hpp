@@ -1,14 +1,14 @@
-/// \file qwen_npu.hpp
-/// \brief qwen_npu class
+/// \file qwen3_npu.hpp
+/// \brief qwen3_npu class
 /// \author FastFlowLM Team
 /// \date 2025-06-24
 /// \version 0.9.24
-/// \note This is a header file for the qwen_npu class
+/// \note This is a header file for the qwen3_npu class
 #pragma once
 #include "lm_config.hpp"
 #include "npu_utils/npu_utils.hpp"
 #include "tensor_utils/q4_npu_eXpress.hpp"
-#include "qwen_npu_sequence.hpp"
+#include "qwen3_npu_sequence.hpp"
 #include "modules/embedding.hpp"
 #include "modules/lm_head.hpp"
 #include "modules/gemm.hpp"
@@ -21,15 +21,15 @@
 #endif
 
 
-class qwen_npu : public causal_lm{
+class qwen3_npu : public causal_lm{
 public:
-    /// \brief  initialize the qwen_npu
+    /// \brief  initialize the qwen3_npu
     /// \param config the configuration
     /// \param npu_instance the npu instance
-    qwen_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
-    ~qwen_npu();
+    qwen3_npu(LM_Config config, npu_xclbin_manager *npu_instance, int MAX_L = 4096);
+    ~qwen3_npu();
 
-    /// \brief forward the qwen_npu
+    /// \brief forward the qwen3_npu
     /// \param ids the ids
     /// \return the output tensor
     buffer<bf16> forward(int ids) override;
