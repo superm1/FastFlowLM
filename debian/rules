@@ -30,9 +30,9 @@ override_dh_auto_install:
 
 	# Install custom libraries and update their RPATH
 	install -m 644 src/lib/*.so debian/fastflowlm/opt/fastflowlm/ || true
-	patchelf --set-rpath '/opt/fastflowlm' debian/fastflowlm/opt/fastflowlm/flm || true; \
+	patchelf --set-rpath '/opt/fastflowlm' debian/fastflowlm/opt/fastflowlm/flm; \
 	for lib in debian/fastflowlm/opt/fastflowlm/*.so; do \
 		if [ -f "$$lib" ]; then \
-			patchelf --set-rpath '/opt/fastflowlm' "$$lib" || true; \
+			patchelf --set-rpath '/opt/fastflowlm' "$$lib"; \
 		fi; \
 	done
