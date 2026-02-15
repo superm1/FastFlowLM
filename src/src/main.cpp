@@ -29,9 +29,35 @@
 
 #include "AutoModel/automodel.hpp"
 
+#ifndef _WIN32
+#include <dlfcn.h>
+#endif
+
 // Global variables
 ///@brief should_exit is used to control the server thread
 std::atomic<bool> should_exit(false);
+
+#ifndef _WIN32
+///@brief Preload critical XRT libraries from the executable directory
+///@details This ensures that dlopen() calls within libraries find the bundled versions
+///@note Only on Linux/Unix; Windows handles DLL loading differently
+void preload_bundled_libraries() {
+    std::string exe_dir = utils::get_executable_directory();
+
+    const std::vector<std::string> libraries = {
+        "libxrt_core.so.2",           // Core - no dependencies
+        "libxrt_coreutil.so.2",       // Depends on core
+        "libxrt_driver_xdna.so.2",    // Driver
+    };
+
+    // Try to load the library with RTLD_GLOBAL so symbols are available to dependent libraries
+    // Don't care about failures
+    for (const auto& lib : libraries) {
+        std::string lib_path = exe_dir + "/" + lib;
+        void* handle = dlopen(lib_path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    }
+}
+#endif
 
 
 
@@ -197,6 +223,9 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+#else
+    // Preload bundled libraries from executable directory
+    preload_bundled_libraries();
 #endif
     
     // Parse command line arguments using Boost Program Options
