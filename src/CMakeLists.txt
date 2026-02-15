@@ -292,19 +292,13 @@ endif()
 
 
 # ———————————————————————————————————————————————
-# Copy the build flm.exe into the lib directory
+# Copy the build flm.exe into the out directory (for local dev)
 # ———————————————————————————————————————————————
 if(WIN32)
     add_custom_command(TARGET flm POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
             $<TARGET_FILE:flm>
             ${CMAKE_SOURCE_DIR}/out/flm.exe
-    )
-else()
-    add_custom_command(TARGET flm POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-            $<TARGET_FILE:flm>
-            ${CMAKE_SOURCE_DIR}/out/flm
     )
 endif()
 
@@ -317,3 +311,11 @@ if(WIN32)
         DEPENDS flm
     )
 endif()
+
+# ———————————————————————————————————————————————
+# Install the flm binary (for proper deployment)
+# ———————————————————————————————————————————————
+install(TARGETS flm
+    RUNTIME DESTINATION bin
+    BUNDLE DESTINATION .
+)
