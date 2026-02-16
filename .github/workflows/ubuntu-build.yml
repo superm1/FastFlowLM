@@ -24,7 +24,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     env:
-      DEB_VERSION: b${{ github.run_number }}
+      DEB_VERSION: 0+b${{ github.run_number }}
     steps:
       - name: Get short SHA
         id: short_sha
