@@ -71,15 +71,10 @@ SOURCES += $(wildcard ../../common/modules/sampler.cpp)
 SOURCES += $(wildcard ../../include/whisper/whisper_npu.hpp)
 SOURCES += $(wildcard test.cpp)
 
-
-TARGET = $(BUILD_DIR)/whisper_npu.dll
-
 all: directories test
 
 directories:
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)/xclbins
-	mkdir -p $(LIB_DIR)
 
 $(BUILD_DIR)/test_whisper_npu.exe: $(SOURCES)
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/whisper_npu"
@@ -90,10 +85,8 @@ clean:
 
 
 test: directories $(BUILD_DIR)/test_whisper_npu.exe
-	cp ../../lib/*.dll $(BUILD_DIR)
-	cp -r ../../xclbins/Whisper* $(BUILD_DIR)/xclbins/
 	cp ../../model_list.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && ${PWSH} -Command ".\test_whisper_npu.exe -m whisper-v3 -p 0 -a test1.ogg -t 1 -r 1"
+	cd $(BUILD_DIR) && ${PWSH} -Command "\$$env:PATH = '..\..\..\lib;' + \$$env:PATH; .\test_whisper_npu.exe -m whisper-v3 -p 0 -a test1.ogg -t 1 -r 1"
 
 .PHONY: all clean test directories
 

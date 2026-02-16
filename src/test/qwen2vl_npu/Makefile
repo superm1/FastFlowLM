@@ -59,7 +59,6 @@ else
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
 
-
 SOURCES := $(wildcard ../../detail/qwen2vl_npu/*.hpp)
 SOURCES += $(wildcard ../../detail/qwen2vl_npu/*.cpp)
 SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
@@ -67,8 +66,6 @@ SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen2vl.cpp)
 SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
 SOURCES += $(wildcard ../../common/modules/sampler.cpp)
 SOURCES += $(wildcard test.cpp)
-
-TARGET = $(BUILD_DIR)/qwen2vl_npu.dll
 
 all: directories test
 
@@ -86,10 +83,8 @@ clean:
 
 
 test: directories $(BUILD_DIR)/test_qwen2vl_npu.exe
-	cp ../../lib/*.dll $(BUILD_DIR)
-	cp -r ../../xclbins/Qwen2.5-VL* $(BUILD_DIR)/xclbins/
 	cp ../../model_list.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && ${PWSH} -Command ".\test_qwen2vl_npu.exe -m qwen2.5vl-it -s 1 -p 0"
+	cd $(BUILD_DIR) && ${PWSH} -Command "\$$env:PATH = '..\..\..\lib;' + \$$env:PATH; .\test_qwen2vl_npu.exe -m qwen2.5vl-it -s 1 -p 0"
 
 .PHONY: all clean test directories
 

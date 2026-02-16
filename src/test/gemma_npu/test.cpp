@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 
     if (short_prompt) {
         uniformed_input.prompt = "Describe this?";
-        uniformed_input.images.push_back("../../../../tb_files/panda.png");
+        uniformed_input.images.push_back("../../../tb_files/panda.png");
         uniformed_input.image_payload_types.push_back(input_payload_type_t::FILE_NAME);
         std::cout << "Prompt: " << uniformed_input.prompt << std::endl;
         std::cout << "Response: ";
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
         std::cout << chat->show_profile() << std::endl;
     }
     else{
-        std::ifstream file("../../../../prompt.txt", std::ios::binary);
+        std::ifstream file("../../../prompt.txt", std::ios::binary);
         if (!file.is_open()) {
             std::cout << "Failed to open prompt file" << std::endl;
             return 1;

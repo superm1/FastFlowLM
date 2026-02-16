@@ -5,6 +5,7 @@
 #include "AutoModel/modeling_gemma3_text.hpp"
 #include "model_list.hpp"
 
+xrt::device npu_device_global;
 // Model-specific factory function for Gemma3 Text family only
 inline std::pair<std::string, std::unique_ptr<AutoModel>> get_gemma_text_model(const std::string& model_tag, xrt::device* npu_device_inst) {
     static std::unordered_set<std::string> gemma3_text_Tags = {
@@ -27,34 +28,35 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_gemma_text_model(c
 int main(int argc, char* argv[]) {
     arg_utils::po::options_description desc("Allowed options");
     arg_utils::po::variables_map vm;
-    arg_utils::add_default_options(desc);
+
     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");
     desc.add_options()("Short,s", arg_utils::po::value<bool>()->default_value(true), "Short Prompt");
     desc.add_options()("Preemption,p", arg_utils::po::value<bool>()->default_value(false), "Preemption");
-    arg_utils::parse_options(argc, argv, desc, vm);
+
+    arg_utils::po::store(arg_utils::po::parse_command_line(argc, argv, desc), vm);
 
     std::string tag = vm["model"].as<std::string>();
     bool short_prompt = vm["Short"].as<bool>();
     bool preemption = vm["Preemption"].as<bool>();
 
-    std::cout << "Model: " << tag << std::endl;
-    std::string model_list_path = "model_list.json";
-    std::string exe_dir = ".";
-    model_list model_list(model_list_path, exe_dir);
+   std::cout << "Model: " << tag << std::endl;
+    std::string exe_dir = utils::get_executable_directory();
+    std::string model_dir = utils::get_models_directory();
+    std::string model_list_path = exe_dir + "/model_list.json";
+    model_list model_list(model_list_path, model_dir);
+
+
    
     header_print("info", "Initializing chat model...");
     std::string model_path = model_list.get_model_path(tag);
-    nlohmann::json model_info = model_list.get_model_info(tag);
+    std::pair<std::string, nlohmann::json> model_info_pair = model_list.get_model_info(tag);
+    nlohmann::json model_info = model_info_pair.second;
+    std::cout << "Model path: " << model_path << std::endl;
+    std::cout << "Model info" << model_info.dump(4) << std::endl;
 
-    auto npu_device_global = xrt::device(0);
-
-    // Use model-specific factory
-    auto [actual_tag, chat] = get_gemma_text_model(tag, &npu_device_global);
-    if (actual_tag != tag) {
-        std::cout << "Model tag adjusted to: " << actual_tag << std::endl;
-        model_path = model_list.get_model_path(actual_tag);
-        model_info = model_list.get_model_info(actual_tag);
-    }
+    
+    npu_device_global = xrt::device(0); 
+    std::unique_ptr<AutoModel> chat = std::make_unique<Gemma3_Text_Only>(&npu_device_global);
    
     chat->load_model(model_path, model_info, -1, preemption);
     chat->set_topk(1);

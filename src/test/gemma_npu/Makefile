@@ -15,48 +15,8 @@
 # =============================================================================
 
 # Check if it is in Windows Subsystem for Linux (WSL)
-ifeq ($(shell uname -a | grep -i WSL),)
-	WSL := 0
-else
-	WSL := 1
-endif
-
-BUILD_DIR := ../../build/gemma_npu/test
-LIB_DIR := ../../lib
-BIN_DIR := $(BUILD_DIR)/bin
+-include ../common.mk
 ifeq ($(WSL), 0)
-# Linux build environment
-# Use g++-13 directly without CMake
-
-COMMON_LIB_DIR := ../../build/common/lib
-
-TARGET = $(LIB_DIR)/libgemma_npu.so
-
-CXX := g++-13
-CXX_FLAGS := -std=c++20 -fPIC -Wall -DUSEAVX2=1
-CXX_FLAGS += -mavx2 -mfma -march=native -ffast-math
-CXX_FLAGS += -fmax-errors=1
-CXX_FLAGS += -I../../include
-CXX_FLAGS += -I../q4nx
-CXX_FLAGS += -I/opt/xilinx/xrt/include
-CXX_FLAGS += -MMD -MP
-
-
-# Flags for test executable
-TEST_FLAGS := $(CXX_FLAGS)
-TEST_FLAGS += -L$(LIB_DIR)
-TEST_FLAGS += -Wl,-rpath,$(LIB_DIR)
-
-LDFLAGS += -L/opt/xilinx/xrt/lib
-LDFLAGS += -Wl,-rpath,/opt/xilinx/xrt/lib
-LDFLAGS += -lxrt_coreutil
-LDFLAGS += -lboost_program_options -lboost_filesystem
-LDFLAGS += -L$(LIB_DIR) -Wl,-rpath,$(LIB_DIR)
-LDFLAGS += -L../../build/lib
-LDFLAGS += -L../../build/tokenizer/lib
-LDFLAGS += -ltokenizers_cpp -ltokenizers_c -l sentencepiece
-LDFLAGS += -lgemma_npu -ldequant -lgemm -llm_head -lq4_npu_eXpress -lnpu_utils
-
 
 TEST_SOURCES += test.cpp
 TEST_SOURCES += ../../common/AutoModel/automodel.cpp
@@ -99,9 +59,6 @@ else
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
 
-
-TARGET = $(BUILD_DIR)/gemma_npu.dll
-
 SOURCES := test.cpp
 SOURCES += ../../common/AutoModel/automodel.cpp
 SOURCES += ../../common/AutoModel/modeling_gemma3.cpp
@@ -113,13 +70,11 @@ SOURCES += $(wildcard ../../detail/gemma_npu/*.cpp)
 
 all: directories test
 
+
 directories:
 	mkdir -p $(BUILD_DIR)
-	mkdir -p $(BIN_DIR)
-	mkdir -p $(BIN_DIR)/xclbins
-	mkdir -p $(LIB_DIR)
 
-$(BIN_DIR)/test_gemma_npu.exe: $(SOURCES)
+$(BUILD_DIR)/test_gemma_npu.exe: $(SOURCES)
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/gemma_npu"
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake --build . --config Release --target test_gemma_npu_target"
 
@@ -127,12 +82,9 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-test: directories $(BIN_DIR)/test_gemma_npu.exe
-	cp ../../lib/*.dll $(BIN_DIR)
-	cp -r ../../xclbins/Gemma3-4B-NPU2 $(BIN_DIR)/xclbins/
-	cp -r ../../xclbins/Medgemma-4B-NPU2 $(BIN_DIR)/xclbins/
-	cp ../../model_list.json $(BIN_DIR)/model_list.json
-	cd $(BIN_DIR) && ${PWSH} -Command ".\test_gemma_npu.exe -m gemma3:4b -s 1 -p 0"
+test: directories $(BUILD_DIR)/test_gemma_npu.exe
+	cp ../../model_list.json $(BUILD_DIR)/model_list.json
+	cd $(BUILD_DIR) && ${PWSH} -Command "\$$env:PATH = '..\..\..\lib;' + \$$env:PATH; .\test_gemma_npu.exe -m gemma3:4b -s 1 -p 0"
 
 .PHONY: all clean test directories
 

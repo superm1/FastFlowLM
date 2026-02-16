@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
         uniformed_input.prompt = "Describe this image in brief?";
         // uniformed_input.prompt = "Who are you?";
         //uniformed_input.images.push_back("C:/Users/alfred/Projects/FastFlowLM_Dev/libraries/panda.png");
-        uniformed_input.images.push_back("../../../../tb_files/panda.png");
+        uniformed_input.images.push_back("../../../tb_files/panda.png");
         std::cout << "Prompt: " << uniformed_input.prompt << std::endl;
         std::cout << "Response: ";
         chat->start_total_timer();

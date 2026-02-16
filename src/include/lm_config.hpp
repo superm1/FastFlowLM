@@ -69,7 +69,7 @@ class LM_Config{
             // #define DEV_BUILD
             #ifdef DEV_BUILD
             #ifdef __WINDOWS__
-                this->exec_path = "..\\..\\";
+                this->exec_path = "..\\..\\..\\";
             #else
                 this->exec_path = "../../../";
             #endif
@@ -177,7 +177,7 @@ public:
         this->model_path = model_name;
         #ifdef DEV_BUILD
         #ifdef __WINDOWS__
-            this->exec_path = "..\\..\\";
+            this->exec_path = "..\\..\\..\\";
         #else
             this->exec_path = "../../../";
         #endif
