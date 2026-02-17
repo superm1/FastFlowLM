@@ -221,27 +221,6 @@
             }
         },
         "gemma3": {
-            "270m": {
-                "name": "Gemma3-270M-NPU2",
-                "url": "https://huggingface.co/FastFlowLM/Gemma3-270M-NPU2/resolve/v0.9.20-faster-q4-1",
-                "file_url": "https://huggingface.co/api/models/FastFlowLM/Gemma3-270M-NPU2/tree/v0.9.20-faster-q4-1",
-                "size": 270000000,
-                "default_context_length": 32768,
-                "flm_min_version": "0.9.20",
-                "files": [
-                    "config.json",
-                    "model.q4nx",
-                    "tokenizer.json",
-                    "tokenizer_config.json"
-                ],
-                "details": {
-                    "family": "gemma3-text",
-                    "think": false,
-                    "think_toggleable": false,
-                    "parameter_size": "270M",
-                    "quantization_level": "Q4_1"
-                }
-            },
             "1b": {
                 "name": "Gemma3-1B-NPU2",
                 "url": "https://huggingface.co/FastFlowLM/Gemma3-1B-NPU2/resolve/v0.9.20-faster-q4-1",

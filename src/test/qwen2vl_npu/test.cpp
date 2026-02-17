@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     npu_device_global = xrt::device(0); 
    
     chat->load_model(model_path, model_info, -1, preemption);
-    // chat->set_topk(1);
+    chat->set_topk(1);
     chat->set_topp(0.8f);
     chat->set_temperature(0.7f);
     chat->set_repetition_penalty(1.01f);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
     if (short_prompt) {
         uniformed_input.prompt = "What is this?";
         std::cout << "Prompt: " << uniformed_input.prompt << std::endl;
-        uniformed_input.images.push_back("../../../tb_files/error_text.png");
+        uniformed_input.images.push_back("../../../tb_files/panda.png");
         std::cout << "Response: ";
         chat->start_total_timer();
         std::string response = chat->generate_with_prompt(meta_info, uniformed_input, 1024, std::cout);
