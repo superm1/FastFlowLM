@@ -3,12 +3,12 @@ name: Build Packages
 on:
   push:
     branches:
-      - linux
+      - main
     tags:
       - '*'
   pull_request:
     branches:
-      - linux
+      - main
   workflow_dispatch:
 
 jobs:
