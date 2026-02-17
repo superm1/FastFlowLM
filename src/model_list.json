@@ -289,6 +289,32 @@
                 }
             }
         },
+        "translategemma": {
+            "4b": {
+                "name": "Translategemma-4B-Instruct-NPU2",
+                "url": "https://huggingface.co/FastFlowLM/Translategemma-4B-Instruct-NPU2/resolve/main",
+                "file_url": "https://huggingface.co/api/models/FastFlowLM/Translategemma-4B-Instruct-NPU2/tree/main",
+                "modified_at": "2025-05-30T00:00:00Z",
+                "size": 4000000000,
+                "default_context_length": 65536,
+                "vlm": true,
+                "flm_min_version": "0.9.34",
+                "files": [
+                    "config.json",
+                    "model.q4nx",
+                    "tokenizer.json",
+                    "tokenizer_config.json", 
+                    "vision_weight.q4nx"
+                ],
+                "details": {
+                    "family": "gemma3",
+                    "think": false,
+                    "think_toggleable": false,
+                    "parameter_size": "4B",
+                    "quantization_level": "Q4_1"
+                }
+            }
+        },
         "medgemma": {
             "4b": {
                 "name": "Medgemma-4B-NPU2",
