@@ -1,4 +1,4 @@
-name: Build and Publish Container Images
+name: Publish Containers
 
 on:
   schedule:
