@@ -15,23 +15,26 @@
 # =============================================================================
 
 -include ../common.mk
+
+
+SOURCES += ../../common/AutoModel/automodel.cpp
+SOURCES += ../../common/AutoModel/modeling_qwen2vl.cpp
+SOURCES += ../../common/AutoModel/modeling_qwen2vl_image.cpp
+SOURCES += ../../common/image_process_utils/imageproc.cpp
+SOURCES += ../../common/image_process_utils/imageprocAVX512.cpp
+SOURCES += ../../common/tokenizer/tokenizer.cpp
+SOURCES += ../../common/modules/sampler.cpp
+SOURCES += test.cpp
+
+HEADERS += ../../include/qwen2vl/qwen2vl_npu.hpp
+
 ifeq ($(WSL), 0)
 # Linux build environment
 # Use g++-13 directly without CMake
 
 LDFLAGS += -lqwen2vl_npu
 LDFLAGS += -lavformat -lavcodec -lavutil -lswscale -lswresample
-
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_qwen2vl.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_qwen2vl_image.cpp
-TEST_SOURCES += ../../common/image_process_utils/imageproc.cpp
-TEST_SOURCES += ../../common/image_process_utils/imageprocAVX512.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
-
-HEADERS += ../../include/qwen2vl/qwen2vl_npu.hpp
+	
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
@@ -40,7 +43,7 @@ all: directories $(BUILD_DIR)/test_qwen2vl_npu
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_qwen2vl_npu: $(TEST_SOURCES) $(TEST_DEPS)
+$(BUILD_DIR)/test_qwen2vl_npu: $(SOURCES) $(TEST_DEPS)
 	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
@@ -58,14 +61,6 @@ else
 # WSL build environment
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
-
-SOURCES := $(wildcard ../../detail/qwen2vl_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/qwen2vl_npu/*.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen2vl.cpp)
-SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
-SOURCES += $(wildcard ../../common/modules/sampler.cpp)
-SOURCES += $(wildcard test.cpp)
 
 all: directories test
 

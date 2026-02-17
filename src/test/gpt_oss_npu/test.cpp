@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cmath>
 #define NOMINMAX
+#ifdef __WINDOWS__
 #include <windows.h>
+#endif
 #include "utils/utils.hpp"
 #include "utils/vm_args.hpp"
 #include "AutoModel/modeling_gpt_oss.hpp"

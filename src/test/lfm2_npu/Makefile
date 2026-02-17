@@ -14,20 +14,26 @@
 #
 # =============================================================================
 -include ../common.mk
-ifeq ($(WSL), 0)
 
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_lfm2.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
 
+SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
+SOURCES += $(wildcard ../../common/AutoModel/modeling_lfm2.cpp)
+SOURCES += $(wildcard ../../include/AutoModel/automodel.hpp)
+SOURCES += $(wildcard ../../include/AutoModel/modeling_lfm2.hpp)
+SOURCES += $(wildcard ../../include/lfm2/lfm2_npu.hpp)
+SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
+SOURCES += $(wildcard ../../common/modules/sampler.cpp)
+SOURCES += $(wildcard test.cpp)
 
 HEADERS += ../../include/lfm2/lfm2_npu.hpp
 HEADERS += ../../include/modules/embedding.hpp
 HEADERS += ../../include/modules/lm_head.hpp
 HEADERS += ../../include/modules/gemm.hpp
 HEADERS += ../../include/modules/dequant.hpp
+
+ifeq ($(WSL), 0)
+
+LDFLAGS += -llfm2_npu
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
@@ -36,17 +42,15 @@ all: directories $(BUILD_DIR)/test_lfm2_npu
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_lfm2_npu: $(TEST_SOURCES) $(TEST_DEPS)
-	$(CXX) $(TEST_FLAGS) -o $@ $^ $(LDFLAGS)
+$(BUILD_DIR)/test_lfm2_npu: $(SOURCES) $(TEST_DEPS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 test: $(BUILD_DIR)/test_lfm2_npu
-	make -C ../../detail/lfm2_npu
-	cp $(LIB_DIR)/*.so $(BUILD_DIR)
-	cp ../../model_list_linux.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_lfm2_npu --model lfm2 -s 1
+	cp ../../model_list.json $(BUILD_DIR)/model_list.json
+	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib && ./test_lfm2_npu --model lfm2 -s 1
 
 -include $(TEST_DEPS)
 .PHONY: all clean test directories
@@ -61,17 +65,6 @@ all: directories test
 
 directories:
 	mkdir -p $(BUILD_DIR)
-
-SOURCES := $(wildcard ../../detail/lfm2_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/lfm2_npu/*.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/modeling_lfm2.cpp)
-SOURCES += $(wildcard ../../include/AutoModel/automodel.hpp)
-SOURCES += $(wildcard ../../include/AutoModel/modeling_lfm2.hpp)
-SOURCES += $(wildcard ../../include/lfm2/lfm2_npu.hpp)
-SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
-SOURCES += $(wildcard ../../common/modules/sampler.cpp)
-SOURCES += $(wildcard test.cpp)
 
 $(BUILD_DIR)/test_lfm2_npu.exe: $(SOURCES)
 	cd $(BUILD_DIR) && $(PWSH) -Command "cmake ../../../test/lfm2_npu"

@@ -440,14 +440,9 @@ public:
     ///@see buffer
     template<typename T>
     buffer<T> create_bo_buffer(size_t size){
-        #ifdef __WINDOWS__
-        assert(this->xclbin_valid);
         assert(size > 0);
         LOG_VERBOSE(2, "Creating buffer buffer with size: " << size);
         return buffer<T>(*this->device, size);
-        #else
-        throw std::runtime_error("Buffer can only be create from an app (kernel) on linux host.");
-        #endif
     }
 
     ///@brief Get the name of the xclbin
@@ -555,18 +550,14 @@ public:
         LOG_VERBOSE(1, "Trace written successfully!");
     }
     
-    ///@brief Create a buffer
+    ///@brief Create a buffer with real bo
     ///@param size size of the buffer
     ///@see buffer
     template<typename T>
     buffer<T> create_bo_buffer(size_t size){
-        #ifdef __WINDOWS__
         assert(size > 0);
         LOG_VERBOSE(2, "Creating buffer buffer with size: " << size);
         return buffer<T>(*this->device, size);
-        #else
-        throw std::runtime_error("Buffer can only be create from an app (kernel) on linux host.");
-        #endif
     }
 
     inline bool is_preemption_enabled(){

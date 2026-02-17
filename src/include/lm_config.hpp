@@ -138,9 +138,6 @@ class LM_Config{
             assert(this->num_attention_heads > 0);
             assert(this->num_hidden_layers > 0);
             assert(this->num_key_value_heads > 0);
-            assert(this->rms_norm_eps > 0);
-            assert(this->addr_qk > 0);
-            assert(this->addr_kv > 0);
             this->vision_model_weight = this->model_path + "/" + this->vision_model_weight;
         }
         std::string _str(){

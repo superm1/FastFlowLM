@@ -16,20 +16,12 @@
 
 -include ../common.mk
 
-ifeq ($(WSL), 0)
-# Linux build environment
-# Use g++-13 directly without CMake
-
-LDFLAGS += -lwhisper_npu
-LDFLAGS += -lfftw3 -lfftw3f -lfftw3l
-LDFLAGS += -lavformat -lavcodec -lavutil -lswscale -lswresample
-
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/whisper/modeling_whisper_audio.cpp
-TEST_SOURCES += ../../common/whisper/modeling_whisper.cpp
+SOURCES += test.cpp
+SOURCES += ../../common/AutoModel/automodel.cpp
+SOURCES += ../../common/modules/sampler.cpp
+SOURCES += ../../common/tokenizer/tokenizer.cpp
+SOURCES += ../../common/whisper/modeling_whisper_audio.cpp
+SOURCES += ../../common/whisper/modeling_whisper.cpp
 
 HEADERS += ../../include/llama/whisper_npu.hpp
 HEADERS += ../../include/llama/whisper_npu_sequence.hpp
@@ -38,6 +30,15 @@ HEADERS += ../../include/modules/lm_head.hpp
 HEADERS += ../../include/modules/gemm.hpp
 HEADERS += ../../include/modules/dequant.hpp
 
+ifeq ($(WSL), 0)
+# Linux build environment
+# Use g++-13 directly without CMake
+
+LDFLAGS += -lwhisper_npu
+LDFLAGS += -lfftw3 -lfftw3f -lfftw3l
+LDFLAGS += -lavformat -lavcodec -lavutil -lswscale -lswresample
+
+
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
 all: directories $(BUILD_DIR)/test_whisper_npu
@@ -45,7 +46,7 @@ all: directories $(BUILD_DIR)/test_whisper_npu
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_whisper_npu: $(TEST_SOURCES) $(TEST_DEPS)
+$(BUILD_DIR)/test_whisper_npu: $(SOURCES) $(TEST_DEPS)
 	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
@@ -63,13 +64,6 @@ else
 # WSL build environment
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
-
-SOURCES += $(wildcard ../../common/whisper/modeling_whisper.cpp)
-SOURCES += $(wildcard ../../common/whisper/modeling_whisper_audio.cpp)
-SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
-SOURCES += $(wildcard ../../common/modules/sampler.cpp)
-SOURCES += $(wildcard ../../include/whisper/whisper_npu.hpp)
-SOURCES += $(wildcard test.cpp)
 
 all: directories test
 

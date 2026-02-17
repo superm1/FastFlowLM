@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
     if (short_prompt) {
         uniformed_input.prompt = "What is this?";
         std::cout << "Prompt: " << uniformed_input.prompt << std::endl;
-        uniformed_input.images.push_back("../../../tb_files/puppy.png");
+        uniformed_input.images.push_back("../../../tb_files/error_text.png");
         std::cout << "Response: ";
         chat->start_total_timer();
         std::string response = chat->generate_with_prompt(meta_info, uniformed_input, 1024, std::cout);

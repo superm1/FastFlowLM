@@ -14,19 +14,25 @@
 #
 # =============================================================================
 -include ../common.mk
-ifeq ($(WSL), 0)
 
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_qwen3vl.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_qwen3vl_image.cpp
-TEST_SOURCES += ../../common/image_process_utils/imageproc.cpp
-TEST_SOURCES += ../../common/image_process_utils/imageprocAVX512.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
+
+SOURCES += test.cpp
+SOURCES += ../../common/AutoModel/automodel.cpp
+SOURCES += ../../common/AutoModel/modeling_qwen3vl.cpp
+SOURCES += ../../common/AutoModel/modeling_qwen3vl_image.cpp
+SOURCES += ../../common/image_process_utils/imageproc.cpp
+SOURCES += ../../common/image_process_utils/imageprocAVX512.cpp
+SOURCES += ../../common/tokenizer/tokenizer.cpp
+SOURCES += ../../common/modules/sampler.cpp
 
 HEADERS += ../../include/qwen3vl/qwen3vl_npu_sequence.hpp
 HEADERS += ../../include/qwen3vl/qwen3vl_npu.hpp
+
+
+ifeq ($(WSL), 0)
+
+LDFLAGS += -lqwen3vl_npu
+LDFLAGS += -lavformat -lavcodec -lavutil -lswscale -lswresample
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
@@ -35,17 +41,15 @@ all: directories $(BUILD_DIR)/test_qwen3vl_npu
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_qwen3vl_npu: $(TEST_SOURCES) $(TEST_DEPS)
-	$(CXX) $(TEST_FLAGS) -o $@ $^ $(LDFLAGS)
+$(BUILD_DIR)/test_qwen3vl_npu: $(SOURCES) $(TEST_DEPS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-test: $(BUILD_DIR)/test_qwen3vl_npu
-	make -C ../../detail/qwen3vl_npu
-	cp $(LIB_DIR)/*.so $(BUILD_DIR)
-	cp ../../model_list_linux.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_qwen3vl_npu --model qwen3vl-it -s 1
+test: $(BUILD_DIR)/
+	cp ../../model_list.json $(BUILD_DIR)/model_list.json
+	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib && ./test_qwen3vl_npu --model qwen3vl-it -s 1
 
 -include $(TEST_DEPS)
 .PHONY: all clean test directories
@@ -55,16 +59,6 @@ else
 # WSL build environment
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
-SOURCES := $(wildcard ../../detail/qwen3vl_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/qwen3vl_npu/*.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen3vl.cpp)
-SOURCES += $(wildcard ../../include/AutoModel/automodel.hpp)
-SOURCES += $(wildcard ../../include/AutoModel/modeling_qwen3vl.hpp)
-SOURCES += $(wildcard ../../include/qwen3vl/qwen3vl_npu.hpp)
-SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
-SOURCES += $(wildcard ../../common/modules/sampler.cpp)
-SOURCES += $(wildcard test.cpp)
 
 all: directories test
 

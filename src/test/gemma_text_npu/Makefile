@@ -14,36 +14,37 @@
 #
 # =============================================================================
 -include ../common.mk
-ifeq ($(WSL), 0)
 
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_gemma3_text.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
+SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
+SOURCES += $(wildcard ../../common/AutoModel/modeling_gemma3_text.cpp)
+SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
+SOURCES += $(wildcard ../../common/modules/sampler.cpp)
+SOURCES += $(wildcard test.cpp)
 
 HEADERS += ../../include/gemma_text/gemma_text_npu.hpp
 HEADERS += ../../include/gemma_text/gemma_text_npu_sequence.hpp
 HEADERS += ../../include/gemma_text/gemma_text_lm_head.hpp
 
+ifeq ($(WSL), 0)
+
+LDFLAGS += -lgemma_text_npu
+
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
-all: directories $(BUILD_DIR)/test_gemma_text_npu
+all: directories $(BUILD_DIR)/test_gemma_text_npu test
 
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_gemma_text_npu: $(TEST_SOURCES) $(TEST_DEPS)
-	$(CXX) $(TEST_FLAGS) -o $@ $^ $(LDFLAGS)
+$(BUILD_DIR)/test_gemma_text_npu: $(SOURCES) $(TEST_DEPS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 test: $(BUILD_DIR)/test_gemma_text_npu
-	make -C ../../detail/gemma_text_npu
-	cp $(LIB_DIR)/libgemma_text_npu.so $(BUILD_DIR)
-	cp ../../../model_list_linux.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_gemma_text_npu --model gemma3:270m -s 1
+	cp ../../model_list.json $(BUILD_DIR)/model_list.json
+	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib && ./test_gemma_text_npu --model gemma3:1b -s 1
 
 -include $(TEST_DEPS)
 .PHONY: all clean test directories
@@ -53,14 +54,6 @@ else
 # WSL build environment
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
-
-SOURCES := $(wildcard ../../detail/gemma_text_npu/*.hpp)
-SOURCES += $(wildcard ../../detail/gemma_text_npu/*.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/modeling_gemma3_text.cpp)
-SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
-SOURCES += $(wildcard ../../common/modules/sampler.cpp)
-SOURCES += $(wildcard test.cpp)
 
 all: directories test
 

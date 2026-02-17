@@ -14,17 +14,18 @@
 #
 # =============================================================================
 -include ../common.mk
-ifeq ($(WSL), 0)
 
-
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_qwen33.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
-
+SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
+SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen3.cpp)
+SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
+SOURCES += $(wildcard ../../common/modules/sampler.cpp)
+SOURCES += $(wildcard test.cpp)
 HEADERS += ../../include/qwen3/qwen3_npu_sequence.hpp
 HEADERS += ../../include/qwen3/qwen3_npu.hpp
+
+ifeq ($(WSL), 0)
+
+LDFLAGS += -lqwen3_npu
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
@@ -33,17 +34,15 @@ all: directories $(BUILD_DIR)/test_qwen3_npu
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_qwen3_npu: $(TEST_SOURCES) $(TEST_DEPS)
-	$(CXX) $(TEST_FLAGS) -o $@ $^ $(LDFLAGS)
+$(BUILD_DIR)/test_qwen3_npu: $(SOURCES) $(TEST_DEPS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 test: directories $(BUILD_DIR)/test_qwen3_npu
-	make -C ../../detail/qwen3_npu
-	cp $(LIB_DIR)/*.so $(BUILD_DIR)
-	cp ../../model_list_linux.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../../build/lib && ./test_qwen3_npu --model qwen33:8b -s 1
+	cp ../../model_list.json $(BUILD_DIR)/model_list.json
+	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib && ./test_qwen3_npu --model qwen3:4b -s 1
 
 -include $(TEST_DEPS)
 .PHONY: all clean test directories
@@ -53,12 +52,6 @@ else
 # WSL build environment
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
-
-SOURCES += $(wildcard ../../common/AutoModel/automodel.cpp)
-SOURCES += $(wildcard ../../common/AutoModel/modeling_qwen33.cpp)
-SOURCES += $(wildcard ../../common/tokenizer/tokenizer.cpp)
-SOURCES += $(wildcard ../../common/modules/sampler.cpp)
-SOURCES += $(wildcard test.cpp)
 
 all: directories test
 

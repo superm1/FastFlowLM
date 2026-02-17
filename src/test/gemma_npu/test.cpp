@@ -8,8 +8,10 @@
 xrt::device npu_device_global;
 
 int main(int argc, char* argv[]) {
+#ifdef __WINDOWS__
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+#endif
     arg_utils::po::options_description desc("Allowed options");
     arg_utils::po::variables_map vm;
     desc.add_options()("model,m", arg_utils::po::value<std::string>()->required(), "Model file");

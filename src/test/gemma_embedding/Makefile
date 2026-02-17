@@ -14,35 +14,35 @@
 #
 # =============================================================================
 -include ../common.mk
+
+SOURCES += test.cpp
+SOURCES += ../../common/AutoEmbeddingModel/auto_embedding_model.cpp
+SOURCES += ../../common/AutoEmbeddingModel/modeling_gemma_embedding.cpp
+SOURCES += ../../common/tokenizer/tokenizer.cpp
+
+HEADERS += ../../include/AutoEmbeddingModel/auto_embedding_model.hpp
+HEADERS += ../../include/AutoEmbeddingModel/modeling_gemma_embedding.hpp
+HEADERS += ../../include/tokenizer/tokenizer.hpp
+
 ifeq ($(WSL), 0)
 
-TEST_SOURCES += test.cpp
-TEST_SOURCES += ../../common/AutoModel/automodel.cpp
-TEST_SOURCES += ../../common/AutoModel/modeling_gemma3_text.cpp
-TEST_SOURCES += ../../common/tokenizer/tokenizer.cpp
-TEST_SOURCES += ../../common/modules/sampler.cpp
-
-HEADERS += ../../include/gemma_text/gemma_embedding.hpp
-HEADERS += ../../include/gemma_text/gemma_embedding_sequence.hpp
-HEADERS += ../../include/gemma_text/gemma_text_lm_head.hpp
+LDFLAGS += -lgemma_embedding
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
-all: directories $(BUILD_DIR)/test_gemma_embedding
+all: directories test
 
 directories:
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/test_gemma_embedding: $(TEST_SOURCES) $(TEST_DEPS)
-	$(CXX) $(TEST_FLAGS) -o $@ $^ $(LDFLAGS)
+$(BUILD_DIR)/test_gemma_embedding: $(SOURCES) $(TEST_DEPS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 test: $(BUILD_DIR)/test_gemma_embedding
-	make -C ../../detail/gemma_embedding
-	cp $(LIB_DIR)/libgemma_embedding.so $(BUILD_DIR)
-	cp ../../../model_list_linux.json $(BUILD_DIR)/model_list.json
+	cp ../../model_list.json $(BUILD_DIR)/model_list.json
 	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib && ./test_gemma_embedding --model embed-gemma:300m -s 1
 
 -include $(TEST_DEPS)
@@ -53,15 +53,6 @@ else
 # WSL build environment
 # Use CMake to invoke the Visual Studio
 PWSH := powershell.exe
-
-SOURCES += test.cpp
-SOURCES += ../../common/AutoEmbeddingModel/auto_embedding_model.cpp
-SOURCES += ../../common/AutoEmbeddingModel/modeling_gemma_embedding.cpp
-SOURCES += ../../common/tokenizer/tokenizer.cpp
-
-HEADERS += ../../include/AutoEmbeddingModel/auto_embedding_model.hpp
-HEADERS += ../../include/AutoEmbeddingModel/modeling_gemma_embedding.hpp
-HEADERS += ../../include/tokenizer/tokenizer.hpp
 
 all: directories test
 
