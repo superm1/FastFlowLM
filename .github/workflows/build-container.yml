@@ -1,4 +1,4 @@
-name: Build and Publish Container Images
+name: Publish Containers
 
 on:
   schedule:
@@ -12,6 +12,8 @@ jobs:
       matrix:
         include:
           - ubuntu_version: "24.04"
+            ubuntu_ppa: "ppa:superm1/xrt"
+          - ubuntu_version: "25.10"
             ubuntu_ppa: "ppa:superm1/xrt"
           - ubuntu_version: "26.04"
             ubuntu_ppa: ""
@@ -38,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/superm1/fastflowlm/build-environment
+          images: ghcr.io/fastflowlm/fastflowlm/build-environment
           tags: |
             type=raw,value=ubuntu${{ matrix.ubuntu_version }}
             type=raw,value=latest,enable=${{ matrix.ubuntu_version == '26.04' }}

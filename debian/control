@@ -28,6 +28,6 @@ Standards-Version: 4.7.3
 
 Package: fastflowlm
 Architecture: amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libxrt-npu2
 Description: FastFlowLM CLI
  FastFlowLM runtime and CLI.
