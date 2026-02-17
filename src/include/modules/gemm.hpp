@@ -23,7 +23,9 @@ public:
 
     /// \brief Generate the sequence
     void generate_seq(npu_sequence* seq, const uint32_t M, const uint32_t K, const uint32_t N, const uint32_t weight_offset);
-
+    uint32_t get_m() const;
+    uint32_t get_k() const;
+    uint32_t get_n() const;
 private:
     struct Impl;
     Impl* _impl;
