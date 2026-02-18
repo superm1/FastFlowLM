@@ -837,7 +837,13 @@ void RestHandler::handle_openai_chat_completion(const json& request,
             header_print("FLM", "Start prefill...");
             bool success = auto_chat_engine->insert(meta_info, uniformed_input);
             if (!success) {
-                json error_response = { {"error", "Max length reached"} };
+                json error_response = {
+                    {"error", {
+                        {"message", "Max length reached!"},
+                        {"type", "model_error"},
+                        {"code", 400}
+                    }}
+                };
                 send_response(error_response);
                 return;
             }

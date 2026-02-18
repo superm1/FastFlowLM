@@ -664,7 +664,22 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
 
         // catch is_deferred 
         auto send_response = [&res, session, this, request_id, needs_npu, is_deferred](const json& response_data) {
-            res.result(http::status::ok);
+            http::status status = http::status::ok;
+
+            if (response_data.contains("error") &&
+                response_data["error"].contains("code"))
+            {
+                int code = response_data["error"]["code"].get<int>();
+
+                if (code == 400) {
+                    status = http::status::bad_request;
+                }
+                //else if () {
+
+                //}
+            }
+
+            res.result(status);
             res.body() = response_data.dump();
             res.set(http::field::content_type, "application/json");
             res.prepare_payload();
