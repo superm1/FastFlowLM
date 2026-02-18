@@ -340,8 +340,8 @@ inline bool check_file_exists(std::string name) {
 }
 
 
-/// \brief get the user's Documents directory on Windows
-/// \return the user's Documents directory path
+/// \brief get the user's Documents directory on Windows or config directory on Linux
+/// \return the user's Documents directory path on Windows, ~/.config on Linux
 inline std::string get_user_documents_directory() {
 #ifdef _WIN32
     char buffer[MAX_PATH];
@@ -353,7 +353,7 @@ inline std::string get_user_documents_directory() {
 #else
     const char* home = std::getenv("HOME");
     if (home && *home) {
-        return std::string(home) + "/Documents";
+        return std::string(home) + "/.config";
     }
     return ".";
 #endif
@@ -443,7 +443,7 @@ inline int get_server_port(int user_port) {
     return 52625; // Default port
 }
 
-///@brief get_models_directory gets the models directory from environment variable or defaults to Documents
+///@brief get_models_directory gets the models directory from environment variable or defaults to Documents/flm/models on Windows or ~/.config/flm on Linux
 ///@return the models directory path
 inline std::string get_models_directory() {
 #ifdef _WIN32
@@ -462,9 +462,13 @@ inline std::string get_models_directory() {
         return std::string(model_path_env);
     }
 #endif
-    // Fallback to Documents directory if environment variable is not set
+    // Fallback to Documents/flm/models on Windows or ~/.config/flm on Linux if environment variable is not set
     std::string documents_dir = get_user_documents_directory();
+#ifdef _WIN32
     return documents_dir + "/flm/models";
+#else
+    return documents_dir + "/flm";
+#endif
 }
 
 } // end of namespace utils

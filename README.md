@@ -50,8 +50,11 @@ flm run llama3.2:1b
 > **Notes:**
 > - Internet access to HuggingFace is required to download the optimized model kernels.
 > - Sometimes downloads from HuggingFace may get corrupted. If this happens, run `flm pull <model_tag> --force` (e.g. `flm pull llama3.2:1b --force`) to re-download and fix them.
-> - By default, models are stored in: `C:\Users\<USER>\Documents\flm\models\`  
-> - During installation, you can select a different base folder (e.g., if you choose `C:\Users\<USER>\flm`, models will be saved under `C:\Users\<USER>\flm\models\`).  
+> - By default, models are stored in:
+>   - **Windows**: `C:\Users\<USER>\Documents\flm\models\`
+>   - **Linux**: `~/.config/flm/`
+> - During installation on Windows, you can select a different base folder (e.g., if you choose `C:\Users\<USER>\flm`, models will be saved under `C:\Users\<USER>\flm\models\`).
+> - On Linux, you can override the default location by setting the `FLM_MODEL_PATH` environment variable.
 > - ⚠️ If HuggingFace is not accessible in your region, manually download the model ([check this issue](https://github.com/FastFlowLM/FastFlowLM/issues/2)) and place it in the chosen directory.   
 
 🎉🚀 FastFlowLM (FLM) is ready — your NPU is unlocked and you can start chatting with models right away!

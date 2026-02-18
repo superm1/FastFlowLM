@@ -120,9 +120,8 @@ std::string get_user_documents_directory() {
 ///@brief ensure_models_directory creates the models directory if it doesn't exist
 ///@param exe_dir the executable directory
 void ensure_models_directory(const std::string& exe_dir) {
-    // Use Documents directory for models instead of executable directory
-    std::string documents_dir = get_user_documents_directory();
-    std::string models_dir = documents_dir + "/flm/models";
+    // Use Documents/flm/models directory on Windows or ~/.config/flm on Linux for models instead of executable directory
+    std::string models_dir = utils::get_models_directory();
     if (!std::filesystem::exists(models_dir)) {
         std::filesystem::create_directories(models_dir);
     }
@@ -191,7 +190,7 @@ int get_server_port(int user_port) {
     return 52625; // Default port
 }
 
-///@brief get_models_directory gets the models directory from environment variable or defaults to Documents
+///@brief get_models_directory gets the models directory from environment variable or defaults to Documents/flm/models on Windows or ~/.config/flm on Linux
 ///@return the models directory path
 std::string get_models_directory() {
 #ifdef _WIN32
@@ -210,9 +209,13 @@ std::string get_models_directory() {
         return std::string(model_path_env);
     }
 #endif
-    // Fallback to Documents directory if environment variable is not set
+    // Fallback to Documents/flm/models on Windows or ~/.config/flm on Linux if environment variable is not set
     std::string documents_dir = get_user_documents_directory();
+#ifdef _WIN32
     return documents_dir + "/flm/models";
+#else
+    return documents_dir + "/flm";
+#endif
 }
 
 ///@brief main function
