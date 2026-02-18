@@ -333,7 +333,7 @@ int main(int argc, char* argv[]) {
         }
         else if (command == "run") {
             check_and_notify_new_version();
-            Runner runner(availble_models, downloader, tag, asr, embed, ctx_length, preemption);
+            Runner runner(availble_models, downloader, tag, asr, embed, ctx_length, resize, preemption);
             runner.run();
 
         } else if (command == "serve") {

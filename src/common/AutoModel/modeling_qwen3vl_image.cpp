@@ -519,7 +519,7 @@ void Qwen3VL::preprocess_image(qwen3vl_image_t& image, std::vector<bf16> &pixel_
 
     //std::cout << "height "<< height << " width " << width <<std::endl;
 
-    int target_longest_edge = (resize == 1) ? 1080 : (resize == 2) ? 2560 : 0;
+    int target_longest_edge = (resize == 0) ? 1080 : (resize == 1) ? 1920 : (resize == 2) ? 2560 : 0;
 
     if (target_longest_edge > 0) {
         float scale = target_longest_edge / static_cast<float>(std::max(height, width));

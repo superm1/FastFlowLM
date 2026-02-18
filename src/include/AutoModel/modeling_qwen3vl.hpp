@@ -47,8 +47,8 @@ private:
     qwen3vl_image_t load_image_base64(const std::string& base64_string);
     
 
-    int debug_count= 0;
-    int resize = -1;
+    int debug_count = 0;
+    int resize = 0;
 
     void smart_resize(
     int height, int width,

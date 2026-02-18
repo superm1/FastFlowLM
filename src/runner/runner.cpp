@@ -36,7 +36,7 @@ std::map<std::string, runner_cmd_t> cmd_map = {
 /// \param supported_models - the list of supported models
 /// \param downloader - the downloader for the models
 /// \param tag - the tag of the model to load
-Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, bool preemption)
+Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, int resize, bool preemption)
     : supported_models(supported_models), downloader(downloader), tag(tag), asr(asr), embed(embed) {
 
     this->npu_device_inst = xrt::device(0);
@@ -83,6 +83,7 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         this->downloader.pull_model(this->tag);
     }
     auto [new_tag, model_info] = this->supported_models.get_model_info(this->tag);
+    this->auto_chat_engine->set_special_flags(resize);
     this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
 
     this->generate_limit = -1;
