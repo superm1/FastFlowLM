@@ -27,7 +27,7 @@ jobs:
             container_tag: "ubuntu26.04"
             deb_codename: "resolute"
     container:
-      image: ghcr.io/fastflowlm/fastflowlm/build-environment:${{ matrix.container_tag }}
+      image: ghcr.io/superm1/fastflowlm/build-environment:${{ matrix.container_tag }}
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
