@@ -12,9 +12,9 @@ jobs:
       matrix:
         include:
           - ubuntu_version: "24.04"
-            ubuntu_ppa: "ppa:superm1/xrt"
+            ubuntu_ppa: "ppa:amd-team/xrt"
           - ubuntu_version: "25.10"
-            ubuntu_ppa: "ppa:superm1/xrt"
+            ubuntu_ppa: "ppa:amd-team/xrt"
           - ubuntu_version: "26.04"
             ubuntu_ppa: ""
 
