@@ -93,8 +93,8 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
     try {
         this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
     }
-        header_print("ERROR", "Failed to load model: " + std::string(e.what()));
     catch (const std::exception& e) {
+        header_print("ERROR", "Failed to load model: " + std::string(e.what()));
         exit(EXIT_FAILURE);
     }
 
