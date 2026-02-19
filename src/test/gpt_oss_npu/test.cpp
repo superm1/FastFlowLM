@@ -47,8 +47,14 @@ int main(int argc, char* argv[]) {
 
     std::unique_ptr<AutoModel> chat = std::make_unique<GPT_OSS>(&npu_device_global);
     npu_device_global = xrt::device(0); 
-   
-    chat->load_model(model_path, model_info, -1, preemption);
+
+    try {
+        chat->load_model(model_path, model_info, -1, preemption);
+    }
+    catch (const std::exception& e) {
+        header_print("ERROR", "Failed to load model: " + std::string(e.what()));
+        return 1;
+    }
     chat_meta_info_t meta_info;
     lm_uniform_input_t uniformed_input;
     chat->set_max_length(16384);

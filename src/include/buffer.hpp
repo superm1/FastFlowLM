@@ -2,7 +2,7 @@
 /// \brief Buffer and bytes class for memory management
 /// \author FastFlowLM Team
 /// \date 2025-06-24
-/// \version 0.9.24
+/// \version 0.9.10
 /// \note This class is used to manage the memory.
 #pragma once
 #include <cstdint>
@@ -86,16 +86,16 @@ public:
 #endif
     {
         if (size > 0 && size < 8ull * 1024 * 1024 * 1024){
-            owned_data_ = std::make_unique<uint8_t[]>(size);
-            if (owned_data_ == nullptr){
-                std::cout << "Warning: allocate buffer with size " << size << " failed" << std::endl;
-                exit(1);
+            try {
+                owned_data_ = std::make_unique<uint8_t[]>(size);
+            }
+            catch (const std::bad_alloc& e) {
+                throw std::runtime_error(std::string("Failed to allocate bytes of size ") + std::to_string(size) + ": " + e.what());
             }
             data_ = owned_data_.get();
         }
         else{
-            std::cout << "Warning: allocate buffer with size 0, input size: " << size << std::endl;
-            exit(1);
+            throw std::runtime_error("Invalid size for bytes allocation");
         }
     }
 
@@ -126,19 +126,27 @@ public:
         : owned_data_(nullptr), size_(size), is_owner_(false), is_bo_owner_(true)
     {
         if (size > 3ull * 1024 * 1024 * 1024 || size == 0){
-            std::cout << "To large buffer!" << std::endl;
-            exit(1);
+            throw std::runtime_error("Invalid size for bytes allocation");
         }
-        size_t alignment = 4 * 1024;
-        int padded_size = (size + alignment - 1) / alignment * alignment; // 1MB alignment
-        // if (padded_size < 512 * 1024){
-        //     padded_size = 512 * 1024;
+        size_t alignment = 1024 * 1024;
+        int padded_size = (size + alignment - 1) / alignment * alignment; // 4KB alignment, , (xrt::ext::bo::access_mode)(xrt::ext::bo::access_mode::read_write | xrt::ext::bo::access_mode::process)
+
+        try {
+            owned_bo_ = std::make_unique<xrt::ext::bo>(device, padded_size);
+        }
+        catch (const std::exception& e) {
+            throw std::runtime_error(std::string("Failed to allocate xrt::ext::bo: ") + e.what());
+        }
+        
+        // uint64_t bo_address = reinterpret_cast<uintptr_t>(owned_bo_->map<uint8_t*>());
+        // while ( ((bo_address & 0xF0000000) == 0x60000000) ||
+        //     ((bo_address & 0xF0000000) == 0x70000000) ) {
+                
+        //     owned_bo_ = std::make_unique<xrt::ext::bo>(device, padded_size);
+        //     //header_print("info", "Re-allocating proj_weights for layer " + std::to_string(i) + " to avoid address in 0x60000000 - 0x7FFFFFFF, new address: " + std::to_string(reinterpret_cast<uintptr_t>(proj_weights[i].data())));
+        //     bo_address = reinterpret_cast<uintptr_t>(owned_bo_->map<uint8_t*>());
         // }
-        owned_bo_ = std::make_unique<xrt::ext::bo>(device, padded_size);
-        if (owned_bo_ == nullptr){
-            std::cout << "Warning: allocate buffer with size " << size << " failed" << std::endl;
-            exit(1);
-        }
+
         data_ = owned_bo_->map<uint8_t*>();
         bo_ = owned_bo_.get();
     }
@@ -246,7 +254,15 @@ public:
         if (data_ != nullptr && !is_owner_) {
             throw std::runtime_error("Cannot resize a non-owner buffer");
         }
-        owned_data_.reset(new uint8_t[new_size]);
+        if (new_size == 0) {
+            throw std::runtime_error("Cannot resize to zero size");
+        }
+        try {
+            owned_data_.reset(new uint8_t[new_size]);
+        }
+        catch (const std::bad_alloc& e) {
+            throw std::runtime_error(std::string("Failed to allocate bytes of size ") + std::to_string(new_size) + ": " + e.what());
+        }
         data_ = owned_data_.get();
         size_ = new_size;
         is_owner_ = true;

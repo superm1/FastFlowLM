@@ -57,7 +57,13 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         this->whisper_engine = std::make_unique<Whisper>(&this->npu_device_inst);
         auto [new_whisper_tag, whisper_model_info] = this->supported_models.get_model_info(whisper_tag);
         std::string whisper_model_path = this->supported_models.get_model_path(new_whisper_tag);
-        this->whisper_engine->load_model(whisper_model_path, whisper_model_info, this->preemption);
+        try {
+            this->whisper_engine->load_model(whisper_model_path, whisper_model_info, this->preemption);
+        }
+        catch (const std::exception& e) {
+            header_print("ERROR", "Failed to load ASR model: " + std::string(e.what()));
+            exit(EXIT_FAILURE);
+        }
     }
 #else
     if (this->asr) {
@@ -83,7 +89,13 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         this->downloader.pull_model(this->tag);
     }
     auto [new_tag, model_info] = this->supported_models.get_model_info(this->tag);
-    this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
+    try {
+        this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
+    }
+    catch (const std::exception& e) {
+        header_print("ERROR", "Failed to load model: " + std::string(e.what()));
+        exit(EXIT_FAILURE);
+    }
 
     this->generate_limit = -1;
 }
@@ -303,10 +315,17 @@ void Runner::run() {
             this->auto_chat_engine->start_total_timer();
             
             this->auto_chat_engine->start_ttft_timer();
-            bool success = this->auto_chat_engine->insert(meta_info, uniformed_input);
-            if (!success){
-                header_print("WARNING", "Max length reached, stopping generation...");
-                break;
+            try {
+                bool success = this->auto_chat_engine->insert(meta_info, uniformed_input);
+                if (!success){
+                    header_print("WARNING", "Max length reached, stopping generation...");
+                    break;
+                }
+            }
+            catch (const std::exception& e) {
+                header_print("ERROR", "Insertion error: " + std::string(e.what()));
+                this->auto_chat_engine->clear_context();
+                continue;
             }
 
             this->auto_chat_engine->stop_ttft_timer();
@@ -314,9 +333,23 @@ void Runner::run() {
             // Use harmony filter for gpt-oss models
             if (this->auto_chat_engine->get_current_model().find("gpt-oss") != std::string::npos) { // contains gpt-oss:20b and gpt-oss
                 cli_harmony_filter harmony_filter_ostream(std::cout);
-                this->auto_chat_engine->generate(meta_info, this->generate_limit, harmony_filter_ostream);
+                try {
+                    this->auto_chat_engine->generate(meta_info, this->generate_limit, harmony_filter_ostream);
+                }
+                catch (const std::exception& e) {
+                    header_print("ERROR", "Generation error: " + std::string(e.what()));
+                    this->auto_chat_engine->clear_context();
+                    continue;
+                }
             } else {
-                this->auto_chat_engine->generate(meta_info, this->generate_limit, base_ostream);
+                try {
+                    this->auto_chat_engine->generate(meta_info, this->generate_limit, base_ostream);
+                }
+                catch (const std::exception& e) {
+                    header_print("ERROR", "Generation error: " + std::string(e.what()));
+                    this->auto_chat_engine->clear_context();
+                    continue;
+                }
             }
             
             this->auto_chat_engine->stop_total_timer();
@@ -360,8 +393,13 @@ void Runner::cmd_load(std::vector<std::string>& input_list) {
         this->auto_chat_engine = std::move(auto_model.second);
 
         auto [new_tag, model_info] = this->supported_models.get_model_info(this->tag);
-
-        this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
+        try {
+            this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
+        }
+        catch (const std::exception& e) {
+            header_print("ERROR", "Failed to load model: " + std::string(e.what()));
+            exit(EXIT_FAILURE);
+        }
         this->auto_chat_engine->configure_parameter("system_prompt", this->system_prompt);
 
     }
@@ -509,7 +547,13 @@ void Runner::cmd_set(std::vector<std::string>& input_list) {
         this->auto_chat_engine->set_presence_penalty(std::stof(set_value));
     }
     else if (set_context == "ctx-len"){
-        this->auto_chat_engine->set_max_length(std::stoi(set_value));
+        try {
+            this->auto_chat_engine->set_max_length(std::stoi(set_value));
+        }
+        catch (const std::exception& e) {
+            header_print("ERROR", "Failed to set context length: " + std::string(e.what()));
+            exit(EXIT_FAILURE);
+        }
     }
     else if (set_context == "gen-lim"){
         this->generate_limit = std::stoi(set_value);
