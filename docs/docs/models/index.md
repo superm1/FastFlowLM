@@ -20,6 +20,7 @@ has_children: true
 - [Qwen](qwen/)
 - [Gemma](gemma/)
 - [MedGemma](medgemma/)
+- [TranslateGemma](translategemma/)
 - [gpt-oss](gpt-oss/)
 - [LiquidAI/LFM](lfm/)
 - [Phi](phi/)
