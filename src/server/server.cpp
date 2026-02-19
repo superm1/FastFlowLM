@@ -545,22 +545,34 @@ void WebServer::do_accept() {
 
 ///@brief process_next_npu_request Handles one queued NPU task at a time
 void WebServer::process_next_npu_request() {
-    // Lock the queue to check it
-    //std::lock_guard<std::mutex> lock(npu_queue_mutex_);
-
+    {
+        std::lock_guard<std::mutex> lock(npu_queue_mutex_);
     if (npu_request_queue_.empty()) {
-
         NPUAccessManager::release_npu_access();
         return; // Queue is empty, NPU is free
     }
+    }
 
-    // Queue is not empty. Try to acquire the NPU lock.
-    // 
-    // Got the NPU lock! Pop the next task and post it to the io_context.
-    auto task = npu_request_queue_.front();
+    // NPU cooldown before running the next queued task.
+    constexpr auto npu_cooldown = std::chrono::seconds(1);
+    header_print("🧊 ", "NPU cooldown for 1 seconds before next queued request...");
+    std::this_thread::sleep_for(npu_cooldown);
+
+    std::function<void()> task;
+    size_t remaining = 0;
+    {
+        std::lock_guard<std::mutex> lock(npu_queue_mutex_);
+        if (npu_request_queue_.empty()) {
+            NPUAccessManager::release_npu_access();
+            return;
+        }
+
+        task = npu_request_queue_.front();
     npu_request_queue_.pop();
+        remaining = npu_request_queue_.size();
+    }
 
-    header_print("🟡 ", "Dequeuing NPU request (" + std::to_string(npu_request_queue_.size()) + " remaining)...");
+    header_print("🟡 ", "Dequeuing NPU request (" + std::to_string(remaining) + " remaining)...");
 
     // Post the task to be executed by the io_context
     net::post(ioc, task);
