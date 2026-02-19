@@ -323,7 +323,8 @@ public:
 	}
 
 	//************ Unique for each model *************/
-	
+	virtual void set_special_flags(int) {}
+
 	virtual void load_model(std::string model_path, json model_info, int default_context_length = -1, bool enable_preemption = false) {}
 	virtual std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled = [] { return false; }) = 0;
 	virtual chat_template_type_t get_chat_template_type() {

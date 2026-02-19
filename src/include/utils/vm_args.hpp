@@ -28,6 +28,7 @@ struct ParsedArgs {
     bool quiet_list;
     bool preemption;
     int ctx_length;
+    int resize;
     size_t max_socket_connections;
     size_t max_npu_queue;
     int port;
@@ -70,6 +71,8 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             ("quiet", "Hide emojis in the model list (can be used with --filter)")
             ("ctx-len,c", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
              "Set context length")
+            ("resize,r", po::value<int>(&parsed_args.resize)->default_value(0),
+             "Pre-resize the image")
             ("socket,s", po::value<size_t>(&parsed_args.max_socket_connections)->default_value(10),
             "Set the maximum number of socket connections allowed (for serve command)")
             ("q-len,q", po::value<size_t>(&parsed_args.max_npu_queue)->default_value(10),
@@ -132,6 +135,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             std::cout << "  " << argv[0] << " serve llama3.2:1b --cors 0" << std::endl;
             std::cout << "  " << argv[0] << " serve llama3.2:1b --asr 1" << std::endl;
             std::cout << "  " << argv[0] << " serve llama3.2:1b --embed 1" << std::endl;
+            std::cout << "  " << argv[0] << " serve qwen3vl-it:4b --resize 0" << std::endl;
             std::cout << "  " << argv[0] << " list" << std::endl;
             std::cout << "  " << argv[0] << " list --quiet" << std::endl;
             std::cout << "  " << argv[0] << " list --filter installed" << std::endl;
@@ -176,6 +180,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --cors 0" << std::endl;
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --asr 1" << std::endl;
                 std::cout << "  " << argv[0] << " serve llama3.2:1b --embed 1" << std::endl;
+                std::cout << "  " << argv[0] << " serve qwen3vl-it:4b --resize 0" << std::endl;
                 std::cout << "  " << argv[0] << " list" << std::endl;
                 std::cout << "  " << argv[0] << " list --quiet" << std::endl;
                 std::cout << "  " << argv[0] << " list --filter installed" << std::endl;

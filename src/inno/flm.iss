@@ -4,7 +4,7 @@
 
 AppName=flm
 
-AppVersion=0.9.33
+AppVersion=0.9.34
 
 AppPublisher=FastFlowLM
 
@@ -59,7 +59,6 @@ Source: "lm_head.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dequant.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "whisper_npu.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "gemm.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "npu_utils.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "msvcp140.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "q4_npu_eXpress.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mha.dll"; DestDir: "{app}"; Flags: ignoreversion

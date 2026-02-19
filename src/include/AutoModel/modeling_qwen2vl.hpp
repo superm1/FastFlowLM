@@ -46,7 +46,8 @@ private:
     qwen2vl_image_t load_image_base64(const std::string& base64_string);
     
 
-    int debug_count= 0;
+    int debug_count = 0;
+    int resize = 0;
     void smart_resize(
     int height, int width,
     int& h_bar,int& w_bar,
@@ -59,6 +60,7 @@ private:
 public:
     Qwen2VL(xrt::device* npu_device_inst);
 
+    void set_special_flags(int resize) override;
     void load_model(std::string model_path, json model_inf, int default_context_length = -1, bool enable_preemption = false) override;
     //void toggle_enable_think() override;
     bool insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) override;

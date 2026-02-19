@@ -512,17 +512,35 @@ void Qwen2VL::preprocess_image(qwen2vl_image_t& image, std::vector<bf16> &pixel_
     const int width = image.width;
     const int height = image.height;
     const int channels = 3; // RGB
+    int downscaled_height;
+    int downscaled_width;
     int resized_height; 
     int resized_width;    
+
+    //std::cout << "height " << height << " width " << width << std::endl;
+
+    int target_longest_edge = (resize == 0) ? 1080 : (resize == 1) ? 1920 : (resize == 2) ? 2560 : 0;
+
+    if (target_longest_edge > 0) {
+        float scale = target_longest_edge / static_cast<float>(std::max(height, width));
+        scale = std::min(scale, 1.0f);
+        downscaled_height = static_cast<int>(height * scale);
+        downscaled_width = static_cast<int>(width * scale);
+    }
+    else {
+        downscaled_height = height;
+        downscaled_width = width;
+    }
+
     // do the automatically resizing in here 
     smart_resize(
-        height, width,
+        downscaled_height, downscaled_width,
         resized_height, resized_width,
         QWEN2_PATCH_SIZE * QWEN2_IMAGE_MERGE_SIZE,
         QWEN2_SHORTEST_EDGE,
         QWEN2_LONGEST_EDGE
     );
-    // std::cout << "resized_height "<< resized_height << " resized_width " << resized_width <<std::endl;
+     //std::cout << "resized_height "<< resized_height << " resized_width " << resized_width <<std::endl;
 
     // Use non-optimized path for consistent results across platforms
     auto resize_image =  imgproc::avx512::resize_bicubic_antialias_rgb_planar_avx512(
