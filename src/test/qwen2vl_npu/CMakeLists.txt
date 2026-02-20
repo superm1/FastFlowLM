@@ -15,6 +15,7 @@ add_npu_test(
         "${CMAKE_SOURCE_DIR}/../../common/AutoModel/modeling_qwen2vl_image.cpp"
         "${CMAKE_SOURCE_DIR}/../../common/image_process_utils/imageproc.cpp"
         "${CMAKE_SOURCE_DIR}/../../common/image_process_utils/imageprocAVX512.cpp"
+        "${CMAKE_SOURCE_DIR}/../../common/image/image_reader.cpp"
 )
 
 target_link_libraries(test_qwen2vl_npu PUBLIC

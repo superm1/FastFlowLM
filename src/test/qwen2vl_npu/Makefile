@@ -22,6 +22,7 @@ SOURCES += ../../common/AutoModel/modeling_qwen2vl.cpp
 SOURCES += ../../common/AutoModel/modeling_qwen2vl_image.cpp
 SOURCES += ../../common/image_process_utils/imageproc.cpp
 SOURCES += ../../common/image_process_utils/imageprocAVX512.cpp
+SOURCES += ../../common/image/image_reader.cpp
 SOURCES += ../../common/tokenizer/tokenizer.cpp
 SOURCES += ../../common/modules/sampler.cpp
 SOURCES += test.cpp

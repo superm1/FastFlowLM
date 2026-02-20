@@ -122,6 +122,8 @@ docs_nav:
         url: "/docs/models/gemma/"
       - label: MedGemma
         url: "/docs/models/medgemma/"
+      - label: TranslateGemma
+        url: "/docs/models/translategemma/"
       - label: gpt-oss
         url: "/docs/models/gpt-oss/"
       - label: LiquidAI/LFM

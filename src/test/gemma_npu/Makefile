@@ -21,6 +21,7 @@ SOURCES := test.cpp
 SOURCES += ../../common/AutoModel/automodel.cpp
 SOURCES += ../../common/AutoModel/modeling_gemma3.cpp
 SOURCES += ../../common/AutoModel/modeling_gemma3_image.cpp
+SOURCES += ../../common/image/image_reader.cpp
 SOURCES += ../../common/tokenizer/tokenizer.cpp
 SOURCES += ../../common/modules/sampler.cpp
 
