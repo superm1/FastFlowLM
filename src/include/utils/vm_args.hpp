@@ -71,7 +71,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             ("quiet", "Hide emojis in the model list (can be used with --filter)")
             ("ctx-len,c", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
              "Set context length")
-            ("img-pre-resize,r", po::value<int>(&parsed_args.img_pre_resize)->default_value(4),
+            ("img-pre-resize,r", po::value<int>(&parsed_args.img_pre_resize)->default_value(3),
              "Pre-resize the image, 0: original size, 1: height = 480, 2: height = 720, 3: height = 1080, 4: height = 1440")
             ("socket,s", po::value<size_t>(&parsed_args.max_socket_connections)->default_value(10),
             "Set the maximum number of socket connections allowed (for serve command)")
