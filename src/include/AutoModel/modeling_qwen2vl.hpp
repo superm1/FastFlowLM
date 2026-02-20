@@ -78,6 +78,8 @@ public:
                     target_size = 720;
                 } else if (this->image_pre_resize <= 3) {
                     target_size = 1080;
+                } else if (this->image_pre_resize <= 4) {
+                    target_size = 1440;
                 } else {
                     this->image_pre_resize = 0;
                     target_size = 0;

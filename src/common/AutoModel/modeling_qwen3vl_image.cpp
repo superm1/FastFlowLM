@@ -27,6 +27,8 @@ qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
             case 3:
                 max_height = 1080;
                 break;
+            case 4:
+                max_height = 1440;
             default:
                 max_height = decoded.height; // no resizing
                 break;
@@ -55,7 +57,7 @@ qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
     qwen3vl_image_t result;
     result.width = reordered.width;
     result.height = reordered.height;
-    result._data = std::vector<uint8_t>(reordered.pixels.data(), reordered.pixels.data() + reordered.pixels.size());
+    result._data = std::move(reordered.pixels);
     image_reader_.recycle(reordered);
     return result;
 }
@@ -79,6 +81,9 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
                 break;
             case 3:
                 max_height = 1080;
+                break;
+            case 4:
+                max_height = 1440;
                 break;
             default:
                 max_height = decoded.height; // no resizing
@@ -107,7 +112,7 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
     qwen3vl_image_t result;
     result.width = reordered.width;
     result.height = reordered.height;
-    result._data = std::vector<uint8_t>(reordered.pixels.data(), reordered.pixels.data() + reordered.pixels.size());
+    result._data = std::move(reordered.pixels);
     image_reader_.recycle(reordered);
     return result;
 }
@@ -234,7 +239,7 @@ void Qwen3VL::preprocess_image(qwen3vl_image_t& image, std::vector<bf16> &pixel_
     image.height_resized = resized_height;
     image.grid_h = grid_h;
     image.grid_w = grid_w;
-    image._data.clear(); // free the data
+    image._data.free(); // free the data
 
     // release the original uint8_t data now, since is no longer useful to us
 }

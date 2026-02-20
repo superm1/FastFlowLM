@@ -27,6 +27,9 @@ qwen2vl_image_t Qwen2VL::load_image(const std::string& filename) {
             case 3:
                 max_height = 1080;
                 break;
+            case 4:
+                max_height = 1440;
+                break;
             default:
                 max_height = decoded.height; // no resizing
                 break;
@@ -80,6 +83,9 @@ qwen2vl_image_t Qwen2VL::load_image_base64(const std::string& base64_string) {
                 break;
             case 3:
                 max_height = 1080;
+                break;
+            case 4:
+                max_height = 1440;
                 break;
             default:
                 max_height = decoded.height; // no resizing
