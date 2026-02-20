@@ -158,24 +158,25 @@ flm run qwen3vl-it:4b
 
 ▶️ Image Resize Options
 
-You can control image resizing when running or serving the model using the `--resize` flag:
+You can control image resizing when running or serving the model using the `--img-pre-resize` flag or simply `-r`:
 
 ```shell
-flm run qwen3vl-it:3b --resize 1
+flm run qwen3vl-it:3b -r 1
 ```
 
 ```shell
-flm serve qwen3vl-it:3b --resize 1
+flm serve qwen3vl-it:3b -r 1
 ```
 
-The `--resize` option determines the target length of the image’s **longest** side:
+The `-r` option determines image's height:
 
-- -1 — Disable resizing (use the original image)
-- 0 — Resize so the longest side is **1080 px** (Default)
-- 1 — Resize so the longest side is **1920 px**
-- 2 — Resize so the longest side is **2560 px**
-
-> Don't worry—if your image is already smaller than 1080px, it keeps its original resolution! ✨
+- 0: original size 
+- 1: height = 480 px 
+- 2: height = 720 px 
+- 3: height = 1080 px (default)
+- 4: height = 1440 px 
+                 
+> Don't worry—if your image is already smaller than the setup, it keeps its original resolution! ✨
 
 📝 **Note**
 
@@ -222,24 +223,25 @@ flm run qwen2.5vl-it:3b
 
 ▶️ Image Resize Options
 
-You can control image resizing when running or serving the model using the `--resize` flag:
+You can control image resizing when running or serving the model using the `--img-pre-resize` flag or simply `-r`:
 
 ```shell
-flm run qwen2.5vl-it:3b --resize 1
+flm run qwen3vl-it:3b -r 1
 ```
 
 ```shell
-flm serve qwen2.5vl-it:3b --resize 1
+flm serve qwen3vl-it:3b -r 1
 ```
 
-The `--resize` option determines the target length of the image’s **longest** side:
+The `-r` option determines image's height:
 
-- -1 — Disable resizing (use the original image)
-- 0 — Resize so the longest side is **1080 px** (Default)
-- 1 — Resize so the longest side is **1920 px**
-- 2 — Resize so the longest side is **2560 px**
-
-> Don't worry—if your image is already smaller than 1080px, it keeps its original resolution! ✨
+- 0: original size 
+- 1: height = 480 px 
+- 2: height = 720 px 
+- 3: height = 1080 px (default)
+- 4: height = 1440 px 
+                 
+> Don't worry—if your image is already smaller than the setup, it keeps its original resolution! ✨
 
 📝 **Note**
 

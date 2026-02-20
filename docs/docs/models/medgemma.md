@@ -57,10 +57,7 @@ flm run medgemma1.5:4b
 This tool (**MedGemma + FastFlowLM**) is **not** a diagnostic or clinical tool. 
 Always consult a licensed medical professional for healthcare decisions.
 
-📺 Demo Video
-
-- [MedGemma1.5:4B (Multimodal) on AMD Ryzen™ AI NPU — Demo Video]()
-- [Reaseach Blog](https://research.google/blog/next-generation-medical-image-interpretation-with-medgemma-15-and-medical-speech-to-text-with-medasr/)
+[Reaseach Blog](https://research.google/blog/next-generation-medical-image-interpretation-with-medgemma-15-and-medical-speech-to-text-with-medasr/)
 
 ---
 
