@@ -38,8 +38,5 @@ TranslateGemma expects a single **user message** with this structure:
 
 🦙Refer to the Ollama model library for detailed usage [examples](https://ollama.com/library/translategemma#:~:text=text%20to%20translate.-,Examples,-English%20to%20Spanish).
 
-📺 Demo Video
-
-- [Translategemma1.5:4B (Multimodal) on AMD Ryzen™ AI NPU — Demo Video]()
 - [Reaseach Blog](https://blog.google/innovation-and-ai/technology/developers-tools/translategemma/)
 - [Technical Report](https://arxiv.org/pdf/2601.09012)
