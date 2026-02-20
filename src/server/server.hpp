@@ -68,7 +68,7 @@ using StreamCallback = std::function<void(const std::string&)>;
 // Cancellation token for request cancellation
 struct CancellationToken {
     std::atomic<bool> is_cancelled;
-    std::shared_ptr<HttpSession> session;
+    std::weak_ptr<HttpSession> session;
     
     CancellationToken(std::shared_ptr<HttpSession> s) : is_cancelled(false), session(s) {}
     

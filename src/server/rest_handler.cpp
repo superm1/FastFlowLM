@@ -952,15 +952,36 @@ void RestHandler::handle_openai_chat_completion(const json& request,
             this->auto_chat_engine->clear_context();
             nullstream nstream;
             std::string response_text;
+            header_print("FLM", "Start prefill...");
             try {
-                response_text = auto_chat_engine->generate_with_prompt(meta_info, uniformed_input, length_limit, nstream);
+                bool success = auto_chat_engine->insert(meta_info, uniformed_input);
+                if (!success) {
+                    json error_response = {
+                        {"error", {
+                        {"message", "Max length reached!"},
+                        {"type", "model_error"},
+                        {"code", 400}
+                        }}
+                    };
+                    send_response(error_response);
+                    this->auto_chat_engine->clear_context();
+                    return;
+                }
             } catch (const std::exception& e) {
                 json error_response = {{"error", e.what()}};
                 send_response(error_response);
                 this->auto_chat_engine->clear_context();
                 return;
             }
-
+            header_print("FLM", "Start generating...");
+            try {
+                response_text = auto_chat_engine->generate(meta_info, length_limit, nstream, [&] { return cancellation_token->cancelled(); });
+            } catch (const std::exception& e) {
+                json error_response = {{"error", e.what()}};
+                send_response(error_response);
+                this->auto_chat_engine->clear_context();
+                return;
+            }
             // check response_text
             json choices = build_nstream_response(response_text);
             json response = {
@@ -978,20 +999,6 @@ void RestHandler::handle_openai_chat_completion(const json& request,
                     {"decoding_duration", static_cast<double>(meta_info.decoding_duration) / 1'000'000'000},
                     {"prefill_speed_tps", static_cast<double>(meta_info.prompt_tokens) / static_cast<double>(meta_info.prefill_duration) * 1'000'000'000},
                     {"decoding_speed_tps", static_cast<double>(meta_info.generated_tokens) / static_cast<double>(meta_info.decoding_duration) * 1'000'000'000},
-                    //{"prompt_tokens_details", json::array({
-                    //    {
-                    //        {"cached_tokens", 0},
-                    //        {"audio_tokens", 0}
-                    //    }
-                    //})},
-                    //{"completion_tokens_details", json::array({
-                    //    {
-                    //        {"reasoning_tokens", 0},
-                    //        {"audio_tokens", 0},
-                    //        {"accepted_prediction_tokens", 0},
-                    //        {"rejected_prediction_tokens", 0}
-                    //    }
-                    //})}
                 }},
                 {"service_tier", "default"}
             };

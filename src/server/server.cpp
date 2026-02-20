@@ -568,7 +568,7 @@ void WebServer::process_next_npu_request() {
         }
 
         task = npu_request_queue_.front();
-    npu_request_queue_.pop();
+        npu_request_queue_.pop();
         remaining = npu_request_queue_.size();
     }
 
@@ -597,7 +597,7 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
     header_print("LOG", "Version: " << req.version());
     header_print("LOG", "Keep-Alive: " << req.keep_alive());
     json request_json_log;
-    bool is_json;
+    bool is_json = false;
     try {
         if (!req.body().empty()) {
             std::string content_type = std::string(req[http::field::content_type]);
@@ -631,25 +631,31 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
     // Decide if this handler needs exclusive NPU access.
     bool needs_npu = requires_npu_access(std::string(req.method_string()), std::string(req.target()));
 
+    // Store stable pointers for deferred execution to avoid reference lifetime issues.
+    auto* req_ptr = &req;
+    auto* res_ptr = &res;
+
     // Define a task lambda with is_deferred flag
-    auto process_task = [this, it, &req, &res, session, needs_npu, key, is_json](bool is_deferred) {
+    auto process_task = [this, it, req_ptr, res_ptr, session, needs_npu, key, is_json](bool is_deferred) {
+        auto& req_ref = *req_ptr;
+        auto& res_ref = *res_ptr;
 
         // Parse JSON request body
         json request_json;
         try {
-            if (!req.body().empty()) {
+            if (!req_ref.body().empty()) {
                 if(is_json)
-                    request_json = json::parse(req.body());
+                    request_json = json::parse(req_ref.body());
                 //else 
                     //do some parse to the MultiPart request?
-                    //std::map<std::string, MultipartPart> parts = parse_multipart(req);
+                    //std::map<std::string, MultipartPart> parts = parse_multipart(req_ref);
             }
         }
         catch (const std::exception& e) {
-            res.result(http::status::bad_request);
-            res.body() = json{ {"error", "Invalid JSON"} }.dump();
-            res.set(http::field::content_type, "application/json");
-            res.prepare_payload();
+            res_ref.result(http::status::bad_request);
+            res_ref.body() = json{ {"error", "Invalid JSON"} }.dump();
+            res_ref.set(http::field::content_type, "application/json");
+            res_ref.prepare_payload();
 
             // Only write from callback when deferred
             if (is_deferred && session) session->write_response_from_callback();
@@ -675,7 +681,8 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
         register_active_request(request_id, cancellation_token);
 
         // catch is_deferred 
-        auto send_response = [&res, session, this, request_id, needs_npu, is_deferred](const json& response_data) {
+        auto send_response = [res_ptr, session, this, request_id, needs_npu, is_deferred](const json& response_data) {
+            auto& response_ref = *res_ptr;
             http::status status = http::status::ok;
 
             if (response_data.contains("error") &&
@@ -691,10 +698,10 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
                 //}
             }
 
-            res.result(status);
-            res.body() = response_data.dump();
-            res.set(http::field::content_type, "application/json");
-            res.prepare_payload();
+            response_ref.result(status);
+            response_ref.body() = response_data.dump();
+            response_ref.set(http::field::content_type, "application/json");
+            response_ref.prepare_payload();
             unregister_active_request(request_id);
 
             if (needs_npu) {
@@ -719,7 +726,41 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
             }
         };
 
-        it->second(req, send_response, send_streaming_response, session, cancellation_token);
+        try {
+            it->second(req_ref, send_response, send_streaming_response, session, cancellation_token);
+        }
+        catch (const std::exception& e) {
+            unregister_active_request(request_id);
+
+            res_ref.result(http::status::internal_server_error);
+            res_ref.body() = json{ {"error", std::string("Handler exception: ") + e.what()} }.dump();
+            res_ref.set(http::field::content_type, "application/json");
+            res_ref.prepare_payload();
+
+            if (needs_npu) {
+                this->process_next_npu_request();
+            }
+
+            if (is_deferred && session) {
+                session->write_response_from_callback();
+            }
+        }
+        catch (...) {
+            unregister_active_request(request_id);
+
+            res_ref.result(http::status::internal_server_error);
+            res_ref.body() = json{ {"error", "Unknown handler exception"} }.dump();
+            res_ref.set(http::field::content_type, "application/json");
+            res_ref.prepare_payload();
+
+            if (needs_npu) {
+                this->process_next_npu_request();
+            }
+
+            if (is_deferred && session) {
+                session->write_response_from_callback();
+            }
+        }
     }; // --- End of process_task lambda ---
 
 

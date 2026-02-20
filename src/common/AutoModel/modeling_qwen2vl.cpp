@@ -59,11 +59,14 @@ std::string Qwen2VL::apply_chat_template(nlohmann::ordered_json& messages, nlohm
 
 bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
     // preprocess
+    header_print_g("FLM", "\033[32mQwen2VL insert called.\033[0m");
+    header_print_g("FLM", "Input get " + std::to_string(input.images.size()) + " images and prompt length " + std::to_string(input.prompt.length()) + ".");
+    header_print_g("FLM", "Input messages length: " + std::to_string(input.messages.size()) + ".");
     constexpr int image_soft_token_id = 151655;
     this->profiler_list[TKOEN_ENCODE_TIME].start();
     std::string templated_text;
     if (input.messages.empty() && input.prompt.empty()) {
-        header_print("WARNING", "No messages or prompt provided");
+        header_print_r("WARNING", "No messages or prompt provided");
         return false;
     }
 
@@ -78,81 +81,98 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
         // time_utils::time_point preprocess_start = time_utils::now();
         for(const auto& img_str : input.images){
             qwen2vl_image_t image = this->load_image(img_str);
-            
+            header_print_g("FLM", "Image loaded: original size (" + std::to_string(image.width) + ", " + std::to_string(image.height) + ")");
+
             preprocess_image(image, image_payload._data__processed);
+
+            header_print_g("FLM", "Image preprocessed: resized to (" + std::to_string(image.width_resized) + ", " + std::to_string(image.height_resized) + 
+                         "), grid size (" + std::to_string(image.grid_h) + ", " + std::to_string(image.grid_w) + ")");
             // Push the image AFTER preprocessing so grid_h and grid_w are set
             image_payload.images.push_back(image);
             image_payload.num_images++;
         } 
     }
-    if (!input.messages.empty()) { // already a formated messages, usually from REST API
-        json qwenvl_message = json::array();
-        for (const auto& item : input.messages) {
-            if (!item.contains("images")) {
-                qwenvl_message.push_back(item);
-                continue;
-            }
+    try {
+        if (!input.messages.empty()) { // already a formated messages, usually from REST API
+            header_print_g("FLM", "Processing messages with images...");
+            json qwenvl_message = json::array();
+            for (const auto& item : input.messages) {
+                if (!item.contains("images")) {
+                    qwenvl_message.push_back(item);
+                    continue;
+                }
 
-            json newContent = json::array();
-            for (const auto& img : item["images"]) {
+                json newContent = json::array();
+                for (const auto& img : item["images"]) {
+                    newContent.push_back({
+                        {"type", "image"},
+                        {"image", img}
+                    });
+                }
                 newContent.push_back({
-                    {"type", "image"},
-                    {"image", img}
+                    {"type", "text"},
+                    {"text", item["content"]}
                 });
+
+                json newItem = {
+                    {"role", item["role"]},
+                    {"content", newContent}
+                };
+
+                qwenvl_message.push_back(newItem);
             }
-            newContent.push_back({
-                {"type", "text"},
-                {"text", item["content"]}
-            });
+            header_print_g("FLM", "Applying chat template...");
+            templated_text = this->apply_chat_template(qwenvl_message);
+            int total_images = 0;
+            for (auto& message : qwenvl_message) {
+                auto content = message.value("content", nlohmann::ordered_json::array());
+                for (auto& item : content) {
+                    if (item.contains("type") && item["type"] == "image") {
+                        std::string img_str = item.value("image", "");
+                        if (!img_str.empty()) {
+                            total_images++;
+                        }
+                        header_print_g("FLM", "Load image from message content.");
+                        qwen2vl_image_t image = this->load_image_base64(img_str);
+                        header_print_g("FLM", "Image loaded: original size (" + std::to_string(image.width) + ", " + std::to_string(image.height) + ")");
 
-            json newItem = {
-                {"role", item["role"]},
-                {"content", newContent}
-            };
+                        preprocess_image(image, image_payload._data__processed);
 
-            qwenvl_message.push_back(newItem);
-        }
-        templated_text = this->apply_chat_template(qwenvl_message);
-        int total_images = 0;
-        for (auto& message : qwenvl_message) {
-            auto content = message.value("content", nlohmann::ordered_json::array());
-            for (auto& item : content) {
-                if (item.contains("type") && item["type"] == "image") {
-                    std::string img_str = item.value("image", "");
-                    if (!img_str.empty()) {
-                        total_images++;
+                        header_print_g("FLM", "Image preprocessed: resized to (" + std::to_string(image.width_resized) + ", " + std::to_string(image.height_resized) + 
+                                    "), grid size (" + std::to_string(image.grid_h) + ", " + std::to_string(image.grid_w) + ")");
+                        image_payload.images.push_back(image);
+                        image_payload.num_images++;
                     }
-                    qwen2vl_image_t image = this->load_image_base64(img_str);
-                    preprocess_image(image, image_payload._data__processed);
-                    image_payload.images.push_back(image);
-                    image_payload.num_images++;
                 }
             }
+            header_print_g("FLM", "Total images: " + std::to_string(total_images));
         }
-        header_print("FLM", "Total images: " << total_images);
-    }
-    else if (!input.prompt.empty()) { // a pure text, usually from the cli
-        nlohmann::ordered_json messages;
-        nlohmann::ordered_json content;
-        content["role"] = "user";
-        content["content"] = nlohmann::ordered_json::array();
-        
-        // Add image objects to content array
-        for (int i = 0; i < input.images.size(); i++) {
-            nlohmann::ordered_json image_obj;
-            image_obj["type"] = "image";
-            image_obj["image"] = input.images[i];
-            content["content"].push_back(image_obj);
+        else if (!input.prompt.empty()) { // a pure text, usually from the cli
+            nlohmann::ordered_json messages;
+            nlohmann::ordered_json content;
+            content["role"] = "user";
+            content["content"] = nlohmann::ordered_json::array();
+            
+            // Add image objects to content array
+            for (int i = 0; i < input.images.size(); i++) {
+                nlohmann::ordered_json image_obj;
+                image_obj["type"] = "image";
+                image_obj["image"] = input.images[i];
+                content["content"].push_back(image_obj);
+            }
+            
+            // Add text object to content array
+            nlohmann::ordered_json text_obj;
+            text_obj["type"] = "text";
+            text_obj["text"] = input.prompt;
+            content["content"].push_back(text_obj);
+            
+            messages.push_back(content);
+            templated_text = this->apply_chat_template(messages);
         }
-        
-        // Add text object to content array
-        nlohmann::ordered_json text_obj;
-        text_obj["type"] = "text";
-        text_obj["text"] = input.prompt;
-        content["content"].push_back(text_obj);
-        
-        messages.push_back(content);
-        templated_text = this->apply_chat_template(messages);
+    } catch (const std::exception& e) {
+        header_print_r("ERROR", std::string("Exception during chat template application: ") + e.what());
+        return false;
     }
     std::vector<int> tokens_init = this->tokenizer->encode(templated_text);
 
