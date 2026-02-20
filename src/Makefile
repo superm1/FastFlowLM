@@ -11,7 +11,7 @@ all:
 	@$(PWSH) "if (!(Test-Path '$(BUILD_DIR)')) { New-Item -ItemType Directory -Path '$(BUILD_DIR)' }"
 	@$(PWSH) "if (!(Test-Path '$(OUT_DIR)'))   { New-Item -ItemType Directory -Path '$(OUT_DIR)' }"
 	@$(PWSH) "cd '$(BUILD_DIR)'; cmake .."
-	@$(PWSH) "cd '$(BUILD_DIR)'; cmake --build . --config Release"
+	@$(PWSH) "cd '$(BUILD_DIR)'; cmake --build . --config Release --parallel 4"
 
 run:
 	@$(PWSH) "Copy-Item 'lib\\*.dll' '$(OUT_DIR)' -Force"
@@ -23,7 +23,7 @@ serve:
 	@$(PWSH) "Copy-Item 'lib\\*.dll' '$(OUT_DIR)' -Force"
 	@$(PWSH) "Copy-Item 'model_list.json' '$(OUT_DIR)' -Force"
 	@$(PWSH) "Copy-Item 'xclbins' '$(OUT_DIR)' -Recurse -Force"
-	@$(PWSH) "cd '$(OUT_DIR)'; .\\flm.exe serve llama3.2 -a 1 -e 1 -c 32768" 
+	@$(PWSH) "cd '$(OUT_DIR)'; .\\flm.exe serve qwen2.5vl-it -c 32768" 
 
 clean:
 	@$(PWSH) "Remove-Item -Recurse -Force '$(BUILD_DIR)'"

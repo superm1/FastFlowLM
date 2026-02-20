@@ -8,17 +8,10 @@
 #pragma once
 #include "AutoModel/automodel.hpp"
 #include "base64.hpp"
+#include "image/image_reader.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-// FFmpeg includes for image processing only
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/frame.h>
-#include <libavutil/pixfmt.h>
-}
 
 
 /************              Gemma3_4b            **************/
@@ -28,13 +21,7 @@ private:
     void setup_tokenizer(std::string model_path);
     
     // Image processing functionality
-    static bool ffmpeg_initialized;
-    void initialize_ffmpeg();
-    void resolve_source_format_and_range(AVPixelFormat input_format,
-                                        AVPixelFormat &resolved_format,
-                                        int &src_full_range,
-                                        AVColorRange frame_color_range,
-                                        AVCodecID codec_id);
+    ImageReader image_reader_;
     bytes load_image(const std::string& filename);
     bytes load_image_base64(const std::string& base64_string);
     buffer<bf16> preprocess_image(bytes& image);

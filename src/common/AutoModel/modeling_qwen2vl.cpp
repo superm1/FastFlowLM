@@ -8,6 +8,7 @@
 
 #include "AutoModel/modeling_qwen2vl.hpp"
 #include "metrices.hpp"
+#include <string_view>
 
 
 /************              Qwen2VL family            **************/
@@ -85,6 +86,8 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
     try {
         if (!input.messages.empty()) { // already a formated messages, usually from REST API
             json qwenvl_message = json::array();
+            std::vector<const std::string*> pending_images;
+            int total_images = 0;
             for (const auto& item : input.messages) {
                 if (!item.contains("images")) {
                     qwenvl_message.push_back(item);
@@ -93,9 +96,12 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
 
                 json newContent = json::array();
                 for (const auto& img : item["images"]) {
+                    if (img.is_string()) {
+                        pending_images.push_back(&img.get_ref<const std::string&>());
+                        total_images++;
+                    }
                     newContent.push_back({
-                        {"type", "image"},
-                        {"image", img}
+                        {"type", "image"}
                     });
                 }
                 newContent.push_back({
@@ -111,18 +117,51 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
                 qwenvl_message.push_back(newItem);
             }
             templated_text = this->apply_chat_template(qwenvl_message);
-            int total_images = 0;
+
+            for (const std::string* img_ptr : pending_images) {
+                if (img_ptr == nullptr || img_ptr->empty()) {
+                    continue;
+                }
+                const std::string_view img_preview =
+                    std::string_view(*img_ptr).substr(0, 8);
+                header_print_g("DEBUG", "Loading image: " + std::string(img_preview) + "...");
+                qwen2vl_image_t image = this->load_image_base64(*img_ptr);
+                header_print_g("DEBUG", "Preprocessing image...");
+                preprocess_image(image, image_payload._data__processed);
+                header_print_g("DEBUG", "Image preprocessed: " +
+                    std::to_string(image.width_resized) + "x" +
+                    std::to_string(image.height_resized) +
+                    ", grid: " + std::to_string(image.grid_w) + "x" +
+                    std::to_string(image.grid_h));
+                header_print_g("DEBUG", "Payload size: " + std::to_string(image_payload._data__processed.size()) );
+
+                image_payload.images.push_back(image);
+                image_payload.num_images++;
+            }
+
             for (auto& message : qwenvl_message) {
                 auto content = message.value("content", nlohmann::ordered_json::array());
                 for (auto& item : content) {
                     if (item.contains("type") && item["type"] == "image") {
-                        std::string img_str = item.value("image", "");
-                        if (!img_str.empty()) {
-                            total_images++;
+                        const std::string* img_ptr = nullptr;
+                        if (item.contains("image") && item["image"].is_string()) {
+                            img_ptr = &item["image"].get_ref<const std::string&>();
                         }
-                        qwen2vl_image_t image = this->load_image_base64(img_str);
-
+                        if (img_ptr == nullptr || img_ptr->empty()) {
+                            continue;
+                        }
+                        const std::string_view img_preview =
+                            std::string_view(*img_ptr).substr(0, 8);
+                        header_print_g("DEBUG", "Loading image: " + std::string(img_preview) + "...");
+                        qwen2vl_image_t image = this->load_image_base64(*img_ptr);
+                        header_print_g("DEBUG", "Preprocessing image...");
                         preprocess_image(image, image_payload._data__processed);
+                        header_print_g("DEBUG", "Image preprocessed: " +
+                            std::to_string(image.width_resized) + "x" +
+                            std::to_string(image.height_resized) +
+                            ", grid: " + std::to_string(image.grid_w) + "x" +
+                            std::to_string(image.grid_h));
+                        header_print_g("DEBUG", "Payload size: " + std::to_string(image_payload._data__processed.size()) );
 
                         image_payload.images.push_back(image);
                         image_payload.num_images++;

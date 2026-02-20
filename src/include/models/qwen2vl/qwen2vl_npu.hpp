@@ -42,7 +42,7 @@ typedef struct {
     int grid_h;
     int grid_w;
 
-    std::vector<uint8_t> _data;
+    bytes _data;
 
 } qwen2vl_image_t;
 

@@ -7,487 +7,50 @@
 
 #include "AutoModel/modeling_qwen3vl.hpp"
 
-// Initialize FFmpeg once
-bool Qwen3VL::ffmpeg_initialized = false;
-
-void Qwen3VL::initialize_ffmpeg() {
-    if (!ffmpeg_initialized) {
-        ffmpeg_initialized = true;
-    }
-}
-
-// Helper to map deprecated YUVJ pixel formats and determine source range
-void Qwen3VL::resolve_source_format_and_range(AVPixelFormat input_format,
-                                    AVPixelFormat &resolved_format,
-                                    int &src_full_range,
-                                    AVColorRange frame_color_range,
-                                    AVCodecID codec_id) {
-    resolved_format = input_format;
-    src_full_range = 0; // default: limited range
-
-    // If decoder reports full-range, honor it
-    if (frame_color_range == AVCOL_RANGE_JPEG) {
-        src_full_range = 1;
-    }
-
-    // JPEG is typically full range
-    if (codec_id == AV_CODEC_ID_MJPEG) {
-        src_full_range = 1;
-    }
-
-    switch (input_format) {
-        case AV_PIX_FMT_YUVJ420P:
-            resolved_format = AV_PIX_FMT_YUV420P;
-            src_full_range = 1;
-            break;
-        case AV_PIX_FMT_YUVJ422P:
-            resolved_format = AV_PIX_FMT_YUV422P;
-            src_full_range = 1;
-            break;
-        case AV_PIX_FMT_YUVJ444P:
-            resolved_format = AV_PIX_FMT_YUV444P;
-            src_full_range = 1;
-            break;
-        case AV_PIX_FMT_YUVJ440P:
-            resolved_format = AV_PIX_FMT_YUV440P;
-            src_full_range = 1;
-            break;
-        default:
-            break;
-    }
-}
-
 qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
-    initialize_ffmpeg();
-    
     qwen3vl_image_t empty_result;
-    
-    try {
-        // Check if file exists
-        if (!std::filesystem::exists(filename)) {
-            std::cerr << "Error: File does not exist: " << filename << std::endl;
-            return empty_result;
-        }
-
-        // Read file into memory
-        std::ifstream file(filename, std::ios::binary | std::ios::ate);
-        if (!file.is_open()) {
-            std::cerr << "Error: Could not open file: " << filename << std::endl;
-            return empty_result;
-        }
-        
-        std::streamsize file_size = file.tellg();
-        file.seekg(0, std::ios::beg);
-        
-        std::vector<uint8_t> file_data(file_size);
-        if (!file.read(reinterpret_cast<char*>(file_data.data()), file_size)) {
-            std::cerr << "Error: Could not read file data" << std::endl;
-            return empty_result;
-        }
-        file.close();
-
-        // Create memory context for decoding
-        AVCodecContext* codecContext = nullptr;
-        AVFrame* frame = nullptr;
-        AVPacket* packet = nullptr;
-        
-        try {
-            // Find decoder based on file header
-            const AVCodec* codec = nullptr;
-            if (file_data.size() >= 8) {
-                // Check for JPEG
-                if (file_data[0] == 0xFF && file_data[1] == 0xD8) {
-                    codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
-                }
-                // Check for PNG
-                else if (file_data.size() >= 8 && 
-                        file_data[0] == 0x89 && file_data[1] == 0x50 && 
-                        file_data[2] == 0x4E && file_data[3] == 0x47) {
-                    codec = avcodec_find_decoder(AV_CODEC_ID_PNG);
-                }
-            }
-            
-            if (!codec) {
-                std::cerr << "Error: Unsupported image format (only JPEG and PNG supported)" << std::endl;
-                return empty_result;
-            }
-
-            // Create codec context
-            codecContext = avcodec_alloc_context3(codec);
-            if (!codecContext) {
-                std::cerr << "Error: Could not allocate codec context" << std::endl;
-                return empty_result;
-            }
-
-            // Open codec
-            if (avcodec_open2(codecContext, codec, nullptr) < 0) {
-                std::cerr << "Error: Could not open codec" << std::endl;
-                return empty_result;
-            }
-
-            // Allocate frame and packet
-            frame = av_frame_alloc();
-            packet = av_packet_alloc();
-            if (!frame || !packet) {
-                std::cerr << "Error: Could not allocate frame or packet" << std::endl;
-                return empty_result;
-            }
-
-            // Set packet data
-            packet->data = file_data.data();
-            packet->size = static_cast<int>(file_data.size());
-
-            // Send packet for decoding
-            int response = avcodec_send_packet(codecContext, packet);
-            if (response < 0) {
-                std::cerr << "Error: Error sending packet for decoding" << std::endl;
-                return empty_result;
-            }
-
-            // Receive decoded frame
-            response = avcodec_receive_frame(codecContext, frame);
-            if (response < 0) {
-                std::cerr << "Error: Error during decoding" << std::endl;
-                return empty_result;
-            }
-
-            // Resolve deprecated pixel formats and color range
-            AVPixelFormat srcFmtResolved = AV_PIX_FMT_NONE;
-            int srcIsFullRange = 0;
-            resolve_source_format_and_range(static_cast<AVPixelFormat>(frame->format),
-                                            srcFmtResolved,
-                                            srcIsFullRange,
-                                            frame->color_range,
-                                            codecContext->codec_id);
-
-            // Convert to RGB24 without rescaling
-            SwsContext* swsContext = sws_getContext(
-                frame->width, frame->height, srcFmtResolved,
-                frame->width, frame->height, AV_PIX_FMT_RGB24,
-                SWS_BILINEAR, nullptr, nullptr, nullptr
-            );
-            
-            if (!swsContext) {
-                std::cerr << "Error: Could not create scaling context" << std::endl;
-                if (frame) av_frame_free(&frame);
-                if (packet) av_packet_free(&packet);
-                if (codecContext) {
-#if LIBAVCODEC_VERSION_MAJOR < 59
-                    avcodec_close(codecContext);
-#endif
-                    avcodec_free_context(&codecContext);
-                }
-                return empty_result;
-            }
-
-            // Set colorspace details to respect full/limited range
-            const int* srcCoeffs = sws_getCoefficients(SWS_CS_DEFAULT);
-            const int* dstCoeffs = sws_getCoefficients(SWS_CS_DEFAULT);
-            int dstIsFullRange = 1; // RGB is full range 0..255
-            sws_setColorspaceDetails(swsContext, srcCoeffs, srcIsFullRange,
-                                    dstCoeffs, dstIsFullRange,
-                                    0, 1 << 16, 1 << 16);
-
-            // Allocate RGB24 frame
-            AVFrame* rgbFrame = av_frame_alloc();
-            int rgbBufferSize = av_image_get_buffer_size(AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
-            
-            qwen3vl_image_t result;
-            result.width = frame->width;
-            result.height = frame->height;
-            result._data.resize(rgbBufferSize);
-            
-            if (result._data.size() > 0) {
-                av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, result._data.data(), AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
-                
-                // Convert to RGB24 without rescaling
-                sws_scale(swsContext, frame->data, frame->linesize, 0, frame->height, rgbFrame->data, rgbFrame->linesize);
-                
-                // Reorder from HWC (height, width, 3) to CHW (3, height, width)
-                // RGB24 layout: pixel 0=[r0,g0,b0], pixel 1=[r1,g1,b1], ...
-                // Desired layout: all R, then all G, then all B
-                std::vector<uint8_t> reordered_data(rgbBufferSize);
-                int num_pixels = frame->width * frame->height;
-                const uint8_t* src = result._data.data();
-                uint8_t* dst = reordered_data.data();
-                
-                // Separate RGB channels into CHW layout
-                for (int y = 0; y < frame->height; y++) {
-                    for (int x = 0; x < frame->width; x++) {
-                        int hwc_idx = y * frame->width * 3 + x * 3;
-                        int pixel_idx = y * frame->width + x;
-                        
-                        dst[0 * num_pixels + pixel_idx] = src[hwc_idx];     // R channel
-                        dst[1 * num_pixels + pixel_idx] = src[hwc_idx + 1]; // G channel
-                        dst[2 * num_pixels + pixel_idx] = src[hwc_idx + 2]; // B channel
-                    }
-                }
-                
-                result._data = std::move(reordered_data);
-                
-                av_frame_free(&rgbFrame);
-                sws_freeContext(swsContext);
-                // Cleanup decoder resources before returning
-                if (frame) av_frame_free(&frame);
-                if (packet) av_packet_free(&packet);
-                if (codecContext) {
-#if LIBAVCODEC_VERSION_MAJOR < 59
-                    avcodec_close(codecContext);
-#endif
-                    avcodec_free_context(&codecContext);
-                }
-                return result;
-            }
-
-            av_frame_free(&rgbFrame);
-            sws_freeContext(swsContext);
-            return empty_result;
-
-        } catch (...) {
-            // Cleanup on error
-            if (frame) av_frame_free(&frame);
-            if (packet) av_packet_free(&packet);
-            if (codecContext) avcodec_free_context(&codecContext);
-            throw;
-        }
-
-        if (frame) {
-            av_frame_free(&frame);
-        }
-        if (packet) {
-            av_packet_free(&packet);
-        }
-        if (codecContext) {
-#if LIBAVCODEC_VERSION_MAJOR < 59
-            avcodec_close(codecContext);
-#endif
-            avcodec_free_context(&codecContext);
-        }
-
+    image_data_t decoded;
+    image_data_t reordered;
+    if (!image_reader_.load_image(filename, decoded)) {
         return empty_result;
     }
-    catch (const std::exception& e) {
-        std::cerr << "Error loading image: " << e.what() << std::endl;
+
+    if (!image_reader_.reorder_hwc_to_chw(decoded, reordered)) {
+        image_reader_.recycle(decoded);
         return empty_result;
     }
+
+    image_reader_.recycle(decoded);
+
+    qwen3vl_image_t result;
+    result.width = reordered.width;
+    result.height = reordered.height;
+    result._data = std::vector<uint8_t>(reordered.pixels.data(), reordered.pixels.data() + reordered.pixels.size());
+    image_reader_.recycle(reordered);
+    return result;
 }
 
 qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
-    initialize_ffmpeg();
-    
     qwen3vl_image_t empty_result;
-    
-    try {
-        // Decode base64 to binary data
-        std::string payload = base64_string;
-        std::size_t comma_pos = payload.find(',');
-        if (comma_pos != std::string::npos) {
-            payload = payload.substr(comma_pos + 1);
-        }
-
-        std::string decoder_bytes = base64::from_base64(payload);
-        
-        // Check for valid image formats
-        if (decoder_bytes.size() < 8) {
-            std::cerr << "Error: Invalid image data (too small)" << std::endl;
-            return empty_result;
-        }
-        
-        // Convert string to vector<uint8_t> for processing
-        std::vector<uint8_t> file_data(decoder_bytes.begin(), decoder_bytes.end());
-        
-        // Create memory context for decoding
-        AVCodecContext* codecContext = nullptr;
-        AVFrame* frame = nullptr;
-        AVPacket* packet = nullptr;
-        
-        try {
-            // Find decoder based on file header
-            const AVCodec* codec = nullptr;
-            if (file_data.size() >= 8) {
-                // Check for JPEG
-                if (file_data[0] == 0xFF && file_data[1] == 0xD8) {
-                    codec = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
-                }
-                // Check for PNG
-                else if (file_data[0] == 0x89 && file_data[1] == 0x50 && 
-                        file_data[2] == 0x4E && file_data[3] == 0x47) {
-                    codec = avcodec_find_decoder(AV_CODEC_ID_PNG);
-                }
-            }
-            
-            if (!codec) {
-                std::cerr << "Error: Unsupported image format (only JPEG and PNG supported)" << std::endl;
-                return empty_result;
-            }
-
-            // Create codec context
-            codecContext = avcodec_alloc_context3(codec);
-            if (!codecContext) {
-                std::cerr << "Error: Could not allocate codec context" << std::endl;
-                return empty_result;
-            }
-
-            // Open codec
-            if (avcodec_open2(codecContext, codec, nullptr) < 0) {
-                std::cerr << "Error: Could not open codec" << std::endl;
-                return empty_result;
-            }
-
-            // Allocate frame and packet
-            frame = av_frame_alloc();
-            packet = av_packet_alloc();
-            if (!frame || !packet) {
-                std::cerr << "Error: Could not allocate frame or packet" << std::endl;
-                return empty_result;
-            }
-
-            // Set packet data
-            packet->data = file_data.data();
-            packet->size = static_cast<int>(file_data.size());
-
-            // Send packet for decoding
-            int response = avcodec_send_packet(codecContext, packet);
-            if (response < 0) {
-                std::cerr << "Error: Error sending packet for decoding" << std::endl;
-                return empty_result;
-            }
-
-            // Receive decoded frame
-            response = avcodec_receive_frame(codecContext, frame);
-            if (response < 0) {
-                std::cerr << "Error: Error during decoding" << std::endl;
-                return empty_result;
-            }
-
-            // Resolve deprecated pixel formats and color range
-            AVPixelFormat srcFmtResolved = AV_PIX_FMT_NONE;
-            int srcIsFullRange = 0;
-            resolve_source_format_and_range(static_cast<AVPixelFormat>(frame->format),
-                                            srcFmtResolved,
-                                            srcIsFullRange,
-                                            frame->color_range,
-                                            codecContext->codec_id);
-
-            // Convert to RGB24 without rescaling
-            SwsContext* swsContext = sws_getContext(
-                frame->width, frame->height, srcFmtResolved,
-                frame->width, frame->height, AV_PIX_FMT_RGB24,
-                SWS_BILINEAR, nullptr, nullptr, nullptr
-            );
-            
-            if (!swsContext) {
-                std::cerr << "Error: Could not create scaling context" << std::endl;
-                if (frame) av_frame_free(&frame);
-                if (packet) av_packet_free(&packet);
-                if (codecContext) {
-#if LIBAVCODEC_VERSION_MAJOR < 59
-                    avcodec_close(codecContext);
-#endif
-                    avcodec_free_context(&codecContext);
-                }
-                return empty_result;
-            }
-
-            // Set colorspace details to respect full/limited range
-            const int* srcCoeffs = sws_getCoefficients(SWS_CS_DEFAULT);
-            const int* dstCoeffs = sws_getCoefficients(SWS_CS_DEFAULT);
-            int dstIsFullRange = 1; // RGB is full range 0..255
-            sws_setColorspaceDetails(swsContext, srcCoeffs, srcIsFullRange,
-                                    dstCoeffs, dstIsFullRange,
-                                    0, 1 << 16, 1 << 16);
-
-            // Allocate RGB24 frame
-            AVFrame* rgbFrame = av_frame_alloc();
-            if (!rgbFrame) {
-                std::cerr << "Error: Could not allocate RGB frame" << std::endl;
-                sws_freeContext(swsContext);
-                return empty_result;
-            }
-
-            int rgbBufferSize = av_image_get_buffer_size(AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
-            if (rgbBufferSize <= 0) {
-                std::cerr << "Error: Invalid RGB buffer size" << std::endl;
-                av_frame_free(&rgbFrame);
-                sws_freeContext(swsContext);
-                return empty_result;
-            }
-            
-            qwen3vl_image_t result;
-            result.width = frame->width;
-            result.height = frame->height;
-            result._data.resize(static_cast<size_t>(rgbBufferSize));
-            
-            if (result._data.size() > 0) {
-                int fill_result = av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, result._data.data(), AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
-                if (fill_result < 0) {
-                    std::cerr << "Error: Could not fill RGB frame arrays" << std::endl;
-                    av_frame_free(&rgbFrame);
-                    sws_freeContext(swsContext);
-                    return empty_result;
-                }
-                
-                // Convert to RGB24 without rescaling
-                int scaled_height = sws_scale(swsContext, frame->data, frame->linesize, 0, frame->height, rgbFrame->data, rgbFrame->linesize);
-                if (scaled_height <= 0) {
-                    std::cerr << "Error: Failed to convert image to RGB" << std::endl;
-                    av_frame_free(&rgbFrame);
-                    sws_freeContext(swsContext);
-                    return empty_result;
-                }
-                
-                // Reorder from HWC (height, width, 3) to CHW (3, height, width)
-                // RGB24 layout: pixel 0=[r0,g0,b0], pixel 1=[r1,g1,b1], ...
-                // Desired layout: all R, then all G, then all B
-                std::vector<uint8_t> reordered_data(rgbBufferSize);
-                int num_pixels = frame->width * frame->height;
-                const uint8_t* src = result._data.data();
-                uint8_t* dst = reordered_data.data();
-                
-                // Separate RGB channels into CHW layout
-                for (int y = 0; y < frame->height; y++) {
-                    for (int x = 0; x < frame->width; x++) {
-                        int hwc_idx = y * frame->width * 3 + x * 3;
-                        int pixel_idx = y * frame->width + x;
-                        
-                        dst[0 * num_pixels + pixel_idx] = src[hwc_idx];     // R channel
-                        dst[1 * num_pixels + pixel_idx] = src[hwc_idx + 1]; // G channel
-                        dst[2 * num_pixels + pixel_idx] = src[hwc_idx + 2]; // B channel
-                    }
-                }
-                
-                result._data = std::move(reordered_data);
-                
-                av_frame_free(&rgbFrame);
-                sws_freeContext(swsContext);
-                // Cleanup decoder resources before returning
-                if (frame) av_frame_free(&frame);
-                if (packet) av_packet_free(&packet);
-                if (codecContext) {
-#if LIBAVCODEC_VERSION_MAJOR < 59
-                    avcodec_close(codecContext);
-#endif
-                    avcodec_free_context(&codecContext);
-                }
-                return result;
-            }
-
-            av_frame_free(&rgbFrame);
-            sws_freeContext(swsContext);
-            return empty_result;
-
-        } catch (...) {
-            // Cleanup on error
-            if (frame) av_frame_free(&frame);
-            if (packet) av_packet_free(&packet);
-            if (codecContext) avcodec_free_context(&codecContext);
-            throw;
-        }
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Error loading base64 image: " << e.what() << std::endl;
+    image_data_t decoded;
+    image_data_t reordered;
+    if (!image_reader_.load_image_base64(base64_string, decoded)) {
         return empty_result;
     }
+
+    if (!image_reader_.reorder_hwc_to_chw(decoded, reordered)) {
+        image_reader_.recycle(decoded);
+        return empty_result;
+    }
+
+    image_reader_.recycle(decoded);
+
+    qwen3vl_image_t result;
+    result.width = reordered.width;
+    result.height = reordered.height;
+    result._data = std::vector<uint8_t>(reordered.pixels.data(), reordered.pixels.data() + reordered.pixels.size());
+    image_reader_.recycle(reordered);
+    return result;
 }
 
 
@@ -562,35 +125,34 @@ void Qwen3VL::preprocess_image(qwen3vl_image_t& image, std::vector<bf16> &pixel_
         image._data.data(), width, height, resized_width, resized_height, true
     );
 
-    // Allocate patch_vector with exact size needed
-    std::vector<float> patch_vector(total_patch_size);
+    // Reuse scratch buffer across calls to avoid repeated allocations
+    static thread_local std::vector<float> patch_vector_scratch;
+    if (patch_vector_scratch.size() < total_patch_size) {
+        patch_vector_scratch.resize(total_patch_size);
+    }
     
     // Apply rescale and normalization to first frame
     imgproc::avx512::rescale_and_normalize_avx512(
-        resize_image.data(), patch_vector.data(),
+        resize_image.data(), patch_vector_scratch.data(),
         resized_width, resized_height, channels,
         true, QWEN3_VISION_RESCALE_FACTOR,
         true, QWEN3_VISION_RESCALE_IMAGE_MEAN, QWEN3_VISION_RESCALE_IMAGE_STD
     );
-
-    // Free resize_image early to reduce memory footprint
-    resize_image.clear();
-    resize_image.shrink_to_fit();
     
     // Replicate first frame for temporal patches (optimized for QWEN3_TEMPORAL_PATCH_SIZE = 2)
     // This is more efficient than a loop for the common case
     if constexpr (QWEN3_TEMPORAL_PATCH_SIZE == 2) {
         memcpy(
-            patch_vector.data() + single_frame_size,
-            patch_vector.data(),
+            patch_vector_scratch.data() + single_frame_size,
+            patch_vector_scratch.data(),
             single_frame_size * sizeof(float)
         );
     } else {
         // Generic loop for other TEMPORAL_PATCH_SIZE values
         for(unsigned l = 1; l < QWEN3_TEMPORAL_PATCH_SIZE; l++){
             memcpy(
-                patch_vector.data() + l * single_frame_size,
-                patch_vector.data(),
+                patch_vector_scratch.data() + l * single_frame_size,
+                patch_vector_scratch.data(),
                 single_frame_size * sizeof(float)
             );
         }
@@ -598,7 +160,7 @@ void Qwen3VL::preprocess_image(qwen3vl_image_t& image, std::vector<bf16> &pixel_
 
     // Reorder patches directly into pre-allocated pixel_values
     imgproc::reorder_patches_inplace(
-        patch_vector.data(),
+        patch_vector_scratch.data(),
         pixel_values.data() + prev_pixel_values_size,
         1, 1, // something special for image
         QWEN3_TEMPORAL_PATCH_SIZE,

@@ -11,6 +11,7 @@
 
 
 #include "typedef.hpp"
+#include "image/image_reader.hpp"
 #include "image_process_utils/imageproc.hpp"
 #include "image_process_utils/imageprocAVX512.hpp"
 #include "tensor_utils/q4_npu_eXpress.hpp"
@@ -18,16 +19,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-// FFmpeg includes for image processing only
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/frame.h>
-#include <libavutil/pixfmt.h>
-}
-
-
 
 /************              Qwen3VL_4b            **************/
 class Qwen3VL : public AutoModel {
@@ -36,13 +27,7 @@ private:
     void setup_tokenizer(std::string model_path);
     
     // Image processing functionality
-    static bool ffmpeg_initialized;
-    void initialize_ffmpeg();
-    void resolve_source_format_and_range(AVPixelFormat input_format,
-                                        AVPixelFormat &resolved_format,
-                                        int &src_full_range,
-                                        AVColorRange frame_color_range,
-                                        AVCodecID codec_id);
+    ImageReader image_reader_;
     qwen3vl_image_t load_image(const std::string& filename);
     qwen3vl_image_t load_image_base64(const std::string& base64_string);
     
