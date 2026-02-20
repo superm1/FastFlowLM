@@ -13,6 +13,7 @@ add_npu_test(
     SOURCES
         "${CMAKE_SOURCE_DIR}/../../common/AutoModel/modeling_gemma3.cpp"
         "${CMAKE_SOURCE_DIR}/../../common/AutoModel/modeling_gemma3_image.cpp"
+        "${CMAKE_SOURCE_DIR}/../../common/image/image_reader.cpp"
 )
 
 target_link_libraries(test_gemma_npu PUBLIC
