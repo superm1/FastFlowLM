@@ -809,9 +809,9 @@ bool WebServer::handle_request(http::request<http::string_body>& req,
 ///@param default_tag the default tag
 ///@param port the port
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, int resize, bool cors, bool preemption) {
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, bool cors, bool preemption) {
     auto server = std::make_unique<WebServer>(host, port, cors);
-    auto rest_handler = std::make_shared<RestHandler>(models, downloader, default_tag, asr, embed, ctx_length, resize);
+    auto rest_handler = std::make_shared<RestHandler>(models, downloader, default_tag, asr, embed, ctx_length);
     
     // Register Ollama-compatible routes
     server->register_handler("POST", "/api/show",

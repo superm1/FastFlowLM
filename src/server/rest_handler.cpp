@@ -146,8 +146,8 @@ static json normalize_template(json messages) {
 ///@param downloader the downloader
 ///@param default_tag the default tag
 ///@return the rest handler
-RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int ctx_length, int resize, bool preemption)
-    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""), asr(asr), embed(embed), resize(resize), preemption(preemption){
+RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int ctx_length, bool preemption)
+    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""), asr(asr), embed(embed), preemption(preemption){
     this->npu_device_inst = xrt::device(0);
 
     if (ctx_length != -1) {
@@ -207,7 +207,6 @@ void RestHandler::ensure_model_loaded(const std::string& model_tag) {
             downloader.pull_model(ensure_tag);
         }
         auto [new_ensure_tag, model_info] = supported_models.get_model_info(ensure_tag);
-        auto_chat_engine->set_special_flags(resize);
         try {
             auto_chat_engine->load_model(supported_models.get_model_path(new_ensure_tag), model_info, ctx_length, preemption);
         }
