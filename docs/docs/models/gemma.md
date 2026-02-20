@@ -48,28 +48,3 @@ flm run gemma3:4b
 ```
 
 ---
-
-## 🧩 Model Card: [gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it)
-
-- **Type:** Image-Text-to-Text
-- **Think:** No
-- **Tool Calling Support:** No  
-- **Base Model:** [google/gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it)
-- **Quantization:** Q4_1
-- **Max Context Length:** 32k tokens  
-- **Default Context Length:** 32k tokens ([change default](https://fastflowlm.com/docs/instructions/cli/#-change-default-context-length-max))  
-- **[Set Context Length at Launch](https://fastflowlm.com/docs/instructions/cli/#-set-context-length-at-launch)**
-
-▶️ Run with FastFlowLM in PowerShell:  
-
-```shell
-flm run gemma3:270m
-```
-
-⚠️ **Warning:** 
-> – `gemma3:270m` is **Experimental** in FLM  
-> – Limited accuracy; may produce errors  
-> – Can loop on long outputs (quirk from Unsloth weights, also seen in LM Studio)  
-> – Experimenting with different quantization + hyperparameters  
-
----

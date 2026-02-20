@@ -156,6 +156,27 @@ flm run qwen3-it:4b
 flm run qwen3vl-it:4b
 ```
 
+▶️ Image Resize Options
+
+You can control image resizing when running or serving the model using the `--resize` flag:
+
+```shell
+flm run qwen3vl-it:3b --resize 1
+```
+
+```shell
+flm serve qwen3vl-it:3b --resize 1
+```
+
+The `--resize` option determines the target length of the image’s **longest** side:
+
+- -1 — Disable resizing (use the original image)
+- 0 — Resize so the longest side is **1080 px** (Default)
+- 1 — Resize so the longest side is **1920 px**
+- 2 — Resize so the longest side is **2560 px**
+
+> Don't worry—if your image is already smaller than 1080px, it keeps its original resolution! ✨
+
 📝 **Note**
 
 - Image understanding adapts to image size. Image TTFT can range from under 1 second to ~200 seconds depending on resolution. Use lower-resolution images (720p or below) unless high resolution is required (e.g. OCR on small text).
@@ -198,6 +219,27 @@ flm run qwen2.5-it:3b
 ```shell
 flm run qwen2.5vl-it:3b
 ```
+
+▶️ Image Resize Options
+
+You can control image resizing when running or serving the model using the `--resize` flag:
+
+```shell
+flm run qwen2.5vl-it:3b --resize 1
+```
+
+```shell
+flm serve qwen2.5vl-it:3b --resize 1
+```
+
+The `--resize` option determines the target length of the image’s **longest** side:
+
+- -1 — Disable resizing (use the original image)
+- 0 — Resize so the longest side is **1080 px** (Default)
+- 1 — Resize so the longest side is **1920 px**
+- 2 — Resize so the longest side is **2560 px**
+
+> Don't worry—if your image is already smaller than 1080px, it keeps its original resolution! ✨
 
 📝 **Note**
 
