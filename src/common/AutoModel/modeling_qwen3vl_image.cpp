@@ -15,6 +15,36 @@ qwen3vl_image_t Qwen3VL::load_image(const std::string& filename) {
         return empty_result;
     }
 
+    if (this->image_pre_resize > 0) {
+        int max_height;
+        switch(this->image_pre_resize) {
+            case 1:
+                max_height = 480;
+                break;
+            case 2:
+                max_height = 720;
+                break;
+            case 3:
+                max_height = 1080;
+                break;
+            default:
+                max_height = decoded.height; // no resizing
+                break;
+        }
+
+        if (decoded.height > max_height) {
+            image_data_t resized_image;
+            float ratio = static_cast<float>(max_height) / static_cast<float>(decoded.height);
+            int target_width = static_cast<int>(static_cast<float>(decoded.width) * ratio);
+            int target_height = max_height;
+            header_print_r("FLM", "Qwen3VL resizing image from (" + std::to_string(decoded.width) + ", " + std::to_string(decoded.height) + ") to (" + std::to_string(target_width) + ", " + std::to_string(target_height) + ")\n");
+            if (image_reader_.resize_image(decoded, target_width, target_height, resized_image)) {
+                image_reader_.recycle(decoded);
+                decoded = std::move(resized_image);
+            }
+        }
+    }
+
     if (!image_reader_.reorder_hwc_to_chw(decoded, reordered)) {
         image_reader_.recycle(decoded);
         return empty_result;
@@ -38,6 +68,35 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
         return empty_result;
     }
 
+    if (this->image_pre_resize > 0) {
+        int max_height;
+        switch(this->image_pre_resize) {
+            case 1:
+                max_height = 480;
+                break;
+            case 2:
+                max_height = 720;
+                break;
+            case 3:
+                max_height = 1080;
+                break;
+            default:
+                max_height = decoded.height; // no resizing
+                break;
+        }
+
+        if (decoded.height > max_height) {
+            image_data_t resized_image;
+            float ratio = static_cast<float>(max_height) / static_cast<float>(decoded.height);
+            int target_width = static_cast<int>(static_cast<float>(decoded.width) * ratio);
+            int target_height = max_height;
+            header_print_r("FLM", "Qwen3VL resizing image from (" + std::to_string(decoded.width) + ", " + std::to_string(decoded.height) + ") to (" + std::to_string(target_width) + ", " + std::to_string(target_height) + ")");
+            if (image_reader_.resize_image(decoded, target_width, target_height, resized_image)) {
+                image_reader_.recycle(decoded);
+                decoded = std::move(resized_image);
+            }
+        }
+    }
     if (!image_reader_.reorder_hwc_to_chw(decoded, reordered)) {
         image_reader_.recycle(decoded);
         return empty_result;

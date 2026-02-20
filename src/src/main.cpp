@@ -145,7 +145,7 @@ void handle_user_input() {
 ///@param default_tag the default tag
 ///@param port the port to listen on, default is 52625, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, bool cors, bool preemption);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, int img_pre_resize, bool cors, bool preemption);
 
 
 ///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
@@ -271,6 +271,7 @@ int main(int argc, char* argv[]) {
     size_t max_socket_connections = parsed_args.max_socket_connections;
     size_t max_npu_queue = parsed_args.max_npu_queue;
     int user_port = parsed_args.port;
+    int img_pre_resize = parsed_args.img_pre_resize;
     std::string user_host = parsed_args.host;
     bool quiet_list = parsed_args.quiet_list;
     std::string list_filter = parsed_args.list_filter;
@@ -335,14 +336,14 @@ int main(int argc, char* argv[]) {
         }
         else if (command == "run") {
             check_and_notify_new_version();
-            Runner runner(availble_models, downloader, tag, asr, embed, ctx_length, preemption);
+            Runner runner(availble_models, downloader, tag, asr, embed, ctx_length, img_pre_resize, preemption);
             runner.run();
 
         } else if (command == "serve") {
             check_and_notify_new_version();
             // Create the server
             int port = utils::get_server_port(user_port);
-            auto server = create_lm_server(availble_models, downloader, tag, asr, embed, user_host, port, ctx_length, cors, preemption);
+            auto server = create_lm_server(availble_models, downloader, tag, asr, embed, user_host, port, ctx_length, img_pre_resize, cors, preemption);
             server->set_max_connections(max_socket_connections);           // Allow up to 10 concurrent connections
             server->set_io_threads(10);          // Allow up to 5 io threads
             server->set_npu_queue_length(max_npu_queue);           // Allow up to 10 concurrent queue

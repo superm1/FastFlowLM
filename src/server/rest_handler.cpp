@@ -145,9 +145,12 @@ static json normalize_template(json messages) {
 ///@param models the model list
 ///@param downloader the downloader
 ///@param default_tag the default tag
+///@param asr whether to enable asr
+///@param embed whether to enable embedding
+
 ///@return the rest handler
-RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int ctx_length, bool preemption)
-    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""), asr(asr), embed(embed), preemption(preemption){
+RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int ctx_length, int img_pre_resize, bool preemption)
+    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""), asr(asr), embed(embed), img_pre_resize(img_pre_resize), preemption(preemption){
     this->npu_device_inst = xrt::device(0);
 
     if (ctx_length != -1) {
@@ -207,6 +210,7 @@ void RestHandler::ensure_model_loaded(const std::string& model_tag) {
             downloader.pull_model(ensure_tag);
         }
         auto [new_ensure_tag, model_info] = supported_models.get_model_info(ensure_tag);
+        auto_chat_engine->configure_parameter("img_pre_resize", this->img_pre_resize);
         try {
             auto_chat_engine->load_model(supported_models.get_model_path(new_ensure_tag), model_info, ctx_length, preemption);
         }

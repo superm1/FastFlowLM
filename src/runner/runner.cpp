@@ -36,11 +36,10 @@ std::map<std::string, runner_cmd_t> cmd_map = {
 /// \param supported_models - the list of supported models
 /// \param downloader - the downloader for the models
 /// \param tag - the tag of the model to load
-Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, bool preemption)
-    : supported_models(supported_models), downloader(downloader), tag(tag), asr(asr), embed(embed) {
+Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, int img_pre_resize, bool preemption)
+    : supported_models(supported_models), downloader(downloader), tag(tag), asr(asr), embed(embed), img_pre_resize(img_pre_resize), preemption(preemption) {
 
     this->npu_device_inst = xrt::device(0);
-    this->preemption = preemption;
 
 
     if (this->embed) {
@@ -89,6 +88,7 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
         this->downloader.pull_model(this->tag);
     }
     auto [new_tag, model_info] = this->supported_models.get_model_info(this->tag);
+    this->auto_chat_engine->configure_parameter("img_pre_resize", this->img_pre_resize);
     try {
         this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
     }
@@ -393,6 +393,7 @@ void Runner::cmd_load(std::vector<std::string>& input_list) {
         this->auto_chat_engine = std::move(auto_model.second);
 
         auto [new_tag, model_info] = this->supported_models.get_model_info(this->tag);
+        this->auto_chat_engine->configure_parameter("img_pre_resize", this->img_pre_resize);
         try {
             this->auto_chat_engine->load_model(this->supported_models.get_model_path(new_tag), model_info, this->ctx_length, this->preemption);
         }

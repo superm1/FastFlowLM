@@ -43,7 +43,7 @@ typedef enum {
 /// \brief Runner class
 class Runner {
     public: 
-        Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, bool preemption);
+        Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, int img_pre_resize, bool preemption);
         void run();
     private:
         std::string tag;
@@ -60,6 +60,7 @@ class Runner {
         int ctx_length;
         std::string system_prompt;
         bool preemption;
+        int img_pre_resize;
         // CLI instance for interactive input
         CLIWide cli;
         xrt::device npu_device_inst;

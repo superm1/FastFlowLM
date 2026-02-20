@@ -351,7 +351,7 @@ bool ImageReader::parse_image_header(const uint8_t* data, size_t size, int& code
 
 bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& out_image) {
     int codec_id = AV_CODEC_ID_NONE;
-    header_print_g("DEBUG", "Decoding image of size: " << std::to_string(size) << " bytes");
+    // header_print_g("DEBUG", "Decoding image of size: " << std::to_string(size) << " bytes");
     if (!parse_image_header(data, size, codec_id)) {
         std::cerr << "Error: Unsupported image format (only JPEG/JPG and PNG supported)" << std::endl;
         return false;
@@ -446,13 +446,13 @@ bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& o
             std::cerr << "Error: Invalid decoded RGB buffer size" << std::endl;
             break;
         }
-        header_print_g("DEBUG", "Decoded image dimensions: " << frame_->width << "x" << frame_->height);
+        // header_print_g("DEBUG", "Decoded image dimensions: " << frame_->width << "x" << frame_->height);
         bytes buffer = memory_pool_.acquire(static_cast<size_t>(rgb_size));
         if (buffer.size() == 0) {
             std::cerr << "Error: Could not allocate output image buffer" << std::endl;
             break;
         }
-        header_print_g("DEBUG", "Acquired buffer of size: " << std::to_string(buffer.size()) << " bytes from memory pool");
+        // header_print_g("DEBUG", "Acquired buffer of size: " << std::to_string(buffer.size()) << " bytes from memory pool");
         if (av_image_fill_arrays(rgb_frame_->data,
                                  rgb_frame_->linesize,
                                  buffer.data(),
@@ -464,7 +464,7 @@ bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& o
             memory_pool_.recycle(std::move(buffer));
             break;
         }
-        header_print_g("DEBUG", "Filling RGB image arrays");
+        // header_print_g("DEBUG", "Filling RGB image arrays");
         if (sws_scale(sws_ctx_,
                       frame_->data,
                       frame_->linesize,
@@ -476,14 +476,14 @@ bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& o
             memory_pool_.recycle(std::move(buffer));
             break;
         }
-        header_print_g("DEBUG", "Successfully converted image to RGB24 format");
+        // header_print_g("DEBUG", "Successfully converted image to RGB24 format");
         recycle(out_image);
-        header_print_g("DEBUG", "Recycling previous output image data if any");
+        // header_print_g("DEBUG", "Recycling previous output image data if any");
         out_image.width = frame_->width;
         out_image.height = frame_->height;
         out_image.pixels = std::move(buffer);
         
-        header_print_g("DEBUG", "Image decoding successful!");
+        // header_print_g("DEBUG", "Image decoding successful!");
         ok = true;
     } while (false);
 

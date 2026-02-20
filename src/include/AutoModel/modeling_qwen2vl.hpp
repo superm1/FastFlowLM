@@ -30,6 +30,7 @@ private:
     qwen2vl_image_t load_image(const std::string& filename);
     qwen2vl_image_t load_image_base64(const std::string& base64_string);
     
+    int image_pre_resize = 0;
 
     int debug_count= 0;
     void smart_resize(
@@ -50,4 +51,45 @@ public:
     std::string generate(chat_meta_info_t& meta_info, int length_limit, std::ostream& os, std::function<bool()> is_cancelled = [] { return false; }) override;
     std::string generate_with_prompt(chat_meta_info_t& meta_info, lm_uniform_input_t& input, int length_limit, std::ostream& os = std::cout) override;
     std::string apply_chat_template(nlohmann::ordered_json& messages, nlohmann::ordered_json tools = nlohmann::ordered_json::object()) override;
+    
+    /// \brief Configure a parameter with type-erased value
+	/// \param parameter_name the name of the parameter
+	/// \param value the value to set (can be any type)
+	/// \return true if the parameter was configured successfully, false otherwise
+	bool configure_parameter(std::string parameter_name, const std::any& value) override{
+		if (parameter_name == "system_prompt") {
+			try {
+				this->user_system_prompt = std::any_cast<std::string>(value);
+				this->extra_context["user_system_prompt"] = this->user_system_prompt;
+				return true;
+			} catch (const std::bad_any_cast&) {
+				return false;
+			}
+		}
+        else if (parameter_name == "img_pre_resize") {
+            try {
+                this->image_pre_resize = std::any_cast<int>(value);
+                int target_size;
+                if (this->image_pre_resize <= 0) {
+                    target_size = 0;
+                } else if (this->image_pre_resize == 1) {
+                    target_size = 480;
+                } else if (this->image_pre_resize <= 2) {
+                    target_size = 720;
+                } else if (this->image_pre_resize <= 3) {
+                    target_size = 1080;
+                } else {
+                    this->image_pre_resize = 0;
+                    target_size = 0;
+                }
+                if (this->image_pre_resize > 0) {
+                    header_print_r("FLM", "Qwen2VL pre-resize image hight to " + std::to_string(target_size) + " pixels if larger than that");
+                }
+                return true;
+            } catch (const std::bad_any_cast&) {
+                return false;
+            }
+        }
+		return false;
+	}
 };

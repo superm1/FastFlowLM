@@ -124,16 +124,16 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
                 }
                 const std::string_view img_preview =
                     std::string_view(*img_ptr).substr(0, 8);
-                header_print_g("DEBUG", "Loading image: " + std::string(img_preview) + "...");
+                // header_print_g("DEBUG", "Loading image: " + std::string(img_preview) + "...");
                 qwen2vl_image_t image = this->load_image_base64(*img_ptr);
-                header_print_g("DEBUG", "Preprocessing image...");
+                // header_print_g("DEBUG", "Preprocessing image...");
                 preprocess_image(image, image_payload._data__processed);
-                header_print_g("DEBUG", "Image preprocessed: " +
-                    std::to_string(image.width_resized) + "x" +
-                    std::to_string(image.height_resized) +
-                    ", grid: " + std::to_string(image.grid_w) + "x" +
-                    std::to_string(image.grid_h));
-                header_print_g("DEBUG", "Payload size: " + std::to_string(image_payload._data__processed.size()) );
+                // header_print_g("DEBUG", "Image preprocessed: " +
+                    // std::to_string(image.width_resized) + "x" +
+                    // std::to_string(image.height_resized) +
+                    // ", grid: " + std::to_string(image.grid_w) + "x" +
+                    // std::to_string(image.grid_h));
+                // header_print_g("DEBUG", "Payload size: " + std::to_string(image_payload._data__processed.size()) );
 
                 image_payload.images.push_back(image);
                 image_payload.num_images++;
@@ -152,16 +152,16 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
                         }
                         const std::string_view img_preview =
                             std::string_view(*img_ptr).substr(0, 8);
-                        header_print_g("DEBUG", "Loading image: " + std::string(img_preview) + "...");
+                        // header_print_g("DEBUG", "Loading image: " + std::string(img_preview) + "...");
                         qwen2vl_image_t image = this->load_image_base64(*img_ptr);
-                        header_print_g("DEBUG", "Preprocessing image...");
+                        // header_print_g("DEBUG", "Preprocessing image...");
                         preprocess_image(image, image_payload._data__processed);
-                        header_print_g("DEBUG", "Image preprocessed: " +
-                            std::to_string(image.width_resized) + "x" +
-                            std::to_string(image.height_resized) +
-                            ", grid: " + std::to_string(image.grid_w) + "x" +
-                            std::to_string(image.grid_h));
-                        header_print_g("DEBUG", "Payload size: " + std::to_string(image_payload._data__processed.size()) );
+                        // header_print_g("DEBUG", "Image preprocessed: " +
+                            // std::to_string(image.width_resized) + "x" +
+                            // std::to_string(image.height_resized) +
+                            // ", grid: " + std::to_string(image.grid_w) + "x" +
+                            // std::to_string(image.grid_h));
+                        // header_print_g("DEBUG", "Payload size: " + std::to_string(image_payload._data__processed.size()) );
 
                         image_payload.images.push_back(image);
                         image_payload.num_images++;
