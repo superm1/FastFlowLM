@@ -554,8 +554,7 @@ void WebServer::process_next_npu_request() {
     }
 
     // NPU cooldown before running the next queued task.
-    constexpr auto npu_cooldown = std::chrono::seconds(1);
-    header_print("🧊 ", "NPU cooldown for 1 seconds before next queued request...");
+    constexpr auto npu_cooldown = std::chrono::milliseconds(333);
     std::this_thread::sleep_for(npu_cooldown);
 
     std::function<void()> task;

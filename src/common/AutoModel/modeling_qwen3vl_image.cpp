@@ -279,7 +279,13 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
     
     try {
         // Decode base64 to binary data
-        std::string decoder_bytes = base64::from_base64(base64_string);
+        std::string payload = base64_string;
+        std::size_t comma_pos = payload.find(',');
+        if (comma_pos != std::string::npos) {
+            payload = payload.substr(comma_pos + 1);
+        }
+
+        std::string decoder_bytes = base64::from_base64(payload);
         
         // Check for valid image formats
         if (decoder_bytes.size() < 8) {
@@ -393,18 +399,42 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
 
             // Allocate RGB24 frame
             AVFrame* rgbFrame = av_frame_alloc();
+            if (!rgbFrame) {
+                std::cerr << "Error: Could not allocate RGB frame" << std::endl;
+                sws_freeContext(swsContext);
+                return empty_result;
+            }
+
             int rgbBufferSize = av_image_get_buffer_size(AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
+            if (rgbBufferSize <= 0) {
+                std::cerr << "Error: Invalid RGB buffer size" << std::endl;
+                av_frame_free(&rgbFrame);
+                sws_freeContext(swsContext);
+                return empty_result;
+            }
             
             qwen3vl_image_t result;
             result.width = frame->width;
             result.height = frame->height;
-            result._data.resize(rgbBufferSize);
+            result._data.resize(static_cast<size_t>(rgbBufferSize));
             
             if (result._data.size() > 0) {
-                av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, result._data.data(), AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
+                int fill_result = av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, result._data.data(), AV_PIX_FMT_RGB24, frame->width, frame->height, 1);
+                if (fill_result < 0) {
+                    std::cerr << "Error: Could not fill RGB frame arrays" << std::endl;
+                    av_frame_free(&rgbFrame);
+                    sws_freeContext(swsContext);
+                    return empty_result;
+                }
                 
                 // Convert to RGB24 without rescaling
-                sws_scale(swsContext, frame->data, frame->linesize, 0, frame->height, rgbFrame->data, rgbFrame->linesize);
+                int scaled_height = sws_scale(swsContext, frame->data, frame->linesize, 0, frame->height, rgbFrame->data, rgbFrame->linesize);
+                if (scaled_height <= 0) {
+                    std::cerr << "Error: Failed to convert image to RGB" << std::endl;
+                    av_frame_free(&rgbFrame);
+                    sws_freeContext(swsContext);
+                    return empty_result;
+                }
                 
                 // Reorder from HWC (height, width, 3) to CHW (3, height, width)
                 // RGB24 layout: pixel 0=[r0,g0,b0], pixel 1=[r1,g1,b1], ...
@@ -453,13 +483,6 @@ qwen3vl_image_t Qwen3VL::load_image_base64(const std::string& base64_string) {
             if (codecContext) avcodec_free_context(&codecContext);
             throw;
         }
-
-        // Cleanup
-        if (frame) av_frame_free(&frame);
-        if (packet) av_packet_free(&packet);
-        if (codecContext) avcodec_free_context(&codecContext);
-
-        return empty_result;
     }
     catch (const std::exception& e) {
         std::cerr << "Error loading base64 image: " << e.what() << std::endl;
