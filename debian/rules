@@ -21,7 +21,7 @@ override_dh_auto_install:
 	DESTDIR=$(CURDIR)/debian/fastflowlm cmake --install build --prefix=/opt/fastflowlm
 	rmdir --ignore-fail-on-non-empty debian/fastflowlm/opt/fastflowlm/bin
 	install -d debian/fastflowlm/opt/fastflowlm debian/fastflowlm/usr/bin
-	ln -sf /opt/fastflowlm/flm debian/fastflowlm/usr/bin/flm
+	ln -sf /opt/fastflowlm/bin/flm debian/fastflowlm/usr/bin/flm
 
 	# Remove include directories
 	rm -rf debian/fastflowlm/opt/fastflowlm/include
