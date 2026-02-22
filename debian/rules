@@ -24,9 +24,6 @@ override_dh_auto_install:
 	rmdir --ignore-fail-on-non-empty debian/fastflowlm/opt/fastflowlm/bin
 	ln -sf /opt/fastflowlm/flm debian/fastflowlm/usr/bin/flm
 
-	# Install model list
-	install -m 644 src/model_list.json debian/fastflowlm/opt/fastflowlm/model_list.json
-
 	# Install xclbins
 	cp -r src/xclbins debian/fastflowlm/opt/fastflowlm/
 
