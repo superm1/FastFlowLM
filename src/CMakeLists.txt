@@ -315,3 +315,5 @@ install(TARGETS flm
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION .
 )
+
+install(FILES model_list.json DESTINATION share/flm)
