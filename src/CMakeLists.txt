@@ -322,3 +322,13 @@ install(FILES model_list.json DESTINATION share/flm)
 # xclbins, which are loaded by shared libraries need to be in location
 # relative to the executable, so we install them to bin/xclbins
 install(DIRECTORY xclbins DESTINATION bin)
+
+if(NOT WIN32 AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr" AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
+    install(CODE "
+        message(STATUS \"Creating symlink for flm\")
+        file(MAKE_DIRECTORY \"$ENV{DESTDIR}/usr/local/bin\")
+        execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink
+            \"${CMAKE_INSTALL_PREFIX}/bin/flm\"
+            \"$ENV{DESTDIR}/usr/local/bin/flm\")"
+    )
+endif()
