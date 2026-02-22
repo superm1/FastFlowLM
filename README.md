@@ -127,3 +127,62 @@ For commercial licensing inquiries, email us: info@fastflowlm.com
 - Tokenization accelerated with [MLC-ai/tokenizers-cpp](https://github.com/mlc-ai/tokenizers-cpp)
 - Chat formatting via [Google/minja](https://github.com/google/minja)
 - Low-level kernels optimized using the powerful [IRON](https://github.com/amd/iron)+[AIE-MLIR](https://github.com/Xilinx/mlir-aie)
+
+---
+
+## 🛠️ Building from Source
+
+For developers who want to build FastFlowLM from source, we provide CMake presets for a convenient and consistent build experience.
+
+### Prerequisites
+
+- Git
+- CMake (version 3.22 or higher)
+- A C++20 compatible compiler (e.g., GCC, Clang, MSVC)
+- Ninja (recommended)
+
+### Build Instructions
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone --recursive https://github.com/FastFlowLM/FastFlowLM.git
+    cd FastFlowLM/src
+    ```
+
+2.  **Configure CMake using presets:**
+
+    -   **For Linux:**
+
+        ```bash
+        cmake --preset linux-default
+        ```
+
+        This will configure the build to install to `/opt/fastflowlm`.
+
+    -   **For Windows (in a developer command prompt):**
+
+        ```bash
+        cmake --preset windows-default
+        ```
+
+3.  **Build the project:**
+
+    ```bash
+    cmake --build build
+    ```
+
+4.  **Install the project (optional):**
+
+    -   **For Linux:**
+
+        ```bash
+        sudo cmake --install build
+        ```
+
+    -   **For Windows (with administrator privileges):**
+
+        ```bash
+        cmake --install build
+        ```
+
