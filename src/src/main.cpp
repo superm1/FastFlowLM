@@ -240,7 +240,7 @@ int main(int argc, char* argv[]) {
     
     // Get the command, model tag, and force flag
     std::string exe_dir = utils::get_executable_directory();
-    std::string config_path = exe_dir + "/model_list.json";
+    std::string config_path = utils::find_model_list();
     // Get the models directory from environment variable or default
     std::string models_dir = utils::get_models_directory();
 
