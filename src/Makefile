@@ -34,18 +34,18 @@ else
 all:
 	@mkdir -p $(BUILD_DIR)
 	@mkdir -p $(OUT_DIR)
-	@cd $(BUILD_DIR) && ${PWSH} -Command "cmake .."
-	@cd $(BUILD_DIR) && ${PWSH} -Command "cmake --build . --config Release"
+	@cd $(BUILD_DIR) && cmake ..
+	@cd $(BUILD_DIR) && cmake --build . --config Release
 
 run:
-	@cp lib/*.dll $(OUT_DIR)
+	@cp lib/*.so $(OUT_DIR)
 	@cp model_list.json $(OUT_DIR)
-	@cd $(OUT_DIR) && ${PWSH} -Command "./flm.exe run gpt-oss -a 0"
+	@cd $(OUT_DIR) && ./flm run gpt-oss -a 0
 
 serve:
-	@cp lib/*.dll $(OUT_DIR)
+	@cp lib/*.so $(OUT_DIR)
 	@cp model_list.json $(OUT_DIR)
-	@cd $(OUT_DIR) && ${PWSH} -Command "./flm.exe serve -a 1 -e 1"
+	@cd $(OUT_DIR) && ./flm serve -a 1 -e 1
 
 clean:
 	@rm -rf $(BUILD_DIR)
