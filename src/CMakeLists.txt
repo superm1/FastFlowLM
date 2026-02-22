@@ -306,11 +306,12 @@ if(WIN32)
         COMMENT "Checking for remaining DLL dependencies"
         DEPENDS flm
     )
+else()
+    file(GLOB so_libs "${CMAKE_SOURCE_DIR}/lib/*.so")
+    install(FILES ${so_libs} DESTINATION lib)
+    set_target_properties(flm PROPERTIES
+        INSTALL_RPATH "$ORIGIN/../lib")
 endif()
-
-# ———————————————————————————————————————————————
-# Install the flm binary (for proper deployment)
-# ———————————————————————————————————————————————
 install(TARGETS flm
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION .
