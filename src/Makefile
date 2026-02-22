@@ -3,7 +3,7 @@ OUT_DIR   := out
 PWSH      := powershell.exe
 
 
-.PHONY: all clean run serve
+.PHONY: all clean run serve install
 
 ifeq ($(OS),Windows_NT)
 
@@ -29,6 +29,10 @@ clean:
 	@$(PWSH) "Remove-Item -Recurse -Force '$(BUILD_DIR)'"
 	@$(PWSH) "Remove-Item -Recurse -Force '$(OUT_DIR)'"
 
+install:
+	@echo "Installing using CMake..."
+	@cd $(BUILD_DIR) && cmake --install . --prefix $(PREFIX)
+
 else
 
 all:
@@ -50,5 +54,9 @@ serve:
 clean:
 	@rm -rf $(BUILD_DIR)
 	@rm -rf $(OUT_DIR)
+
+install:
+	@echo "Installing using CMake..."
+	@cd $(BUILD_DIR) && cmake --install . --prefix $(PREFIX)
 
 endif
