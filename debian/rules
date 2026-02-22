@@ -24,9 +24,6 @@ override_dh_auto_install:
 	rmdir --ignore-fail-on-non-empty debian/fastflowlm/opt/fastflowlm/bin
 	ln -sf /opt/fastflowlm/flm debian/fastflowlm/usr/bin/flm
 
-	# Install xclbins
-	cp -r src/xclbins debian/fastflowlm/opt/fastflowlm/
-
 	# Remove include and lib directories
 	rm -rf debian/fastflowlm/opt/fastflowlm/include debian/fastflowlm/opt/fastflowlm/lib
 

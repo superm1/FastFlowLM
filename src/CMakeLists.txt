@@ -317,3 +317,7 @@ install(TARGETS flm
 )
 
 install(FILES model_list.json DESTINATION share/flm)
+
+# xclbins, which are loaded by shared libraries need to be in location
+# relative to the executable, so we install them to bin/xclbins
+install(DIRECTORY xclbins DESTINATION bin)
