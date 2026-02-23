@@ -25,6 +25,7 @@ CXX_FLAGS += -I/opt/xilinx/xrt/include
 CXX_FLAGS += -MMD -MP
 CXX_FLAGS += -DDEV_BUILD
 CXX_FLAGS += -fopenmp
+CXX_FLAGS += -DCMAKE_INSTALL_PREFIX="\"/opt/fastflowlm\""
 
 LDFLAGS += -L/opt/xilinx/xrt/lib
 LDFLAGS += -Wl,-rpath,/opt/xilinx/xrt/lib
@@ -34,7 +35,10 @@ LDFLAGS += -L$(LIB_DIR)
 LDFLAGS += -L../../build/tokenizers-cpp
 LDFLAGS += -L../../build/tokenizers-cpp/sentencepiece/src
 LDFLAGS += -ltokenizers_cpp -ltokenizers_c -lsentencepiece -laiebu
-LDFLAGS += -lmha -ldequant -lgemm -llm_head -lq4_npu_eXpress
+DEPENDENCY_LDFLAGS += -lmha -ldequant -lgemm -llm_head -lq4_npu_eXpress
+
+
+SOURCES += ../../common/utils.cpp
 
 else
 

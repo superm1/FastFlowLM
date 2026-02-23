@@ -36,10 +36,9 @@ install:
 else
 
 all:
-	@mkdir -p $(BUILD_DIR)
 	@mkdir -p $(OUT_DIR)
-	@cd $(BUILD_DIR) && cmake ..
-	@cd $(BUILD_DIR) && cmake --build . --config Release
+	@cmake --preset linux-default
+	@cmake --build build
 
 run:
 	@cp lib/*.so $(OUT_DIR)
