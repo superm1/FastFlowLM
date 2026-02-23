@@ -394,9 +394,6 @@ int main(int argc, char* argv[]) {
             std::string xrt_cmd = "cd \"C:\\Windows\\System32\\AMD\" && .\\xrt-smi.exe configure --pmode " + power_mode + " > NUL 2>&1";
             header_print("FLM", "Configuring NPU Power Mode to " + power_mode + (got_power_mode ? "" : " (flm default)"));
             (void)system(xrt_cmd.c_str());
-#else
-            (void)got_power_mode;
-            header_print("FLM", "Power mode configuration is Windows-only; continuing on this platform.");
 #endif
         }
         else{
