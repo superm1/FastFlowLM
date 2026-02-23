@@ -54,7 +54,7 @@ clean:
 
 test: $(BUILD_DIR)/test_whisper_npu
 	cp ../../model_list.json $(BUILD_DIR)/model_list.json
-	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib:$(LD_LIBRARY_PATH) && ./test_whisper_npu -m whisper-v3 -p 0 -a test1.ogg -t 1 -r 1
+	cd $(BUILD_DIR) && export LD_LIBRARY_PATH=../../../lib:$(LD_LIBRARY_PATH) && ./test_whisper_npu -m whisper-v3 -p 0 -a test1.ogg -t 1 -r 0
 
 -include $(TEST_DEPS)
 .PHONY: all clean test directories

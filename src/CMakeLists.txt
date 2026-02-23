@@ -72,7 +72,7 @@ if(NOT WIN32)
     )
 
     # Define a macro to indicate limited model support on Linux
-    add_compile_definitions(FASTFLOWLM_LINUX_LIMITED_MODELS=1)
+    # add_compile_definitions(FASTFLOWLM_LINUX_LIMITED_MODELS=1)
 endif()
 
 
