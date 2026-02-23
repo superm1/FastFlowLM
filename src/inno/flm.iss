@@ -24,6 +24,8 @@ SolidCompression=yes
 
 LicenseFile=terms.txt
 
+ChangesEnvironment=yes
+
 ; Icon configuration to preserve original background
 SetupIconFile=logo.ico
 
