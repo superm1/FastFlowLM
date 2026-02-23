@@ -119,6 +119,7 @@ endif()
 
 target_compile_definitions(flm PUBLIC
     DISABLE_ABI_CHECK=1
+    CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}"
 )
 
 if(WIN32)

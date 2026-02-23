@@ -20,11 +20,8 @@
 namespace utils {
 
 std::string find_model_list() {
-#ifdef CMAKE_INSTALL_PREFIX
     std::string install_prefix = CMAKE_INSTALL_PREFIX;
-#else
-    std::string install_prefix = "/usr/local";
-#endif
+
     // 1. Check FLM_CONFIG_PATH environment variable
     const char* env_path = std::getenv("FLM_CONFIG_PATH");
     if (env_path && *env_path) {
