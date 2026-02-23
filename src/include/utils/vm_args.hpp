@@ -121,6 +121,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             std::cout << "  version             - Show version information" << std::endl;
             std::cout << "  help                - Show this help message" << std::endl;
             std::cout << "  port                - Show the default server port" << std::endl;
+            std::cout << "  validate            - Validate the NPU stack" << std::endl;
             std::cout << std::endl;
             std::cout << general << std::endl;
             std::cout << "Examples:" << std::endl;
@@ -166,6 +167,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                 std::cout << "  version             - Show version information" << std::endl;
                 std::cout << "  help                - Show this help message" << std::endl;
                 std::cout << "  port                - Show the default server port" << std::endl;
+                std::cout << "  validate            - Validate the NPU stack" << std::endl;
                 std::cout << std::endl;
                 std::cout << general << std::endl;
                 std::cout << "Examples:" << std::endl;
