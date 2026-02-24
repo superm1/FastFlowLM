@@ -166,8 +166,10 @@ void Sampler::sampler_minp_apply(float p) {
 }
 
 void Sampler::sampler_temp_apply(float temp) {
-    if (temp == 0) {
-        return;
+    if (temp == 0) { // Greedy sampling
+        for (int i = 1; i < this->top_k_logits.size(); i++) {
+            this->top_k_logits[i].logits = -std::numeric_limits<float>::infinity();
+        }
     }
 
     for (int i = 0; i < this->top_k_logits.size(); i++) {

@@ -24,6 +24,7 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libavutil/frame.h>
 #include <libavutil/pixfmt.h>
+#include <libavutil/pixdesc.h>
 }
 
 namespace {
@@ -223,6 +224,7 @@ bytes ImageMemoryPool::acquire(size_t size) {
     if (it != free_lists_.end() && !it->second.empty()) {
         bytes block = std::move(it->second.back());
         it->second.pop_back();
+        memset(block.data(), 0, block.size());
         return block;
     }
 
@@ -230,6 +232,7 @@ bytes ImageMemoryPool::acquire(size_t size) {
         if (candidate->first >= bucket_size && !candidate->second.empty()) {
             bytes block = std::move(candidate->second.back());
             candidate->second.pop_back();
+            memset(block.data(), 0, block.size());
             return block;
         }
     }
@@ -290,6 +293,9 @@ bool ImageReader::ensure_decode_resources(int codec_id) {
         if (!codec_ctx_) {
             return false;
         }
+
+        codec_ctx_->thread_count = 1;
+        codec_ctx_->thread_type = 0;
 
         if (avcodec_open2(codec_ctx_, codec, nullptr) < 0) {
             avcodec_free_context(&codec_ctx_);
@@ -362,6 +368,8 @@ bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& o
         return false;
     }
 
+    reset_decode_resources();
+
     if (!ensure_decode_resources(codec_id)) {
         std::cerr << "Error: Could not initialize FFmpeg decode objects" << std::endl;
         return false;
@@ -372,7 +380,6 @@ bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& o
         av_frame_unref(frame_);
         av_frame_unref(rgb_frame_);
         av_packet_unref(packet_);
-        avcodec_flush_buffers(codec_ctx_);
 
         packet_->data = const_cast<uint8_t*>(data);
         packet_->size = static_cast<int>(size);
@@ -429,17 +436,24 @@ bool ImageReader::decode_bytes(const uint8_t* data, size_t size, image_data_t& o
             break;
         }
 
-        const int* src_coeffs = sws_getCoefficients(SWS_CS_DEFAULT);
-        const int* dst_coeffs = sws_getCoefficients(SWS_CS_DEFAULT);
-        const int dst_full_range = 1;
-        sws_setColorspaceDetails(sws_ctx_,
-                                 src_coeffs,
-                                 src_full_range,
-                                 dst_coeffs,
-                                 dst_full_range,
-                                 0,
-                                 1 << 16,
-                                 1 << 16);
+        const AVPixFmtDescriptor* src_desc = av_pix_fmt_desc_get(src_fmt);
+        const bool src_is_rgb = src_desc && ((src_desc->flags & AV_PIX_FMT_FLAG_RGB) != 0);
+        if (!src_is_rgb) {
+            const int* src_coeffs = sws_getCoefficients(SWS_CS_DEFAULT);
+            const int* dst_coeffs = sws_getCoefficients(SWS_CS_DEFAULT);
+            const int dst_full_range = 1;
+            if (sws_setColorspaceDetails(sws_ctx_,
+                                         src_coeffs,
+                                         src_full_range,
+                                         dst_coeffs,
+                                         dst_full_range,
+                                         0,
+                                         1 << 16,
+                                         1 << 16) < 0) {
+                std::cerr << "Error: Could not configure colorspace conversion" << std::endl;
+                break;
+            }
+        }
 
         const int rgb_size = av_image_get_buffer_size(AV_PIX_FMT_RGB24, frame_->width, frame_->height, 1);
         if (rgb_size <= 0) {
