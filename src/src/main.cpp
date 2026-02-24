@@ -247,7 +247,7 @@ static bool sanity_check_npu_stack(bool quiet) {
         return false;
     }
     if (!quiet) {
-        header_print("Linux", "Kernel Version: " << u_name.release);
+        header_print("Linux", "Kernel: " << u_name.release);
     }
 
     // Check firmware version of all AMD devices
@@ -287,7 +287,7 @@ static bool sanity_check_npu_stack(bool quiet) {
         amd_device_found = true;
 
         if (!quiet) {
-            header_print_g("Linux", "Found AMD NPU at " + dev_name);
+            header_print_g("Linux", "NPU: " + dev_name);
             header_print_g("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
         }
 
@@ -299,7 +299,7 @@ static bool sanity_check_npu_stack(bool quiet) {
     }
 
     if (!amd_device_found && !quiet) {
-        header_print_r("ERROR", "No AMD NPU device found.");
+        header_print_r("ERROR", "No NPU device found.");
     }
 
     // Check memlock limit
