@@ -57,7 +57,7 @@ std::string get_executable_directory() {
     char buffer[MAX_PATH];
     GetModuleFileNameA(NULL, buffer, MAX_PATH);
     std::string exe_path(buffer);
-    size_t last_slash = exe_path.find_last_of("/");
+    size_t last_slash = exe_path.find_last_of("\\");
     if (last_slash != std::string::npos) {
         return exe_path.substr(0, last_slash);
     }
