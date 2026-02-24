@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/resource.h>
 #include <linux/types.h>
 #include <libdrm/drm.h>
 #include <sys/utsname.h>
@@ -301,7 +302,26 @@ static bool sanity_check_npu_stack(bool quiet) {
         header_print("ERROR", "No AMD NPU device found.");
     }
 
-    return amd_device_found && kernel_ok && all_fw_ok;
+    // Check memlock limit
+    bool memlock_ok = true;
+    struct rlimit rl;
+    if (getrlimit(RLIMIT_MEMLOCK, &rl) == 0) {
+        if (rl.rlim_cur != RLIM_INFINITY && rl.rlim_cur < 100 * 1024 * 1024) {
+            header_print("ERROR", "Memlock limit is too low (" << (rl.rlim_cur / 1024 / 1024) << "MB). Please raise the limit or set to infinity.");
+            memlock_ok = false;
+        } else if (!quiet) {
+            if (rl.rlim_cur == RLIM_INFINITY) {
+                header_print("Linux", "Memlock Limit: infinity");
+            } else {
+                header_print("Linux", "Memlock Limit: " << (rl.rlim_cur / 1024 / 1024) << " MB");
+            }
+        }
+    } else {
+        if (!quiet)
+            perror("Failed to get memlock limit");
+    }
+
+    return amd_device_found && kernel_ok && all_fw_ok && memlock_ok;
 #else
     return true;
 #endif
