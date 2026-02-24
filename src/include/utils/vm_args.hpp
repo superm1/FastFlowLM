@@ -11,43 +11,53 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include "program_args.hpp"
 
 namespace arg_utils {
 
 namespace po = boost::program_options;
 
-/// \brief Structure to hold parsed command line arguments
-struct ParsedArgs {
-    std::string command;
-    std::string model_tag;
-    std::string power_mode;
-    std::string list_filter;
-    bool force_redownload;
-    bool version_requested;
-    bool port_requested;
-    bool quiet_list;
-    bool preemption;
-    int ctx_length;
-    int img_pre_resize;
-    size_t max_socket_connections;
-    size_t max_npu_queue;
-    int port;
-    std::string host;
-    bool cors;
-    bool asr;
-    bool embed;
-    std::string input_file_name;
-    ParsedArgs() : power_mode("performance"), force_redownload(false), 
-                   version_requested(false), port_requested(false),
-                   quiet_list(false) {}
-};
+inline void print_help(po::options_description& general) {
+    std::cout << "Usage: flm <command> [options] [model_tag]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Commands:" << std::endl;
+    std::cout << "  run <model_tag>     - Run the model interactively" << std::endl;
+    std::cout << "  serve <model_tag>   - Start the  server" << std::endl;
+    std::cout << "  pull <model_tag>    - Download model files if not present" << std::endl;
+    std::cout << "  remove <model_tag>  - Remove a model" << std::endl;
+    std::cout << "  list                - List all available models" << std::endl;
+    std::cout << "  version             - Show version information" << std::endl;
+    std::cout << "  help                - Show this help message" << std::endl;
+    std::cout << "  port                - Show the default server port" << std::endl;
+    std::cout << "  validate            - Validate the NPU stack" << std::endl;
+    std::cout << std::endl;
+    std::cout << general << std::endl;
+    std::cout << "Examples:" << std::endl;
+    std::cout << "\tflm run llama3.2:1b" << std::endl;
+    std::cout << "\tflm run llama3.2:1b --asr 1" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --pmode balanced" << std::endl;
+    std::cout << "\tflm pull llama3.2:1b --force" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --ctx-len 8192" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --socket 10" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --q-len 10" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --port 8000" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --cors 0" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --asr 1" << std::endl;
+    std::cout << "\tflm serve llama3.2:1b --embed 1" << std::endl;
+    std::cout << "\tflm serve qwen3vl-it:4b --resize 1 (0: original size, 1: height = 480, 2: height = 720, 3: height = 1080)" << std::endl;
+    std::cout << "\tflm list" << std::endl;
+    std::cout << "\tflm list --quiet" << std::endl;
+    std::cout << "\tflm list --filter installed" << std::endl;
+    std::cout << std::endl;
+}
+
 
 /// \brief parse the options using Boost Program Options with positional arguments
 /// \param argc the number of arguments
 /// \param argv the arguments
 /// \param parsed_args reference to store parsed arguments
 /// \return true if parsing was successful, false otherwise
-bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
+bool parse_options(int argc, char *argv[], program_args_t& parsed_args) {
     try {
         // Define the command line options
         po::options_description general("Allowed options");
@@ -68,7 +78,10 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
              "Force re-download even if model exists (for pull command)")
             ("filter", po::value<std::string>(&parsed_args.list_filter)->default_value("all"),
              "Show models: all | installed | not-installed")
-            ("quiet", "Hide emojis in the model list (can be used with --filter)")
+            ("quiet", po::bool_switch(&parsed_args.sub_process_mode),
+             "Quiet mode, for sub-process usages")
+            ("json,j", po::bool_switch(&parsed_args.json_output),
+             "Output in JSON format (for list, validate, version commands)")
             ("ctx-len,c", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
              "Set context length")
             ("img-pre-resize,r", po::value<int>(&parsed_args.img_pre_resize)->default_value(3),
@@ -107,100 +120,30 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                   .run(), vm);
         po::notify(vm);
 
-        // Check for help or version flags
+        // Help has highest priority
         if (vm.count("help")) {
             // Custom help formatting to match the desired style
-            std::cout << "Usage: " << argv[0] << " <command> [options] [model_tag]" << std::endl;
-            std::cout << std::endl;
-            std::cout << "Commands:" << std::endl;
-            std::cout << "  run <model_tag>     - Run the model interactively" << std::endl;
-            std::cout << "  serve <model_tag>   - Start the  server" << std::endl;
-            std::cout << "  pull <model_tag>    - Download model files if not present" << std::endl;
-            std::cout << "  remove <model_tag>  - Remove a model" << std::endl;
-            std::cout << "  list                - List all available models" << std::endl;
-            std::cout << "  version             - Show version information" << std::endl;
-            std::cout << "  help                - Show this help message" << std::endl;
-            std::cout << "  port                - Show the default server port" << std::endl;
-            std::cout << "  validate            - Validate the NPU stack" << std::endl;
-            std::cout << std::endl;
-            std::cout << general << std::endl;
-            std::cout << "Examples:" << std::endl;
-            std::cout << "  " << argv[0] << " run llama3.2:1b" << std::endl;
-            std::cout << "  " << argv[0] << " run llama3.2:1b --asr 1" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --pmode balanced" << std::endl;
-            std::cout << "  " << argv[0] << " pull llama3.2:1b --force" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --ctx-len 8192" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --socket 10" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --q-len 10" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --port 8000" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --cors 0" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --asr 1" << std::endl;
-            std::cout << "  " << argv[0] << " serve llama3.2:1b --embed 1" << std::endl;
-            std::cout << "  " << argv[0] << " serve qwen3vl-it:4b --resize 1 (0: original size, 1: height = 480, 2: height = 720, 3: height = 1080)" << std::endl;
-            std::cout << "  " << argv[0] << " list" << std::endl;
-            std::cout << "  " << argv[0] << " list --quiet" << std::endl;
-            std::cout << "  " << argv[0] << " list --filter installed" << std::endl;
+            print_help(general);
             return false; // Exit after showing help
         }
 
-        if (vm.count("version")) {
-            parsed_args.version_requested = true;
-            return true; // Exit after showing help
-        }
-       
-
-        // Extract command and model_tag from positional arguments
+        // Extract command
         if (vm.count("command")) {
             parsed_args.command = vm["command"].as<std::string>();
             
             // Handle help and version commands directly
             if (parsed_args.command == "help") {
-                // Custom help formatting to match the desired style
-                std::cout << "Usage: " << argv[0] << " <command> [options] [model_tag]" << std::endl;
-                std::cout << std::endl;
-                std::cout << "Commands:" << std::endl;
-                std::cout << "  run <model_tag>     - Run the model interactively" << std::endl;
-                std::cout << "  serve <model_tag>   - Start the Ollama-compatible server" << std::endl;
-                std::cout << "  pull <model_tag>    - Download model files if not present" << std::endl;
-                std::cout << "  remove <model_tag>  - Remove a model" << std::endl;
-                std::cout << "  list                - List all available models" << std::endl;
-                std::cout << "  version             - Show version information" << std::endl;
-                std::cout << "  help                - Show this help message" << std::endl;
-                std::cout << "  port                - Show the default server port" << std::endl;
-                std::cout << "  validate            - Validate the NPU stack" << std::endl;
-                std::cout << std::endl;
-                std::cout << general << std::endl;
-                std::cout << "Examples:" << std::endl;
-                std::cout << "  " << argv[0] << " run llama3.2:1b" << std::endl;
-                std::cout << "  " << argv[0] << " run llama3.2:1b --asr 1" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --pmode balanced" << std::endl;
-                std::cout << "  " << argv[0] << " pull llama3.2:1b --force" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --ctx-len 8192" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --socket 10" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --q-len 10" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --port 8000" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --cors 0" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --asr 1" << std::endl;
-                std::cout << "  " << argv[0] << " serve llama3.2:1b --embed 1" << std::endl;
-                std::cout << "  " << argv[0] << " serve qwen3vl-it:4b --resize 0" << std::endl;
-                std::cout << "  " << argv[0] << " list" << std::endl;
-                std::cout << "  " << argv[0] << " list --quiet" << std::endl;
-                std::cout << "  " << argv[0] << " list --filter installed" << std::endl;
+                print_help(general);
                 return false; // Exit after showing help
             }
             
             if (parsed_args.command == "version") {
-                parsed_args.version_requested = true;
                 return true;
             }
             if (parsed_args.command == "port") {
-                parsed_args.port_requested = true;
                 return true;
             }
             if (parsed_args.command == "list") {
-                if (vm.count("quiet")) {
-                    parsed_args.quiet_list = true;
-                }
                 return true;
             }
             if (parsed_args.command == "bench") {
@@ -211,17 +154,6 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
             return false;
         }
 
-        if (vm.count("model_tag")) {
-            parsed_args.model_tag = vm["model_tag"].as<std::string>();
-        }
-
-        // Validate command-specific requirements
-        if (parsed_args.command == "run" || parsed_args.command == "pull" || parsed_args.command == "remove") {
-            if (parsed_args.model_tag.empty()) {
-                std::cerr << "Error: Model tag is required for command '" << parsed_args.command << "'" << std::endl;
-                return false;
-            }
-        }
         if (parsed_args.command != "serve")
         {
             if (!vm["socket"].defaulted())
@@ -245,6 +177,13 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                 return false;
             }
         }
+
+        // Handle all options
+        if (vm.count("model_tag")) {
+            parsed_args.model_tag = vm["model_tag"].as<std::string>();
+        }
+
+
         // Note: serve command allows empty model_tag (will use default)
 
         // Validate power mode for run/serve commands
@@ -257,6 +196,14 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
                 return false;
             }
             //if(parsed_args.model_tag == "")
+        }
+
+        // Validate command-specific requirements
+        if (parsed_args.command == "run" || parsed_args.command == "pull" || parsed_args.command == "remove") {
+            if (parsed_args.model_tag.empty()) {
+                std::cerr << "Error: Model tag is required for command '" << parsed_args.command << "'" << std::endl;
+                return false;
+            }
         }
 
         return true;

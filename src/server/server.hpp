@@ -25,6 +25,7 @@
 #include <thread>
 #include <vector>
 #include "wstream_buf.hpp"
+#include "program_args.hpp"
 #include "streaming_ostream.hpp"
 #include "model_downloader.hpp"
 #include "multipart.hpp"
@@ -210,5 +211,5 @@ class model_list;
 ///@param default_tag the default tag
 ///@param port the port to listen on, default is 52625, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, std::string host, int port, int ctx_length = -1, bool cors=1, bool preemption = false);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, program_args_t& args);
 

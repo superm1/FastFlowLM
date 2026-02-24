@@ -149,12 +149,12 @@ static json normalize_template(json messages) {
 ///@param embed whether to enable embedding
 
 ///@return the rest handler
-RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int ctx_length, int img_pre_resize, bool preemption)
-    : supported_models(models), downloader(downloader), default_model_tag(default_tag), current_model_tag(""), asr(asr), embed(embed), img_pre_resize(img_pre_resize), preemption(preemption){
+RestHandler::RestHandler(model_list& models, ModelDownloader& downloader, program_args_t& args)
+    : supported_models(models), downloader(downloader), default_model_tag(args.model_tag), current_model_tag(""), asr(args.asr), embed(args.embed), img_pre_resize(args.img_pre_resize), preemption(args.preemption){
     this->npu_device_inst = xrt::device(0);
 
-    if (ctx_length != -1) {
-        this->ctx_length = ctx_length >= 512 ? ctx_length : 512;
+    if (args.ctx_length != -1) {
+        this->ctx_length = args.ctx_length >= 512 ? args.ctx_length : 512;
     } else {
         this->ctx_length = -1;
     }

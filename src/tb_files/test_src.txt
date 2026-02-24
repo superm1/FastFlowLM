@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     size_t max_socket_connections = parsed_args.max_socket_connections;
     size_t max_npu_queue = parsed_args.max_npu_queue;
     int user_port = parsed_args.port;
-    bool quiet_list = parsed_args.quiet_list;
+    bool sub_process_mode = parsed_args.sub_process_mode;
     std::string list_filter = parsed_args.list_filter;
 
     // Set process priority to high for better performance
@@ -329,7 +329,7 @@ int main(int argc, char* argv[]) {
                     bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>());
                     if ((list_filter == "installed") == is_present || list_filter == "all") {
                         std::cout << "  - " << model["name"].get<std::string>();
-                        if (!quiet_list) {
+                        if (!sub_process_mode) {
                             std::cout << (is_present ? " ✅" : " ⏬");
                         }
                         std::cout << std::endl;

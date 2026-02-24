@@ -20,14 +20,14 @@ ModelDownloader::ModelDownloader(model_list& models)
 /// \brief Check if the model is downloaded
 /// \param model_tag the model tag
 /// \return true if the model is downloaded, false otherwise
-bool ModelDownloader::is_model_downloaded(const std::string& model_tag, bool quiet_list) {
+bool ModelDownloader::is_model_downloaded(const std::string& model_tag, bool sub_process_mode) {
     auto missing_files = get_missing_files(model_tag);
     bool is_config_file_missing = std::find(missing_files.begin(), missing_files.end(), "config.json") != missing_files.end();
     if (!is_config_file_missing) {
-        if (!check_model_compatibility(model_tag, quiet_list)) {
-            if (!quiet_list)
+        if (!check_model_compatibility(model_tag, sub_process_mode)) {
+            if (!sub_process_mode)
                 header_print("FLM", "Model is not compatible with the current FLM version. ");
-            remove_model(model_tag, quiet_list);
+            remove_model(model_tag, sub_process_mode);
             return false;
         }
     }
@@ -37,7 +37,7 @@ bool ModelDownloader::is_model_downloaded(const std::string& model_tag, bool qui
 /// \brief Check if the model is compatible with the current FLM version
 /// \param model_tag the model tag
 /// \return true if the model is compatible, false otherwise
-bool ModelDownloader::check_model_compatibility(const std::string& model_tag, bool quiet_list) {
+bool ModelDownloader::check_model_compatibility(const std::string& model_tag, bool sub_process_mode) {
     auto [new_model_tag, model_info] = supported_models.get_model_info(model_tag);
     LM_Config config;
     config.from_pretrained(this->supported_models.get_model_path(new_model_tag));
@@ -60,7 +60,7 @@ bool ModelDownloader::check_model_compatibility(const std::string& model_tag, bo
     if (local_version_u32 < required_version_u32) {
         is_compatible = false;
     }
-    if (!quiet_list) {
+    if (!sub_process_mode) {
         if (is_future_version) {
             header_print("WARNING", "Local model version: " + flm_version + " > " + __FLM_VERSION__);
             header_print("WARNING", "This model may not be compatible with the current FLM version.");
@@ -344,7 +344,7 @@ std::pair<nlohmann::json, float> ModelDownloader::build_download_list(const std:
 /// \brief Remove a model and all its files
 /// \param model_tag the model tag
 /// \return true if the model was successfully removed, false otherwise
-bool ModelDownloader::remove_model(const std::string& model_tag, bool quiet_list) {
+bool ModelDownloader::remove_model(const std::string& model_tag, bool sub_process_mode) {
     try {
         // Check if model exists in supported models by trying to get its info
         try {
@@ -364,7 +364,7 @@ bool ModelDownloader::remove_model(const std::string& model_tag, bool quiet_list
             return true; // Consider it already removed
         }
 
-        if (!quiet_list) {
+        if (!sub_process_mode) {
             header_print("FLM", "Removing model: " + model_tag);
             header_print("FLM", "Path: " + model_path);
         }
@@ -380,7 +380,7 @@ bool ModelDownloader::remove_model(const std::string& model_tag, bool quiet_list
         
         // Remove the model directory itself
         if (std::filesystem::remove(model_path)) {
-            if(!quiet_list)
+            if(!sub_process_mode)
                 header_print("FLM", "Successfully removed " + std::to_string(removed_files) + " files and model directory.");
             return true;
         } else {
