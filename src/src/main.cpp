@@ -27,6 +27,17 @@
 #include <boost/program_options.hpp>
 #include "benchmarking.hpp"
 
+#ifndef _WIN32
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <libdrm/drm.h>
+#include <sys/utsname.h>
+#include <cerrno>
+#include "npu_utils/amdxdna_accel.h"
+#endif
+
 #include "AutoModel/automodel.hpp"
 
 #ifndef _WIN32
@@ -218,6 +229,84 @@ std::string get_models_directory() {
 #endif
 }
 
+static bool sanity_check_npu_stack(bool quiet) {
+#ifndef _WIN32
+    // Check kernel version
+    struct utsname u_name;
+    if (uname(&u_name) != 0) {
+        if (!quiet)
+            perror("Failed to get kernel version");
+        return false;
+    }
+    int major, minor;
+    sscanf(u_name.release, "%d.%d", &major, &minor);
+    bool kernel_ok = (major > 6) || (major == 6 && minor >= 14);
+    if (!kernel_ok) {
+        header_print("ERROR", "Kernel version incompatible with this version of FLM. Please update your kernel!");
+        return false;
+    }
+    if (!quiet) {
+        header_print("Linux", "Kernel Version: " << u_name.release);
+    }
+
+    // Check firmware version of all AMD devices
+    bool all_fw_ok = true;
+    bool amd_device_found = false;
+
+    for (int i = 0; i < 16; ++i) {
+        std::string dev_name = "/dev/accel/accel" + std::to_string(i);
+        int fd = open(dev_name.c_str(), O_RDWR);
+
+        if (fd < 0) {
+            if (errno == ENOENT)
+                break;
+            continue;
+        }
+
+        amdxdna_drm_query_firmware_version query_fw_version;
+        amdxdna_drm_get_info get_info = {
+            .param = DRM_AMDXDNA_QUERY_FIRMWARE_VERSION,
+            .buffer_size = sizeof(amdxdna_drm_query_firmware_version),
+            .buffer = (unsigned long)&query_fw_version,
+        };
+
+        int ret = ioctl(fd, DRM_IOCTL_AMDXDNA_GET_INFO, &get_info);
+        close(fd);
+        if (ret < 0) {
+            // ENOTTY means it's not an AMD device, just ignore it.
+            if (errno != ENOTTY) {
+                 if (!quiet) {
+                    std::cout << "Error code: " << ret << " on " << dev_name << std::endl;
+                    perror("Failed to get firmware version");
+                 }
+            }
+            continue;
+        }
+
+        amd_device_found = true;
+
+        if (!quiet) {
+            header_print("Linux", "Found AMD NPU at " + dev_name);
+            header_print("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
+        }
+
+        bool fw_ok = (query_fw_version.major > 1 || (query_fw_version.major == 1 && query_fw_version.minor >= 1));
+        if (!fw_ok) {
+            all_fw_ok = false;
+            header_print("ERROR", "NPU firmware version on " + dev_name + " is incompatible. Please update NPU firmware!");
+        }
+    }
+
+    if (!amd_device_found && !quiet) {
+        header_print("ERROR", "No AMD NPU device found.");
+    }
+
+    return amd_device_found && kernel_ok && all_fw_ok;
+#else
+    return true;
+#endif
+}
+
 ///@brief main function
 ///@param argc the number of arguments
 ///@param argv the arguments
@@ -240,7 +329,7 @@ int main(int argc, char* argv[]) {
     
     // Get the command, model tag, and force flag
     std::string exe_dir = utils::get_executable_directory();
-    std::string config_path = exe_dir + "/model_list.json";
+    std::string config_path = utils::find_model_list();
     // Get the models directory from environment variable or default
     std::string models_dir = utils::get_models_directory();
 
@@ -278,6 +367,7 @@ int main(int argc, char* argv[]) {
     bool cors = parsed_args.cors;
     bool asr = parsed_args.asr;
     bool embed = parsed_args.embed;
+    bool stable_stack = false;
 
     // Set process priority to high for better performance
 #ifdef _WIN32
@@ -304,9 +394,6 @@ int main(int argc, char* argv[]) {
             std::string xrt_cmd = "cd \"C:\\Windows\\System32\\AMD\" && .\\xrt-smi.exe configure --pmode " + power_mode + " > NUL 2>&1";
             header_print("FLM", "Configuring NPU Power Mode to " + power_mode + (got_power_mode ? "" : " (flm default)"));
             (void)system(xrt_cmd.c_str());
-#else
-            (void)got_power_mode;
-            header_print("FLM", "Power mode configuration is Windows-only; continuing on this platform.");
 #endif
         }
         else{
@@ -320,9 +407,12 @@ int main(int argc, char* argv[]) {
         header_print("FLM", "Allowing high priority tasks to preempt FLM!");
     }
 
+    stable_stack = sanity_check_npu_stack(command != "validate");
+    if (command == "validate")
+        return stable_stack ? 0 : 1;
 
     try {
-        
+
         // Load the model list with the models directory as the base
         ModelDownloader downloader(availble_models);
 

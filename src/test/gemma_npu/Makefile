@@ -17,7 +17,7 @@
 # Check if it is in Windows Subsystem for Linux (WSL)
 -include ../common.mk
 
-SOURCES := test.cpp
+SOURCES += test.cpp
 SOURCES += ../../common/AutoModel/automodel.cpp
 SOURCES += ../../common/AutoModel/modeling_gemma3.cpp
 SOURCES += ../../common/AutoModel/modeling_gemma3_image.cpp
@@ -45,7 +45,7 @@ directories:
 	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/test_gemma_npu: $(SOURCES) $(TEST_DEPS)
-	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS) $(DEPENDENCY_LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)

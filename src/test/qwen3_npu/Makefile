@@ -35,7 +35,7 @@ directories:
 	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/test_qwen3_npu: $(SOURCES) $(TEST_DEPS)
-	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS) $(DEPENDENCY_LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)

@@ -32,7 +32,7 @@ HEADERS += ../../include/modules/dequant.hpp
 
 ifeq ($(WSL), 0)
 
-LDFLAGS += -lllama_npu
+LDFLAGS += -lllama_npu -lmha -ldequant -lgemm
 
 TEST_DEPS := $(test.cpp:.cpp=.d)
 
@@ -42,7 +42,7 @@ directories:
 	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/test_llama_npu: $(SOURCES) $(TEST_DEPS)
-	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LDFLAGS) $(DEPENDENCY_LDFLAGS)
 
 clean:
 	rm -rf $(BUILD_DIR)
