@@ -29,12 +29,12 @@ void Qwen2VL::load_model(std::string model_path, json model_info, int default_co
     this->sampler.reset();
 
     sampler_config config;
-    config.rep_penalty = 1.1;
-    config.temperature = 0.8;
-    config.top_p = 0.95;
+    config.rep_penalty = 1.05;
+    config.temperature = 0.6;
+    config.top_p = 0.8;
     config.top_k = 10;
     config.rep_penalty_window = 1024;
-    config.freq_penalty = 1.1;
+    config.freq_penalty = 1.05;
     config.freq_penalty_window = 1024;
     this->set_sampler(config);
     for (size_t i = 0; i < PROFILER_TYPE_NUM; i++) {
@@ -77,7 +77,7 @@ bool Qwen2VL::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
             qwen2vl_image_t image = this->load_image(img_str);
 
             preprocess_image(image, image_payload._data__processed);
-            
+                       
             // Push the image AFTER preprocessing so grid_h and grid_w are set
             image_payload.images.push_back(image);
             image_payload.num_images++;
