@@ -91,8 +91,8 @@ class model_list {
                 if (!model_found) {
                     if (last_error_tag != new_tag) {
                         last_error_tag = new_tag;
-                        header_print("ERROR", "Model not found: " + model_size + " in subset " + model_type);
-                        header_print("ERROR", "Using default model: llama3.2-1B");
+                        header_print_r("ERROR", "Model not found: " + model_size + " in subset " + model_type);
+                        header_print_r("ERROR", "Using default model: llama3.2-1B");
                     }
                     return std::make_pair("llama3.2:1b", this->config["models"]["llama3.2"]["1b"]);
                 }
@@ -100,7 +100,7 @@ class model_list {
             else{
                 if (last_error_tag != new_tag) {
                     last_error_tag = new_tag;
-                    header_print("ERROR", "Model subset not found: " << model_type << "; using default model: llama3.2-1B");
+                    header_print_r("ERROR", "Model subset not found: " << model_type << "; using default model: llama3.2-1B");
                 }
                 return std::make_pair("llama3.2:1b", this->config["models"]["llama3.2"]["1b"]);
             }

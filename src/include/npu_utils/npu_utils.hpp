@@ -94,7 +94,7 @@ private:
             NULL, 0, (void**)elf_buf, NULL, 0, "", "", NULL, 0);
         assert(elf_buf_size > 0);
         if (elf_buf_size == 0){
-            header_print("error", "Failed to get elf from ctrl_seq");
+            header_print_r("ERROR", "Failed to get elf from ctrl_seq");
             exit(1);
         }
         return elf_buf_size;
@@ -210,7 +210,7 @@ public:
         uint32_t elf_buf_size = this->_gen_elf(&elf_buf, data);
         std::ofstream fout(elf_name, std::ios::binary);
         if (fout.is_open() == false) {
-            header_print("error", "Failed to open file: " << elf_name);
+            header_print_r("ERROR", "Failed to open file: " << elf_name);
             exit(1);
         }
         fout.write((char*)elf_buf, elf_buf_size);

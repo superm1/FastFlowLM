@@ -63,7 +63,7 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
 
     
     if (available_models.is_model_supported(model_tag) == false) {
-        header_print("Error", "Model tag '" << model_tag << "' is not supported. Please check the model list.");
+        header_print_r("ERROR", "Model tag '" << model_tag << "' is not supported. Please check the model list.");
         return std::make_pair("llama3.2:1b", std::make_unique<Llama3>(npu_device_inst));
     }
 
@@ -116,7 +116,7 @@ inline std::pair<std::string, std::unique_ptr<AutoModel>> get_auto_model(const s
         case SupportedModelFamily::error_whiper:
         case SupportedModelFamily::error_embedding:
         default:
-            header_print("Error", "Unsupported model family or non-llm: " << model_info["details"]["family"]);
+            header_print_r("ERROR", "Unsupported model family or non-llm: " << model_info["details"]["family"]);
             auto_chat_engine = std::make_unique<Llama3>(npu_device_inst);
             new_model_tag = "llama3.2:1b";
     }

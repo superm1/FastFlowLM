@@ -243,7 +243,7 @@ static bool sanity_check_npu_stack(bool quiet) {
     sscanf(u_name.release, "%d.%d", &major, &minor);
     bool kernel_ok = (major > 6) || (major == 6 && minor >= 14);
     if (!kernel_ok) {
-        header_print("ERROR", "Kernel version incompatible with this version of FLM. Please update your kernel!");
+        header_print_r("ERROR", "Kernel version incompatible with this version of FLM. Please update your kernel!");
         return false;
     }
     if (!quiet) {
@@ -277,7 +277,7 @@ static bool sanity_check_npu_stack(bool quiet) {
             // ENOTTY means it's not an AMD device, just ignore it.
             if (errno != ENOTTY) {
                  if (!quiet) {
-                    std::cout << "Error code: " << ret << " on " << dev_name << std::endl;
+                    header_print_r("ERROR", "Error code: " << ret << " on " << dev_name);
                     perror("Failed to get firmware version");
                  }
             }
@@ -287,19 +287,19 @@ static bool sanity_check_npu_stack(bool quiet) {
         amd_device_found = true;
 
         if (!quiet) {
-            header_print("Linux", "Found AMD NPU at " + dev_name);
-            header_print("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
+            header_print_g("Linux", "Found AMD NPU at " + dev_name);
+            header_print_g("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
         }
 
         bool fw_ok = (query_fw_version.major > 1 || (query_fw_version.major == 1 && query_fw_version.minor >= 1));
         if (!fw_ok) {
             all_fw_ok = false;
-            header_print("ERROR", "NPU firmware version on " + dev_name + " is incompatible. Please update NPU firmware!");
+            header_print_r("ERROR", "NPU firmware version on " + dev_name + " is incompatible. Please update NPU firmware!");
         }
     }
 
     if (!amd_device_found && !quiet) {
-        header_print("ERROR", "No AMD NPU device found.");
+        header_print_r("ERROR", "No AMD NPU device found.");
     }
 
     // Check memlock limit
@@ -307,11 +307,11 @@ static bool sanity_check_npu_stack(bool quiet) {
     struct rlimit rl;
     if (getrlimit(RLIMIT_MEMLOCK, &rl) == 0) {
         if (rl.rlim_cur != RLIM_INFINITY && rl.rlim_cur < 100 * 1024 * 1024) {
-            header_print("ERROR", "Memlock limit is too low (" << (rl.rlim_cur / 1024 / 1024) << "MB). Please raise the limit or set to infinity.");
+            header_print_r("ERROR", "Memlock limit is too low (" << (rl.rlim_cur / 1024 / 1024) << "MB). Please raise the limit or set to infinity.");
             memlock_ok = false;
         } else if (!quiet) {
             if (rl.rlim_cur == RLIM_INFINITY) {
-                header_print("Linux", "Memlock Limit: infinity");
+                header_print_g("Linux", "Memlock Limit: infinity");
             } else {
                 header_print("Linux", "Memlock Limit: " << (rl.rlim_cur / 1024 / 1024) << " MB");
             }
