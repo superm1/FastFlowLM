@@ -121,7 +121,7 @@
     do { \
         std::ostringstream oss; \
         oss << msg; \
-        std::cout << "\033[31m[" << header << "]  " << oss.str() << "\033[0m" << std::endl; \
+        std::cerr << "\033[31m[" << header << "]  " << oss.str() << "\033[0m" << std::endl; \
     } while (0)
 
     
