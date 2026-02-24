@@ -478,22 +478,22 @@ class npu_sequence{
                 constexpr int wrap_bits = 10; 
                 
                 if(size[3] > (1<< wrap_bits)){
-                    header_print("ERROR", ": step_3 out ouf range");
+                    header_print_r("ERROR", ": step_3 out ouf range");
                 }
                 if(stride[3] > (1<< step_bits)){
-                    header_print("ERROR", ": stride_3 out of range");
+                    header_print_r("ERROR", ": stride_3 out of range");
                 }
                 if(size[2] > (1<< wrap_bits)){
-                    header_print("ERROR", ": step_2 out ouf range");
+                    header_print_r("ERROR", ": step_2 out ouf range");
                 }
                 if(stride[2] > (1<< step_bits)){
-                    header_print("ERROR", ": stride_2 out of range");
+                    header_print_r("ERROR", ": stride_2 out of range");
                 }
                 if(size[1] > (1<< wrap_bits)){
-                    header_print("ERROR", ": step_1 out ouf range");
+                    header_print_r("ERROR", ": step_1 out ouf range");
                 }
                 if(stride[1] > (1<< step_bits)){
-                    header_print("ERROR", ": stride_1 out of range");
+                    header_print_r("ERROR", ": stride_1 out of range");
                 }
                 // inverse of human's order
                 cmd->dim0_size = size[3];

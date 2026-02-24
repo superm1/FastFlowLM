@@ -133,7 +133,7 @@ inline void write_bench_csv(const BenchmarkResults_t& results, const std::string
 
     std::ofstream out(filename, std::ios::out | std::ios::trunc);
     if (!out.is_open()) {
-        header_print("ERROR", "Failed to open output file: " + filename);
+        header_print_r("ERROR", "Failed to open output file: " + filename);
         return;
     }
 
@@ -260,7 +260,7 @@ BenchmarkResults_t run_benchmarks(std::string model_tag, std::string bench_confi
     else {
         std::ifstream input_file(bench_config_file);
         if (!input_file.is_open()) {
-            header_print("ERROR", "Failed to open input file: " + bench_config_file);
+            header_print_r("ERROR", "Failed to open input file: " + bench_config_file);
             return results;
         }
         bench_config = nlohmann::json::parse(input_file);
@@ -270,7 +270,7 @@ BenchmarkResults_t run_benchmarks(std::string model_tag, std::string bench_confi
     xrt::device npu_device_inst = xrt::device(0);
     std::unique_ptr<AutoModel> auto_chat_engine;
     if (!availble_models.is_model_supported(model_tag)) {
-        header_print("ERROR", "Model not found: " << model_tag << "; Please check with `flm list` and try again.");
+        header_print_r("ERROR", "Model not found: " << model_tag << "; Please check with `flm list` and try again.");
         return results;
     }
     auto [new_tag, model_info] = availble_models.get_model_info(model_tag);
