@@ -26,6 +26,7 @@ struct ParsedArgs {
     bool version_requested;
     bool port_requested;
     bool quiet_list;
+    bool quiet;
     bool preemption;
     int ctx_length;
     int img_pre_resize;
@@ -37,9 +38,9 @@ struct ParsedArgs {
     bool asr;
     bool embed;
     std::string input_file_name;
-    ParsedArgs() : power_mode("performance"), force_redownload(false), 
+    ParsedArgs() : power_mode("performance"), force_redownload(false),
                    version_requested(false), port_requested(false),
-                   quiet_list(false) {}
+                   quiet_list(false), quiet(false) {}
 };
 
 /// \brief parse the options using Boost Program Options with positional arguments
@@ -68,7 +69,7 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
              "Force re-download even if model exists (for pull command)")
             ("filter", po::value<std::string>(&parsed_args.list_filter)->default_value("all"),
              "Show models: all | installed | not-installed")
-            ("quiet", "Hide emojis in the model list (can be used with --filter)")
+            ("quiet", "Suppress output (hides emojis in list, suppresses prompts in serve)")
             ("ctx-len,c", po::value<int>(&parsed_args.ctx_length)->default_value(-1),
              "Set context length")
             ("img-pre-resize,r", po::value<int>(&parsed_args.img_pre_resize)->default_value(3),
@@ -209,6 +210,14 @@ bool parse_options(int argc, char *argv[], ParsedArgs& parsed_args) {
         } else {
             std::cerr << "Error: Command is required" << std::endl;
             return false;
+        }
+
+        // Handle --quiet flag globally
+        if (vm.count("quiet")) {
+            parsed_args.quiet = true;
+            if (parsed_args.command == "list") {
+                parsed_args.quiet_list = true;
+            }
         }
 
         if (vm.count("model_tag")) {
