@@ -148,16 +148,9 @@ class model_list {
 
             for (const auto& [model_type, model_subset] : this->config["models"].items()) {
                 for (const auto& [size, model_info] : model_subset.items()) {
-                    nlohmann::json model_entry = {
-                        {"name", model_type + ":" + size},
-                        {"model", model_type + ":" + size},
-                        {"details", {
-                            {"format", "gguf"},
-                            {"family", model_info["details"]["family"]},
-                            {"parameter_size", model_info["details"]["parameter_size"]},
-                            {"quantization_level", model_info["details"]["quantization_level"]}
-                        }}
-                    };
+                    nlohmann::json model_entry = model_info;
+                    model_entry["name"] = model_type + ":" + size;
+                    model_entry["model"] = model_type + ":" + size;
                     response["models"].push_back(model_entry);
                 }
             }

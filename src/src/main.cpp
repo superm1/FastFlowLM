@@ -235,23 +235,48 @@ std::string get_models_directory() {
 #endif
 }
 
-static bool sanity_check_npu_stack(bool quiet) {
+static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
+    bool print_human = !quiet && !json_output;
+    nlohmann::json validation_json = {
+        {"object", "npu_stack_validation"},
+        {"platform", "windows"},
+        {"kernel_ok", true},
+        {"amd_device_found", true},
+        {"all_fw_ok", true},
+        {"memlock_ok", true},
+        {"devices", nlohmann::json::array()},
+        {"ok", true}
+    };
 #ifndef _WIN32
+    validation_json["platform"] = "linux";
     // Check kernel version
     struct utsname u_name;
     if (uname(&u_name) != 0) {
-        if (!quiet)
+        if (print_human)
             perror("Failed to get kernel version");
+        validation_json["kernel_ok"] = false;
+        validation_json["ok"] = false;
+        if (json_output) {
+            std::cout << validation_json.dump(4) << std::endl;
+        }
         return false;
     }
     int major, minor;
     sscanf(u_name.release, "%d.%d", &major, &minor);
     bool kernel_ok = (major > 6) || (major == 6 && minor >= 14);
+    validation_json["kernel"] = u_name.release;
+    validation_json["kernel_ok"] = kernel_ok;
     if (!kernel_ok) {
-        header_print_r("ERROR", "Kernel version incompatible with this version of FLM. Please update your kernel!");
+        if (print_human) {
+            header_print_r("ERROR", "Kernel version incompatible with this version of FLM. Please update your kernel!");
+        }
+        validation_json["ok"] = false;
+        if (json_output) {
+            std::cout << validation_json.dump(4) << std::endl;
+        }
         return false;
     }
-    if (!quiet) {
+    if (print_human) {
         header_print("Linux", "Kernel: " << u_name.release);
     }
 
@@ -291,19 +316,33 @@ static bool sanity_check_npu_stack(bool quiet) {
 
         amd_device_found = true;
 
-        if (!quiet) {
+        nlohmann::json device_entry = {
+            {"device", dev_name},
+            {"fw_major", query_fw_version.major},
+            {"fw_minor", query_fw_version.minor},
+            {"fw_patch", query_fw_version.patch},
+            {"fw_build", query_fw_version.build}
+        };
+
+        if (print_human) {
             header_print_g("Linux", "NPU: " + dev_name);
             header_print_g("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
         }
 
         bool fw_ok = (query_fw_version.major > 1 || (query_fw_version.major == 1 && query_fw_version.minor >= 1));
+        device_entry["fw_ok"] = fw_ok;
+        validation_json["devices"].push_back(device_entry);
         if (!fw_ok) {
             all_fw_ok = false;
-            header_print_r("ERROR", "NPU firmware version on " + dev_name + " is incompatible. Please update NPU firmware!");
+            if (print_human) {
+                header_print_r("ERROR", "NPU firmware version on " + dev_name + " is incompatible. Please update NPU firmware!");
+            }
         }
     }
+    validation_json["amd_device_found"] = amd_device_found;
+    validation_json["all_fw_ok"] = all_fw_ok;
 
-    if (!amd_device_found && !quiet) {
+    if (!amd_device_found && print_human) {
         header_print_r("ERROR", "No NPU device found.");
     }
 
@@ -311,10 +350,15 @@ static bool sanity_check_npu_stack(bool quiet) {
     bool memlock_ok = true;
     struct rlimit rl;
     if (getrlimit(RLIMIT_MEMLOCK, &rl) == 0) {
+        validation_json["memlock_limit"] = (rl.rlim_cur == RLIM_INFINITY)
+            ? "infinity"
+            : std::to_string(static_cast<unsigned long long>(rl.rlim_cur));
         if (rl.rlim_cur != RLIM_INFINITY && rl.rlim_cur < 100 * 1024 * 1024) {
-            header_print_r("ERROR", "Memlock limit is too low (" << (rl.rlim_cur / 1024 / 1024) << "MB). Please raise the limit or set to infinity.");
+            if (print_human) {
+                header_print_r("ERROR", "Memlock limit is too low (" << (rl.rlim_cur / 1024 / 1024) << "MB). Please raise the limit or set to infinity.");
+            }
             memlock_ok = false;
-        } else if (!quiet) {
+        } else if (print_human) {
             if (rl.rlim_cur == RLIM_INFINITY) {
                 header_print_g("Linux", "Memlock Limit: infinity");
             } else {
@@ -322,12 +366,22 @@ static bool sanity_check_npu_stack(bool quiet) {
             }
         }
     } else {
-        if (!quiet)
+        if (print_human)
             perror("Failed to get memlock limit");
     }
+    validation_json["memlock_ok"] = memlock_ok;
 
-    return amd_device_found && kernel_ok && all_fw_ok && memlock_ok;
+    bool overall_ok = amd_device_found && kernel_ok && all_fw_ok && memlock_ok;
+    validation_json["ok"] = overall_ok;
+    if (json_output) {
+        std::cout << validation_json.dump(4) << std::endl;
+    }
+
+    return overall_ok;
 #else
+    if (json_output) {
+        std::cout << validation_json.dump(4) << std::endl;
+    }
     return true;
 #endif
 }
@@ -371,7 +425,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     // Check if the commands and args valid
-    stable_stack = sanity_check_npu_stack(parsed_args.command != "validate");
+    stable_stack = sanity_check_npu_stack(parsed_args.command != "validate", parsed_args.command == "validate" && parsed_args.json_output);
     if (parsed_args.command == "validate")
         return stable_stack ? 0 : 1;
 
@@ -407,7 +461,11 @@ int main(int argc, char* argv[]) {
     // code for all commands:
     
     if (parsed_args.command == "version") {
-        std::cout << "FLM v" << __FLM_VERSION__ << std::endl;
+        if (parsed_args.json_output) {
+            std::cout << "{ \"version\": \"" << __FLM_VERSION__ << "\" }" << std::endl;
+        } else {
+            std::cout << "FLM v" << __FLM_VERSION__ << std::endl;
+        }
         return 0;
     }
 
@@ -496,9 +554,27 @@ int main(int argc, char* argv[]) {
         }
         else if (parsed_args.command == "list") {
             // List the models, this will be used to list the models
-            if (parsed_args.list_filter == "installed" || parsed_args.list_filter == "not-installed" || parsed_args.list_filter == "all") {
+            if (!(parsed_args.list_filter == "installed" || parsed_args.list_filter == "not-installed" || parsed_args.list_filter == "all")) {
+                header_print("Error", "Invalid filter: please use 'all', 'installed', or 'not-installed'");
+                return 1;
+            }
+            if (parsed_args.json_output) {
+                nlohmann::json output_json;
+                output_json["models"] = nlohmann::json::array();
+                nlohmann::json models = availble_models.get_all_models();
+                for (const auto& model : models["models"]) {
+                    bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>(), parsed_args.sub_process_mode);
+                    if ((parsed_args.list_filter == "installed") == is_present || parsed_args.list_filter == "all") {
+                        nlohmann::json model_entry = model;
+                        output_json["models"].push_back(model_entry);
+                    }
+                }
+                std::cout << output_json.dump(4) << std::endl;
+            }
+            else {
                 std::cout << "Models:" << std::endl;
                 nlohmann::json models = availble_models.get_all_models();
+                bool any_model_listed = false;
                 for (const auto& model : models["models"]) {
                     bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>(), parsed_args.sub_process_mode);
                     if ((parsed_args.list_filter == "installed") == is_present || parsed_args.list_filter == "all") {
@@ -507,13 +583,13 @@ int main(int argc, char* argv[]) {
                             std::cout << (is_present ? " ✅" : " ⏬");
                         }
                         std::cout << std::endl;
+                        any_model_listed = true;
                     }
                 }
+                if (!any_model_listed) {
+                    std::cout << "  No models found for the specified filter." << std::endl;
+                }
             }
-            else
-                header_print("Error", "Invalid filter: please use 'all', 'installed', or 'not-installed'");
-
-
         }
         else {
             // Invalid command, this will be used to show the invalid command

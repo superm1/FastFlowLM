@@ -524,7 +524,7 @@
                     "think": true,
                     "think_toggleable": true,
                     "parameter_size": "4B",
-                    "quantization_level": "AWQ-asym-uint4-g32"
+                    "quantization_level": "Q4_1"
                 }
             },
             "8b": {
@@ -546,7 +546,7 @@
                     "think": true,
                     "think_toggleable": true,
                     "parameter_size": "8B",
-                    "quantization_level": "AWQ-asym-uint4-g32"
+                    "quantization_level": "Q4_1"
                 }
             }
         },
@@ -618,7 +618,7 @@
                     "think": true,
                     "think_toggleable": false,
                     "parameter_size": "20B",
-                    "quantization_level": "Q4_0"
+                    "quantization_level": "Q4_1"
                 }
             }
         },
@@ -641,7 +641,7 @@
                     "family": "gpt-oss",
                     "think": true,
                     "think_toggleable": false,
-                    "parameter_size": "4B",
+                    "parameter_size": "20B",
                     "quantization_level": "Q4_1"
                 }
             }
