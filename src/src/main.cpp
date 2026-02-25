@@ -140,10 +140,13 @@ void ensure_models_directory(const std::string& exe_dir) {
 }
 
 ///@brief handle_user_input is used to handle the user input
-void handle_user_input() {
+///@param quiet if true, suppresses printing prompts
+void handle_user_input(bool quiet = false) {
     std::string input;
     while (!should_exit) {
-        header_print("FLM", "Enter 'exit' to stop the server: ");
+        if (!quiet) {
+            header_print("FLM", "Enter 'exit' to stop the server: ");
+        }
         std::getline(std::cin, input);
         if (input == "exit") {
             should_exit = true;
@@ -383,6 +386,7 @@ int main(int argc, char* argv[]) {
     int img_pre_resize = parsed_args.img_pre_resize;
     std::string user_host = parsed_args.host;
     bool quiet_list = parsed_args.quiet_list;
+    bool quiet = parsed_args.quiet;
     std::string list_filter = parsed_args.list_filter;
     bool cors = parsed_args.cors;
     bool asr = parsed_args.asr;
@@ -463,7 +467,7 @@ int main(int argc, char* argv[]) {
             server->start();
 
             // Start a thread to handle user input, this thread will be used to handle the user input
-            std::thread input_thread(handle_user_input);
+            std::thread input_thread(handle_user_input, quiet);
 
             // Wait for exit command, this thread will be used to wait for the user to exit the server
             while (!should_exit) {
