@@ -36,8 +36,8 @@ std::map<std::string, runner_cmd_t> cmd_map = {
 /// \param supported_models - the list of supported models
 /// \param downloader - the downloader for the models
 /// \param tag - the tag of the model to load
-Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, int img_pre_resize, bool preemption)
-    : supported_models(supported_models), downloader(downloader), tag(tag), asr(asr), embed(embed), img_pre_resize(img_pre_resize), preemption(preemption) {
+Runner::Runner(model_list& supported_models, ModelDownloader& downloader, program_args_t& args)
+    : supported_models(supported_models), downloader(downloader), tag(args.model_tag), asr(args.asr), embed(args.embed), img_pre_resize(args.img_pre_resize), preemption(args.preemption) {
 
     this->npu_device_inst = xrt::device(0);
 
@@ -70,8 +70,8 @@ Runner::Runner(model_list& supported_models, ModelDownloader& downloader, std::s
     }
 #endif
 
-    if (ctx_length != -1) {
-        this->ctx_length = ctx_length >= 512 ? ctx_length : 512;
+    if (args.ctx_length != -1) {
+        this->ctx_length = args.ctx_length >= 512 ? args.ctx_length : 512;
     } 
     else {
         this->ctx_length = -1;

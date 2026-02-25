@@ -11,6 +11,7 @@
 #include "model_downloader.hpp"
 #include "update.hpp"
 #include "utils/utils.hpp"
+#include "program_args.hpp"
 #include "minja/chat-template.hpp"
 #include <iostream>
 #include <string>
@@ -141,12 +142,13 @@ void ensure_models_directory(const std::string& exe_dir) {
 
 ///@brief handle_user_input is used to handle the user input
 ///@param quiet if true, suppresses printing prompts
-void handle_user_input(bool quiet = false) {
+void handle_user_input(bool sub_process_mode) {
     std::string input;
     while (!should_exit) {
-        if (!quiet) {
+        if (!sub_process_mode){
             header_print("FLM", "Enter 'exit' to stop the server: ");
         }
+        
         std::getline(std::cin, input);
         if (input == "exit") {
             should_exit = true;
@@ -160,7 +162,7 @@ void handle_user_input(bool quiet = false) {
 ///@param default_tag the default tag
 ///@param port the port to listen on, default is 52625, same with the ollama server
 ///@return the server
-std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, std::string host, int port, int ctx_length, int img_pre_resize, bool cors, bool preemption);
+std::unique_ptr<WebServer> create_lm_server(model_list& models, ModelDownloader& downloader, program_args_t& args);
 
 
 ///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
@@ -344,7 +346,7 @@ int main(int argc, char* argv[]) {
 #endif
     
     // Parse command line arguments using Boost Program Options
-    arg_utils::ParsedArgs parsed_args;
+    program_args_t parsed_args;
     if (!arg_utils::parse_options(argc, argv, parsed_args)) {
         return 1; // Help was already printed by Boost Program Options
     }
@@ -359,81 +361,60 @@ int main(int argc, char* argv[]) {
     
     model_list availble_models(config_path, models_dir);
     
-    // Handle version requests
-    
-    if (parsed_args.version_requested) {
-        std::cout << "FLM v" << __FLM_VERSION__ << std::endl;
-        return 0;
-    }
-
-    if (parsed_args.port_requested) {
-        std::cout << "Default server port: " << utils::get_server_port(-1) << std::endl;
-        return 0;
-    }
-
-    
     // Extract parsed values
-    std::string command = parsed_args.command;
-    std::string tag = parsed_args.model_tag;
-    bool force_redownload = parsed_args.force_redownload;
-    std::string power_mode = parsed_args.power_mode;
-    bool got_power_mode = (power_mode != "performance"); // Check if user explicitly set power mode
-    int ctx_length = parsed_args.ctx_length;
-    bool preemption = parsed_args.preemption;
-    size_t max_socket_connections = parsed_args.max_socket_connections;
-    size_t max_npu_queue = parsed_args.max_npu_queue;
-    int user_port = parsed_args.port;
-    int img_pre_resize = parsed_args.img_pre_resize;
-    std::string user_host = parsed_args.host;
-    bool quiet_list = parsed_args.quiet_list;
-    bool quiet = parsed_args.quiet;
-    std::string list_filter = parsed_args.list_filter;
-    bool cors = parsed_args.cors;
-    bool asr = parsed_args.asr;
-    bool embed = parsed_args.embed;
+    bool got_power_mode = (parsed_args.power_mode != "performance"); // Check if user explicitly set power mode
     bool stable_stack = false;
 
     // Set process priority to high for better performance
 #ifdef _WIN32
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 #endif
-    
-    // Handle special case for serve command - use default tag if none provided
-    if (command == "serve" && tag.empty()) {
-        tag = "model-faker"; // Use default tag
-    }
-    
-    if (command == "run" || command == "serve" || command == "pull" || command == "remove" || command == "bench") {
-      if (tag != "model-faker" && (!availble_models.is_model_supported(tag))) {
-            header_print("ERROR", "Model not found: " << tag << "; Please check with `flm list` and try again.");
+
+    // Check if the commands and args valid
+    stable_stack = sanity_check_npu_stack(parsed_args.command != "validate");
+    if (parsed_args.command == "validate")
+        return stable_stack ? 0 : 1;
+
+    if (parsed_args.command == "run" || parsed_args.command == "serve" || parsed_args.command == "pull" || parsed_args.command == "remove" || parsed_args.command == "bench") {
+      if (parsed_args.model_tag != "model-faker" && (!availble_models.is_model_supported(parsed_args.model_tag))) {
+            header_print("ERROR", "Model not found: " << parsed_args.model_tag << "; Please check with `flm list` and try again.");
             return 1;
         }
     }
   
-    if (command == "serve" || command == "run" || command == "bench"){
+    if (parsed_args.command == "serve" || parsed_args.command == "run" || parsed_args.command == "bench"){
         // Configure AMD XRT for the specified power mode
-        if (power_mode == "default" || power_mode == "powersaver" || power_mode == "balanced" || 
-            power_mode == "performance" || power_mode == "turbo") {
+        if (parsed_args.power_mode == "default" || parsed_args.power_mode == "powersaver" || parsed_args.power_mode == "balanced" || 
+            parsed_args.power_mode == "performance" || parsed_args.power_mode == "turbo") {
 #ifdef _WIN32
-            std::string xrt_cmd = "cd \"C:\\Windows\\System32\\AMD\" && .\\xrt-smi.exe configure --pmode " + power_mode + " > NUL 2>&1";
-            header_print("FLM", "Configuring NPU Power Mode to " + power_mode + (got_power_mode ? "" : " (flm default)"));
+            std::string xrt_cmd = "cd \"C:\\Windows\\System32\\AMD\" && .\\xrt-smi.exe configure --pmode " + parsed_args.power_mode + " > NUL 2>&1";
+            header_print("FLM", "Configuring NPU Power Mode to " + parsed_args.power_mode + (got_power_mode ? "" : " (flm default)"));
             (void)system(xrt_cmd.c_str());
 #endif
         }
         else{
-            std::cout << "Invalid power mode: " << power_mode << std::endl;
+            std::cout << "Invalid power mode: " << parsed_args.power_mode << std::endl;
             std::cout << "Valid power modes: default, powersaver, balanced, performance, turbo" << std::endl;
             return 1;
         }
     }
 
-    if (preemption){
+    // Handle special case for serve command - use default tag if none provided
+    if (parsed_args.command == "serve" && parsed_args.model_tag.empty()) {
+        parsed_args.model_tag = "model-faker"; // Use default tag
+    }
+
+    // code for all commands:
+    
+    if (parsed_args.command == "version") {
+        std::cout << "FLM v" << __FLM_VERSION__ << std::endl;
+        return 0;
+    }
+
+    if (parsed_args.preemption){
         header_print("FLM", "Allowing high priority tasks to preempt FLM!");
     }
 
-    stable_stack = sanity_check_npu_stack(command != "validate");
-    if (command == "validate")
-        return stable_stack ? 0 : 1;
 
     try {
 
@@ -445,29 +426,35 @@ int main(int argc, char* argv[]) {
             std::filesystem::create_directories(models_dir);
         }
 
-        if (command == "bench") {
-            benchmarking::BenchmarkResults_t results = benchmarking::run_benchmarks(tag, parsed_args.input_file_name, availble_models);
+        if (parsed_args.command == "bench") {
+            benchmarking::BenchmarkResults_t results = benchmarking::run_benchmarks(parsed_args.model_tag, parsed_args.input_file_name, availble_models);
         }
-        else if (command == "run") {
+        else if (parsed_args.command == "run") {
             check_and_notify_new_version();
-            Runner runner(availble_models, downloader, tag, asr, embed, ctx_length, img_pre_resize, preemption);
+            Runner runner(availble_models, downloader, parsed_args);
             runner.run();
 
-        } else if (command == "serve") {
+        } else if (parsed_args.command == "serve") {
             check_and_notify_new_version();
             // Create the server
-            int port = utils::get_server_port(user_port);
-            auto server = create_lm_server(availble_models, downloader, tag, asr, embed, user_host, port, ctx_length, img_pre_resize, cors, preemption);
-            server->set_max_connections(max_socket_connections);           // Allow up to 10 concurrent connections
+            int port = utils::get_server_port(parsed_args.port);
+            if (parsed_args.port == -1) { // User did not specify port
+                header_print("FLM", "Using environment-specified port: " << port);
+                parsed_args.port = port; // overwrite to ensure server uses correct port
+            } else {
+                header_print("FLM", "Using user-specified port: " << port);
+            }
+            auto server = create_lm_server(availble_models, downloader, parsed_args);
+            server->set_max_connections(parsed_args.max_socket_connections);           // Allow up to 10 concurrent connections
             server->set_io_threads(10);          // Allow up to 5 io threads
-            server->set_npu_queue_length(max_npu_queue);           // Allow up to 10 concurrent queue
+            server->set_npu_queue_length(parsed_args.max_npu_queue);           // Allow up to 10 concurrent queue
             server->set_request_timeout(std::chrono::seconds(600)); // 10 minute timeout for long requests
             // Start the server
             header_print("FLM", "Starting server on port " << port << "...");
             server->start();
 
             // Start a thread to handle user input, this thread will be used to handle the user input
-            std::thread input_thread(handle_user_input, quiet);
+            std::thread input_thread(handle_user_input, parsed_args.sub_process_mode);
 
             // Wait for exit command, this thread will be used to wait for the user to exit the server
             while (!should_exit) {
@@ -479,13 +466,13 @@ int main(int argc, char* argv[]) {
             server->stop();
             input_thread.join();
         }
-        else if (command == "pull") {
+        else if (parsed_args.command == "pull") {
             // Check if the model is already downloaded, if true, the model will not be downloaded
             // Check if model is already downloaded
-            if (!force_redownload && downloader.is_model_downloaded(tag)) {
+            if (!parsed_args.force_redownload && downloader.is_model_downloaded(parsed_args.model_tag)) {
                 header_print("FLM", "Model is already downloaded.");
                 // Show missing files if any, this will be used to show the missing files
-                auto missing_files = downloader.get_missing_files(tag);
+                auto missing_files = downloader.get_missing_files(parsed_args.model_tag);
                 if (!missing_files.empty()) {
                     header_print("FLM", "Missing files:");
                     for (const auto& file : missing_files) {
@@ -496,27 +483,27 @@ int main(int argc, char* argv[]) {
                 }
             } else {
                 // Download the model, this will be used to download the model
-                bool success = downloader.pull_model(tag, force_redownload);
+                bool success = downloader.pull_model(parsed_args.model_tag, parsed_args.force_redownload);
                 if (!success) {
-                    header_print("ERROR", "Failed to pull model: " + tag);
+                    header_print("ERROR", "Failed to pull model: " + parsed_args.model_tag);
                     return 1;
                 }
             }
         }
-        else if (command == "remove") {
+        else if (parsed_args.command == "remove") {
             // Remove the model, this will be used to remove the model
-            downloader.remove_model(tag);
+            downloader.remove_model(parsed_args.model_tag);
         }
-        else if (command == "list") {
+        else if (parsed_args.command == "list") {
             // List the models, this will be used to list the models
-            if (list_filter == "installed" || list_filter == "not-installed" || list_filter == "all") {
+            if (parsed_args.list_filter == "installed" || parsed_args.list_filter == "not-installed" || parsed_args.list_filter == "all") {
                 std::cout << "Models:" << std::endl;
                 nlohmann::json models = availble_models.get_all_models();
                 for (const auto& model : models["models"]) {
-                    bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>(), quiet_list);
-                    if ((list_filter == "installed") == is_present || list_filter == "all") {
+                    bool is_present = downloader.is_model_downloaded(model["name"].get<std::string>(), parsed_args.sub_process_mode);
+                    if ((parsed_args.list_filter == "installed") == is_present || parsed_args.list_filter == "all") {
                         std::cout << "  - " << model["name"].get<std::string>();
-                        if (!quiet_list) {
+                        if (!parsed_args.sub_process_mode) {
                             std::cout << (is_present ? " ✅" : " ⏬");
                         }
                         std::cout << std::endl;
@@ -530,7 +517,7 @@ int main(int argc, char* argv[]) {
         }
         else {
             // Invalid command, this will be used to show the invalid command
-            std::cerr << "Invalid command: " << command << std::endl;
+            std::cerr << "Invalid command: " << parsed_args.command << std::endl;
             std::cerr << "Use --help for usage information" << std::endl;
             return 1;
         }

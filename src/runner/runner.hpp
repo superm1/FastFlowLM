@@ -13,6 +13,7 @@
 #include "wstream_buf.hpp"
 #include "model_downloader.hpp"
 #include "cli_wide.hpp"
+#include "program_args.hpp"
 #include "image/image_reader.hpp"
 #ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
 #include "whisper/modeling_whisper.hpp"
@@ -43,7 +44,7 @@ typedef enum {
 /// \brief Runner class
 class Runner {
     public: 
-        Runner(model_list& supported_models, ModelDownloader& downloader, std::string& tag, bool asr, bool embed, int ctx_length, int img_pre_resize, bool preemption);
+        Runner(model_list& supported_models, ModelDownloader& downloader, program_args_t& args);
         void run();
     private:
         std::string tag;

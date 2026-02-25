@@ -14,6 +14,9 @@
 #include "AutoEmbeddingModel/all_embedding_model.hpp"
 #endif
 #include "model_list.hpp"
+#include "program_args.hpp"
+
+
 #include "model_downloader.hpp"
 #include <nlohmann/json.hpp>
 #include <string>
@@ -31,7 +34,7 @@ using StreamResponseCallback = std::function<void(const json&, bool)>; // data, 
 
 class RestHandler {
 public:
-    RestHandler(model_list& models, ModelDownloader& downloader, const std::string& default_tag, bool asr, bool embed, int ctx_length = -1, int img_pre_resize = 0, bool preemption = false);
+    RestHandler(model_list& models, ModelDownloader& downloader, program_args_t& args);
     ~RestHandler();
 
     void handle_show(const json& request,
