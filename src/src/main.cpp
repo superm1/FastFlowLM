@@ -469,6 +469,15 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    if (parsed_args.command == "port"){
+        if (parsed_args.json_output) {
+            std::cout << "{ \"port\": " << get_server_port(parsed_args.port) << " }" << std::endl;
+        } else {
+            std::cout << "Server Port: " << get_server_port(parsed_args.port) << std::endl;
+        }
+        return 0;
+    }
+
     if (parsed_args.preemption){
         header_print("FLM", "Allowing high priority tasks to preempt FLM!");
     }
