@@ -452,7 +452,7 @@
                 ],
                 "default_context_length": 16384,
                 "details": {
-                    "family": "qwen3",
+                    "family": "deepseek-r1-0528",
                     "think": true,
                     "think_toggleable": false,
                     "parameter_size": "8B",
