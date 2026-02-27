@@ -865,6 +865,7 @@ void RestHandler::handle_openai_chat_completion(const json& request,
             else {
                 // cannot use cache, clear and re-insert all
                 auto_chat_engine->clear_context();
+                this->prompt_cache.update_checksum(current_messages);
                 messages = current_messages;
             }
         }
