@@ -50,8 +50,6 @@ std::string Qwen2::apply_chat_template(nlohmann::ordered_json& messages, nlohman
     inputs.add_generation_prompt = true;
     inputs.messages = messages;
     inputs.extra_context = this->extra_context;
-    if (!tools.empty())
-        inputs.tools = tools;
     return this->chat_tmpl->apply(inputs);
 }
 
@@ -64,7 +62,7 @@ bool Qwen2::insert(chat_meta_info_t& meta_info, lm_uniform_input_t& input) {
         return false;
     }
     if (!input.messages.empty()) { // already a formated messages, usually from REST API
-        templated_text = this->apply_chat_template(input.messages, input.tools);
+        templated_text = this->apply_chat_template(input.messages);
     }
     else if (!input.prompt.empty()) { // a pure text, usually from the cli
         nlohmann::ordered_json messages;
