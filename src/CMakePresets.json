@@ -9,7 +9,8 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "/opt/fastflowlm"
+        "CMAKE_INSTALL_PREFIX": "/opt/fastflowlm",
+        "CMAKE_XCLBIN_PREFIX": "/opt/fastflowlm/share/flm"
       }
     },
     {

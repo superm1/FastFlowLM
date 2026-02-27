@@ -74,7 +74,7 @@ class LM_Config{
                 this->exec_path = "../../../";
             #endif
             #else
-                this->exec_path = utils::get_executable_directory();
+                this->exec_path = utils::find_xclbin_path();
             #endif
             this->model_path = model_name;
             this->model_name = std::filesystem::path(model_name).filename().string();
@@ -170,7 +170,6 @@ public:
     /// \brief from pretrained
     /// \param model_name the model name
     void from_pretrained(std::string model_name){
-        this->exec_path = utils::get_executable_directory();
         this->model_path = model_name;
         #ifdef DEV_BUILD
         #ifdef __WINDOWS__
@@ -179,7 +178,7 @@ public:
             this->exec_path = "../../../";
         #endif
         #else
-            this->exec_path = utils::get_executable_directory();
+            this->exec_path = utils::find_xclbin_path();
         #endif
         this->model_name = std::filesystem::path(model_name).filename().string();
         std::ifstream file(model_name + "/config.json");

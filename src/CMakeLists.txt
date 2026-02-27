@@ -120,6 +120,7 @@ endif()
 target_compile_definitions(flm PUBLIC
     DISABLE_ABI_CHECK=1
     CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}"
+    CMAKE_XCLBIN_PREFIX="${CMAKE_XCLBIN_PREFIX}"
 )
 
 if(WIN32)
@@ -322,7 +323,7 @@ install(FILES model_list.json DESTINATION share/flm)
 
 # xclbins, which are loaded by shared libraries need to be in location
 # relative to the executable, so we install them to bin/xclbins
-install(DIRECTORY xclbins DESTINATION bin)
+install(DIRECTORY xclbins DESTINATION share/flm)
 
 if(NOT WIN32 AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr" AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
     install(CODE "

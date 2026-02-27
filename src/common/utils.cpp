@@ -26,6 +26,7 @@ std::string find_model_list() {
     const char* env_path = std::getenv("FLM_CONFIG_PATH");
     if (env_path && *env_path) {
         if (std::filesystem::exists(env_path)) {
+            header_print("FLM", "Using custom model list path: " + std::string(env_path));
             return env_path;
         }
     }
@@ -50,6 +51,51 @@ std::string find_model_list() {
 
     // If not found, throw an error
     throw std::runtime_error("model_list.json not found. Please set FLM_CONFIG_PATH or place it next to the executable.");
+}
+
+std::string find_xclbin_path() {
+    std::string xclbin_prefix = CMAKE_XCLBIN_PREFIX;
+
+    // 1. Check FLM_CONFIG_PATH environment variable
+    const char* env_path = std::getenv("FLM_XCLBIN_PATH");
+    if (env_path && *env_path) {
+        // Remove possible "/xclbins" or "/xclbins/" from the end of the path
+        std::string path(env_path);
+        if (path.size() > 9 && path.substr(path.size() - 9) == "/xclbins/") {
+            path = path.substr(0, path.size() - 9);
+        } else if (path.size() > 9 && path.substr(path.size() - 9) == "\\xclbins\\") {
+            path = path.substr(0, path.size() - 9);
+        } else if (path.size() > 8 && path.substr(path.size() - 8) == "/xclbins") {
+            path = path.substr(0, path.size() - 8);
+        } else if (path.size() > 8 && path.substr(path.size() - 8) == "\\xclbins") {
+            path = path.substr(0, path.size() - 8);
+        }
+
+        if (std::filesystem::exists(path + "/xclbins")) {
+            return path;
+        }
+    }
+
+    // 2. Check for install prefix
+    std::string installed_path = xclbin_prefix;
+    if (std::filesystem::exists(installed_path)) {
+        return installed_path;
+    }
+
+    // 3. Check relative to executable
+    std::string exe_dir = get_executable_directory();
+    std::string exe_relative_path = exe_dir;
+    if (std::filesystem::exists(exe_relative_path)) {
+        return exe_relative_path;
+    }
+
+    // 4. Check current working directory
+    if (std::filesystem::exists("xclbins")) {
+        return "xclbins";
+    }
+
+    // If not found, throw an error
+    throw std::runtime_error("xclbins not found. Please set FLM_XCLBIN_PATH or place it next to the executable.");
 }
 
 std::string get_executable_directory() {

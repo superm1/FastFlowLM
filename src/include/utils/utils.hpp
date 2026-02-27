@@ -368,6 +368,10 @@ inline std::string path_join(fileName&&... args){
 ///@return path to model_list.json
 std::string find_model_list();
 
+///@brief get the path to the xclbin directory
+///@return path to the xclbin directory
+std::string find_xclbin_path();
+
 ///@brief get_server_port gets the server port from environment variable FLM_SERVE_PORT
 ///@return the server port, default is 52625 if environment variable is not set
 int get_server_port(int user_port);
