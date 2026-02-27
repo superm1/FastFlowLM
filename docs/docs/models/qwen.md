@@ -9,7 +9,7 @@ parent: Models
 
 - **Type:** Text-to-Text
 - **Think:** Toggleable
-- **Tool Calling Support:** Yes  
+- **Tool Calling Support:** No  
 - **Base Model:** [Qwen/Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -33,7 +33,7 @@ flm run qwen3:0.6b
 
 - **Type:** Text-to-Text
 - **Think:** Toggleable
-- **Tool Calling Support:** Yes  
+- **Tool Calling Support:** No  
 - **Base Model:** [Qwen/Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B)
 - **Quantization:** Q4_1
 - **Max Context Length:** 32k tokens  
@@ -208,7 +208,7 @@ flm run qwen2.5-it:3b
 
 - **Type:** Image-Text-to-Text
 - **Think:** No
-- **Tool Calling Support:** Yes  
+- **Tool Calling Support:** No  
 - **Base Model:** [Qwen/Qwen2.5-VL-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)
 - **Quantization:** Q4_1
 - **Max Context Length:** 256k tokens  
