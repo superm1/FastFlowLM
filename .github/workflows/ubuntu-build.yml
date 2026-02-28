@@ -17,15 +17,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - ubuntu_version: "24.04"
+          - version: "24.04"
             container_tag: "ubuntu24.04"
             deb_codename: "noble"
-          - ubuntu_version: "25.10"
+          - version: "25.10"
             container_tag: "ubuntu25.10"
             deb_codename: "questing"
-          - ubuntu_version: "26.04"
+          - version: "26.04"
             container_tag: "ubuntu26.04"
             deb_codename: "resolute"
+          - version: "testing"
+            container_tag: "debiantesting"
+            deb_codename: "testing"
     container:
       image: ghcr.io/superm1/fastflowlm/build-environment:${{ matrix.container_tag }}
       credentials:
@@ -66,7 +69,7 @@ jobs:
           chmod +x debian/rules
 
       - name: Upgrade Rust toolchain (24.04)
-        if: ${{ matrix.ubuntu_version == '24.04' }}
+        if: ${{ matrix.version == '24.04' }}
         run: |
           apt-get update
           apt-get install -y --no-install-recommends curl ca-certificates
@@ -83,14 +86,14 @@ jobs:
           DEB_VERSION: ${{ steps.get_version.outputs.deb_version }}
         run: |
           dpkg-buildpackage -b -us -uc
-          mv ../fastflowlm_${DEB_VERSION}_amd64.deb ./fastflowlm_${DEB_VERSION}_ubuntu${{ matrix.ubuntu_version }}_amd64.deb
-          ls -lah ./fastflowlm_${DEB_VERSION}_ubuntu${{ matrix.ubuntu_version }}_amd64.deb
+          mv ../fastflowlm_${DEB_VERSION}_amd64.deb ./fastflowlm_${DEB_VERSION}_ubuntu${{ matrix.version }}_amd64.deb
+          ls -lah ./fastflowlm_${DEB_VERSION}_ubuntu${{ matrix.version }}_amd64.deb
 
       - name: Upload Debian package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flm-ubuntu${{ matrix.ubuntu_version }}-${{ steps.short_sha.outputs.sha }}-deb
-          path: ./fastflowlm_${{ steps.get_version.outputs.deb_version }}_ubuntu${{ matrix.ubuntu_version }}_amd64.deb
+          name: flm-ubuntu${{ matrix.version }}-${{ steps.short_sha.outputs.sha }}-deb
+          path: ./fastflowlm_${{ steps.get_version.outputs.deb_version }}_ubuntu${{ matrix.version }}_amd64.deb
           if-no-files-found: error
 
   release:
