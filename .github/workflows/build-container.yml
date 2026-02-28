@@ -11,12 +11,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - ubuntu_version: "24.04"
-            ubuntu_ppa: "ppa:amd-team/xrt"
-          - ubuntu_version: "25.10"
-            ubuntu_ppa: "ppa:amd-team/xrt"
-          - ubuntu_version: "26.04"
-            ubuntu_ppa: ""
+          - distro: "ubuntu"
+            release:  "24.04"
+            PPA: "ppa:amd-team/xrt"
+          - distro: "ubuntu"
+            release:  "25.10"
+            PPA: "ppa:amd-team/xrt"
+          - distro: "ubuntu"
+            release:  "26.04"
+            PPA: ""
+          - distro: "debian"
+            release: "testing"
+            PPA: ""
 
     permissions:
       contents: read
@@ -42,9 +48,9 @@ jobs:
         with:
           images: ghcr.io/superm1/fastflowlm/build-environment
           tags: |
-            type=raw,value=ubuntu${{ matrix.ubuntu_version }}
-            type=raw,value=latest,enable=${{ matrix.ubuntu_version == '26.04' }}
-            type=raw,value=nightly,enable=${{ matrix.ubuntu_version == '26.04' }}
+            type=raw,value=${{ matrix.distro }}${{ matrix.release }}
+            type=raw,value=latest,enable=${{ matrix.distro == 'ubuntu' && matrix.release == '26.04' }}
+            type=raw,value=nightly,enable=${{ matrix.distro == 'ubuntu' && matrix.release == '26.04' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -52,8 +58,8 @@ jobs:
           context: .
           file: ./Dockerfile
           build-args: |
-            BASE_IMAGE=ubuntu:${{ matrix.ubuntu_version }}
-            UBUNTU_PPA=${{ matrix.ubuntu_ppa }}
+            BASE_IMAGE=${{ matrix.distro }}:${{ matrix.release }}
+            PPA=${{ matrix.PPA || '' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
