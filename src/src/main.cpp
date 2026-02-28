@@ -263,7 +263,7 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
     }
     int major, minor;
     sscanf(u_name.release, "%d.%d", &major, &minor);
-    bool kernel_ok = (major > 6) || (major == 6 && minor >= 14);
+    bool kernel_ok = (major > 6) || (major == 6 && minor >= 17);
     validation_json["kernel"] = u_name.release;
     validation_json["kernel_ok"] = kernel_ok;
     if (!kernel_ok) {
