@@ -283,6 +283,7 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
     // Check firmware version of all AMD devices
     bool all_fw_ok = true;
     bool amd_device_found = false;
+    bool drm_version_ok = true;
 
     for (int i = 0; i < 16; ++i) {
         std::string dev_name = "/dev/accel/accel" + std::to_string(i);
@@ -293,6 +294,15 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
                 break;
             continue;
         }
+
+        struct drm_version drm_v;
+        memset(&drm_v, 0, sizeof(drm_v));
+        if (ioctl(fd, DRM_IOCTL_VERSION, &drm_v) == 0) {
+            if (!(drm_v.version_major > 0 || (drm_v.version_major == 0 && drm_v.version_minor >= 6))) {
+                drm_version_ok = false;
+            }
+        }
+        validation_json["drm_version"] = std::to_string(drm_v.version_major) + "." + std::to_string(drm_v.version_minor);
 
         amdxdna_drm_query_firmware_version query_fw_version;
         amdxdna_drm_get_info get_info = {
@@ -341,6 +351,18 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
     }
     validation_json["amd_device_found"] = amd_device_found;
     validation_json["all_fw_ok"] = all_fw_ok;
+
+    if (amd_device_found) {
+        if (!drm_version_ok)
+            kernel_ok = false;
+        if (print_human) {
+            if (drm_version_ok)
+                header_print_g("Linux", "amdxdna version: " << validation_json["drm_version"].get<std::string>());
+            else
+                header_print_r("ERROR", "amdxdna version " << validation_json["drm_version"].get<std::string>() << " is incompatible");
+        }
+    }
+    validation_json["kernel_ok"] = kernel_ok;
 
     if (!amd_device_found && print_human) {
         header_print_r("ERROR", "No NPU device found.");
