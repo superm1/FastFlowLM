@@ -243,6 +243,7 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
         {"kernel_ok", true},
         {"amd_device_found", true},
         {"all_fw_ok", true},
+        {"enough_cols", true},
         {"memlock_ok", true},
         {"devices", nlohmann::json::array()},
         {"ok", true}
@@ -282,6 +283,7 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
 
     // Check firmware version of all AMD devices
     bool all_fw_ok = true;
+    bool enough_cols = true;
     bool amd_device_found = false;
     bool drm_version_ok = true;
 
@@ -312,8 +314,8 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
         };
 
         int ret = ioctl(fd, DRM_IOCTL_AMDXDNA_GET_INFO, &get_info);
-        close(fd);
         if (ret < 0) {
+            close(fd);
             // ENOTTY means it's not an AMD device, just ignore it.
             if (errno != ENOTTY) {
                  if (!quiet) {
@@ -334,23 +336,40 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
             {"fw_build", query_fw_version.build}
         };
 
-        if (print_human) {
-            header_print_g("Linux", "NPU: " + dev_name);
-            header_print_g("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
-        }
-
         bool fw_ok = (query_fw_version.major > 1 || (query_fw_version.major == 1 && query_fw_version.minor >= 1));
         device_entry["fw_ok"] = fw_ok;
-        validation_json["devices"].push_back(device_entry);
         if (!fw_ok) {
             all_fw_ok = false;
             if (print_human) {
                 header_print_r("ERROR", "NPU firmware version on " + dev_name + " is incompatible. Please update NPU firmware!");
             }
         }
+
+        amdxdna_drm_query_aie_metadata query_aie_metadata;
+        get_info.param = DRM_AMDXDNA_QUERY_AIE_METADATA;
+        get_info.buffer_size = sizeof(amdxdna_drm_query_aie_metadata);
+        get_info.buffer = (unsigned long)&query_aie_metadata;
+        if (ioctl(fd, DRM_IOCTL_AMDXDNA_GET_INFO, &get_info) == 0) {
+            device_entry["cols"] = query_aie_metadata.cols;
+            if (query_aie_metadata.cols < 8) {
+                enough_cols = false;
+                if (print_human) {
+                    header_print_r("ERROR", "NPU " + dev_name + " does not have enough columns (" << query_aie_metadata.cols << " < 8)");
+                }
+            }
+        }
+        close(fd);
+
+        if (print_human) {
+            header_print_g("Linux", "NPU: " + dev_name + " with " + std::to_string(query_aie_metadata.cols) + " columns");
+            header_print_g("Linux", "NPU FW Version: " << query_fw_version.major << "." << query_fw_version.minor << "." << query_fw_version.patch << "." << query_fw_version.build);
+        }
+
+        validation_json["devices"].push_back(device_entry);
     }
     validation_json["amd_device_found"] = amd_device_found;
     validation_json["all_fw_ok"] = all_fw_ok;
+    validation_json["enough_cols"] = enough_cols;
 
     if (amd_device_found) {
         if (!drm_version_ok)
@@ -393,7 +412,7 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
     }
     validation_json["memlock_ok"] = memlock_ok;
 
-    bool overall_ok = amd_device_found && kernel_ok && all_fw_ok && memlock_ok;
+    bool overall_ok = amd_device_found && kernel_ok && all_fw_ok && enough_cols && memlock_ok;
     validation_json["ok"] = overall_ok;
     if (json_output) {
         std::cout << validation_json.dump(4) << std::endl;
