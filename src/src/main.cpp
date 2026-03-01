@@ -158,10 +158,10 @@ void ensure_models_directory(const std::string& exe_dir) {
 ///@param quiet if true, suppresses printing prompts
 void handle_user_input(bool sub_process_mode) {
     std::string input;
+    if (!sub_process_mode){
+        header_print("FLM", "Enter 'exit' or use 'Ctrl+C' to stop the server: ");
+    }
     while (!should_exit) {
-        if (!sub_process_mode){
-            header_print("FLM", "Enter 'exit' or use 'Ctrl+C' to stop the server: ");
-        }
         std::getline(std::cin, input);
         if (input == "exit") {
             should_exit = true;
