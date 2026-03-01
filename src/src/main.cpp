@@ -13,6 +13,7 @@
 #include "utils/utils.hpp"
 #include "program_args.hpp"
 #include "minja/chat-template.hpp"
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -299,12 +300,16 @@ static bool sanity_check_npu_stack(bool quiet, bool json_output = false) {
 
         struct drm_version drm_v;
         memset(&drm_v, 0, sizeof(drm_v));
+        std::string drm_version_str = "unknown";
         if (ioctl(fd, DRM_IOCTL_VERSION, &drm_v) == 0) {
+            drm_version_str = std::to_string(drm_v.version_major) + "." + std::to_string(drm_v.version_minor);
             if (!(drm_v.version_major > 0 || (drm_v.version_major == 0 && drm_v.version_minor >= 6))) {
                 drm_version_ok = false;
             }
+        } else {
+            drm_version_ok = false;
         }
-        validation_json["drm_version"] = std::to_string(drm_v.version_major) + "." + std::to_string(drm_v.version_minor);
+        validation_json["drm_version"] = drm_version_str;
 
         amdxdna_drm_query_firmware_version query_fw_version;
         amdxdna_drm_get_info get_info = {
