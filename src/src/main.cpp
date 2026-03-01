@@ -148,9 +148,8 @@ void handle_user_input(bool sub_process_mode) {
         if (!sub_process_mode){
             header_print("FLM", "Enter 'exit' to stop the server: ");
         }
-        
-        std::getline(std::cin, input);
-        if (input == "exit") {
+        if (!std::getline(std::cin, input)) {
+            // Handle EOF or input error to avoid spinning in a tight loop
             should_exit = true;
             break;
         }
