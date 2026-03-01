@@ -621,7 +621,14 @@ void RestHandler::handle_embeddings(const json& request,
             input = request["input"];
         }
         else if (request["input"].is_array() && !request["input"].empty()) {
-            input = request["input"][0];
+            bool first = true;
+            for (const auto& item : request["input"]) {
+                if (!item.is_string()) continue;
+
+                if (!first) input += "\n";  
+                input += item.get<std::string>();
+                first = false;
+            }           
         }
 
         //std::string encoding_format = request["encoding_format"];
@@ -630,7 +637,7 @@ void RestHandler::handle_embeddings(const json& request,
         json response;
         if (this->embed) {
 #ifndef FASTFLOWLM_LINUX_LIMITED_MODELS
-            std::cout << "Embedding input: " << input << std::endl;
+            std::cout << "Embedding input: " << "\n" << input << std::endl;
             std::vector<float> embedding_result = this->auto_embedding_engine->embed(input, embedding_task_type_t::task_query);
 #else
             throw std::runtime_error("Embedding models are not supported in this build");
