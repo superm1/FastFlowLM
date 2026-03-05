@@ -17,7 +17,7 @@ Run large language models — now with **Vision**, **Audio**, **Embedding** and 
 🤝 **Think Ollama — but deeply optimized for NPUs.**  
 ✨ **From Idle Silicon to Instant Power — FastFlowLM Makes Ryzen™ AI Shine.**
 
-> FastFlowLM (FLM) supports all Ryzen™ AI Series chips with XDNA2 NPUs (Strix, Strix Halo, and Kraken).
+> FastFlowLM (FLM) supports all Ryzen™ AI Series chips with XDNA2 NPUs (Strix, Strix Halo, Kraken, and Gorgon Point).
 
 ---
 
@@ -25,7 +25,7 @@ Run large language models — now with **Vision**, **Audio**, **Embedding** and 
 
   🔽 **[Download](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe)** | 📊 **[Benchmarks](https://fastflowlm.com/docs/benchmarks/)** | 📦 **[Model List](https://fastflowlm.com/docs/models/)**  
 
-  🐧 **[Linux Getting Started Guide](docs/linux-getting-started.md)**
+  🐧 **[Linux Getting Started Guide](https://fastflowlm.com/docs/install_lin/)**
 
   📖 **[Docs](https://fastflowlm.com/docs)** | 📺 **[Demos](https://www.youtube.com/@FastFlowLM-YT/playlists)** | 🧪 **[Test Drive](https://fastflowlm.com/docs/#-test-drive-remote-demo)** | 💬 **[Discord](https://discord.gg/z24t23HsHF)** 
 
@@ -35,7 +35,7 @@ Run large language models — now with **Vision**, **Audio**, **Embedding** and 
 
 A packaged FLM Windows installer is available here: [**flm-setup.exe**](https://github.com/FastFlowLM/FastFlowLM/releases/latest/download/flm-setup.exe). For more details, see the [release notes](https://github.com/FastFlowLM/FastFlowLM/releases/).
 
-📺 [**Watch the quick start video**](https://www.youtube.com/watch?v=mYOfDNkyBII)
+📺 [**Watch the quick start video (Windows)**](https://www.youtube.com/watch?v=mYOfDNkyBII)
 
 > [!IMPORTANT]  
 > ⚠️ Ensure NPU driver version is **>= 32.0.203.304** (`.304` is the minimum requirement but `.311` is recommended; check via Task Manager→Performance→NPU or Device Manager).  

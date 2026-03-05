@@ -54,8 +54,11 @@ Select the `FLM-RAG` model (powered by Qwen3-Thinking-2507-4B) with a knowledge 
 
 ## 📚 Sections
 
-### 🚀 [Get Started](install/)
+### 🚀 [Get Started](install_win/)
 Quick 5‑minute setup guide for Windows.
+
+### 🐧 [Get Started](install_lin/)
+Quick 5‑minute setup guide for Linux.
 
 ### 🛠️ [Instructions](instructions/)
 Run FastFlowLM using the CLI mode or server mode.

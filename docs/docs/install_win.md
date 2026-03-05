@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Get Started
+title: Get Started (Windows)
 nav_order: 1
 has_children: false
 ---
