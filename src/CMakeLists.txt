@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 project(flm LANGUAGES CXX VERSION 0.1.0)
 
-set(FLM_VERSION "0.9.34" CACHE STRING "FastFlowLM version string embedded at compile time")
+set(FLM_VERSION "0.9.35" CACHE STRING "FastFlowLM version string embedded at compile time")
 set(NPU_VERSION "32.0.203.304" CACHE STRING "Minimum NPU driver version string embedded at compile time")
 
 # Set build type to Release
