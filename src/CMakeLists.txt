@@ -29,14 +29,192 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 # ———————————————————————————————————————————————
-# User-tweakable XRT settings (override on cmake command-line)
+# User-tweakable static build settings
 # ———————————————————————————————————————————————
+option(FLM_PORTABLE_BUILD "Build portable distribution with bundled libraries (XRT dynamic, FFmpeg static)" OFF)
+
 if(WIN32)
     set(XRT_INCLUDE_DIR C:/dev/XRT/src/runtime_src/core/include CACHE PATH   "Where XRT headers live")
     set(XRT_LIB_DIR     C:/dev/xrtNPUfromDLL     CACHE PATH   "Where XRT libs live")
 else()
-    set(XRT_INCLUDE_DIR /opt/xilinx/xrt/include CACHE PATH   "Where XRT headers live")
-    set(XRT_LIB_DIR     /opt/xilinx/xrt/lib     CACHE PATH   "Where XRT libs live")
+    # On Linux, find pkg-config first, then use it to find XRT
+    find_package(PkgConfig)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(XRT xrt)
+        if(XRT_FOUND)
+            message(STATUS "Found XRT via pkg-config")
+            message(STATUS "  XRT include dirs: ${XRT_INCLUDE_DIRS}")
+            message(STATUS "  XRT library dirs: ${XRT_LIBRARY_DIRS}")
+            message(STATUS "  XRT libraries: ${XRT_LIBRARIES}")
+        endif()
+    endif()
+
+    # Check if we need to fetch dependencies from source for static build
+    set(NEED_FETCH_DEPS FALSE)
+    if(FLM_PORTABLE_BUILD)
+        if(NOT XRT_FOUND)
+            set(NEED_FETCH_DEPS TRUE)
+            message(STATUS "XRT not found on system, will fetch from source for static build")
+        else()
+            # Check if static libraries are available
+            set(CMAKE_FIND_LIBRARY_SUFFIXES_SAVE ${CMAKE_FIND_LIBRARY_SUFFIXES})
+            set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+            find_library(XRT_STATIC_CHECK NAMES xrt_coreutil PATHS ${XRT_LIBRARY_DIRS} NO_DEFAULT_PATH)
+            set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES_SAVE})
+
+            if(NOT XRT_STATIC_CHECK)
+                set(NEED_FETCH_DEPS TRUE)
+                message(STATUS "Static build requested but XRT static libraries not found, will fetch from source")
+            endif()
+            unset(XRT_STATIC_CHECK CACHE)
+        endif()
+    endif()
+
+    if(NEED_FETCH_DEPS)
+        message(STATUS "FLM_STATIC_BUILD enabled: Fetching dependencies from source...")
+        message(STATUS "  - XRT (Xilinx Runtime)")
+        message(STATUS "  - FFmpeg (multimedia libraries)")
+        include(FetchContent)
+
+        # ———————————————————————————————————————————————
+        # 1. Fetch XRT first (XDNA driver depends on it)
+        # ———————————————————————————————————————————————
+        set(XRT_GIT_REPO "https://github.com/Xilinx/XRT.git" CACHE STRING "XRT Git repository URL")
+        set(XRT_GIT_TAG "2.21.75" CACHE STRING "XRT Git tag/branch to fetch")
+
+        FetchContent_Declare(
+            xrt_source
+            GIT_REPOSITORY ${XRT_GIT_REPO}
+            GIT_TAG ${XRT_GIT_TAG}
+            GIT_SHALLOW TRUE
+        )
+
+        # Configure XRT build options
+        set(XRT_NATIVE_BUILD ON CACHE BOOL "Native XRT build" FORCE)
+        set(BUILD_DOCS OFF CACHE BOOL "Build documentation" FORCE)
+
+        # Don't compile Alveo support - only base XRT needed
+        set(XRT_BASE 1 CACHE STRING "Build base XRT only" FORCE)
+        set(XRT_ALVEO 0 CACHE STRING "Disable Alveo support" FORCE)
+
+        # Disable building tools/utilities that have errors or aren't needed
+        set(XRT_BUILD_XBMGMT OFF CACHE BOOL "Build xbmgmt" FORCE)
+        set(XRT_BUILD_XBUTIL OFF CACHE BOOL "Build xbutil" FORCE)
+        set(XRT_BUILD_XBT OFF CACHE BOOL "Build xbt" FORCE)
+
+        message(STATUS "Fetching XRT sources...")
+        FetchContent_MakeAvailable(xrt_source)
+
+        # Set XRT paths for XDNA driver
+        set(XRT_REPO_DIR ${xrt_source_SOURCE_DIR})  # Root of XRT repo
+        set(XRT_BUILD_DIR ${xrt_source_BINARY_DIR})
+        set(XRT_INCLUDE_DIRS ${XRT_REPO_DIR}/src/runtime_src/core/include)
+
+        message(STATUS "XRT fetched successfully")
+        message(STATUS "  XRT repo dir: ${XRT_REPO_DIR}")
+        message(STATUS "  XRT build dir: ${XRT_BUILD_DIR}")
+
+        # Set variables for later use
+        set(XRT_BUILT_FROM_SOURCE TRUE)
+        set(XRT_LIBRARY_DIRS ${XRT_BUILD_DIR}/src/runtime_src)
+
+        # Note: XDNA userspace plugin is NOT built here as it requires exact version
+        # matching with XRT and has compatibility issues. The plugin should be:
+        # 1. Installed from system packages (libxrt-npu2)
+        # 2. Or placed in /usr/lib/ or lib/ directory manually
+        message(STATUS "Note: XDNA plugin (libxrt_driver_xdna.so.2) must be provided separately")
+
+        # ———————————————————————————————————————————————
+        # 2. Fetch and build FFmpeg as static libraries
+        # ———————————————————————————————————————————————
+        set(FFMPEG_GIT_REPO "https://github.com/FFmpeg/FFmpeg.git" CACHE STRING "FFmpeg Git repository URL")
+        set(FFMPEG_GIT_TAG "n7.1" CACHE STRING "FFmpeg Git tag/branch to fetch")
+
+        FetchContent_Declare(
+            ffmpeg_source
+            GIT_REPOSITORY ${FFMPEG_GIT_REPO}
+            GIT_TAG ${FFMPEG_GIT_TAG}
+            GIT_SHALLOW TRUE
+        )
+
+        message(STATUS "Fetching FFmpeg sources...")
+        FetchContent_Populate(ffmpeg_source)
+
+        set(FFMPEG_SOURCE_DIR ${ffmpeg_source_SOURCE_DIR})
+        set(FFMPEG_BUILD_DIR ${CMAKE_BINARY_DIR}/ffmpeg-build)
+        set(FFMPEG_INSTALL_DIR ${CMAKE_BINARY_DIR}/ffmpeg-install)
+
+        # Configure and build FFmpeg as static libraries
+        message(STATUS "Configuring FFmpeg for static build...")
+        file(MAKE_DIRECTORY ${FFMPEG_BUILD_DIR})
+
+        # Run FFmpeg configure
+        execute_process(
+            COMMAND ${FFMPEG_SOURCE_DIR}/configure
+                --prefix=${FFMPEG_INSTALL_DIR}
+                --enable-static
+                --disable-shared
+                --disable-programs
+                --disable-doc
+                --disable-htmlpages
+                --disable-manpages
+                --disable-podpages
+                --disable-txtpages
+                --enable-pic
+                --disable-autodetect
+                --enable-avcodec
+                --enable-avformat
+                --enable-avutil
+                --enable-swscale
+                --enable-swresample
+            WORKING_DIRECTORY ${FFMPEG_BUILD_DIR}
+            RESULT_VARIABLE FFMPEG_CONFIGURE_RESULT
+            OUTPUT_FILE ${FFMPEG_BUILD_DIR}/configure.log
+            ERROR_FILE ${FFMPEG_BUILD_DIR}/configure.log
+        )
+
+        if(NOT FFMPEG_CONFIGURE_RESULT EQUAL 0)
+            message(FATAL_ERROR "FFmpeg configure failed. Check ${FFMPEG_BUILD_DIR}/configure.log")
+        endif()
+
+        message(STATUS "Building FFmpeg static libraries...")
+        execute_process(
+            COMMAND make -j${CMAKE_BUILD_PARALLEL_LEVEL}
+            WORKING_DIRECTORY ${FFMPEG_BUILD_DIR}
+            RESULT_VARIABLE FFMPEG_BUILD_RESULT
+            OUTPUT_FILE ${FFMPEG_BUILD_DIR}/build.log
+            ERROR_FILE ${FFMPEG_BUILD_DIR}/build.log
+        )
+
+        if(NOT FFMPEG_BUILD_RESULT EQUAL 0)
+            message(FATAL_ERROR "FFmpeg build failed. Check ${FFMPEG_BUILD_DIR}/build.log")
+        endif()
+
+        message(STATUS "Installing FFmpeg static libraries...")
+        execute_process(
+            COMMAND make install
+            WORKING_DIRECTORY ${FFMPEG_BUILD_DIR}
+            RESULT_VARIABLE FFMPEG_INSTALL_RESULT
+        )
+
+        if(NOT FFMPEG_INSTALL_RESULT EQUAL 0)
+            message(FATAL_ERROR "FFmpeg install failed")
+        endif()
+
+        set(FFMPEG_BUILT_FROM_SOURCE TRUE)
+        set(FFMPEG_INCLUDE_DIRS ${FFMPEG_INSTALL_DIR}/include)
+        set(FFMPEG_LIBRARY_DIRS ${FFMPEG_INSTALL_DIR}/lib)
+
+        message(STATUS "FFmpeg built successfully")
+        message(STATUS "  FFmpeg include dir: ${FFMPEG_INCLUDE_DIRS}")
+        message(STATUS "  FFmpeg library dir: ${FFMPEG_LIBRARY_DIRS}")
+    endif()
+
+    # Fallback to manual paths if pkg-config didn't find XRT and FLM_FETCH_XDNA is not enabled
+    if(NOT XRT_FOUND AND NOT XRT_BUILT_FROM_SOURCE)
+        set(XRT_INCLUDE_DIR /opt/xilinx/xrt/include CACHE PATH   "Where XRT headers live")
+        set(XRT_LIB_DIR     /opt/xilinx/xrt/lib     CACHE PATH   "Where XRT libs live")
+    endif()
 endif()
 
 # ———————————————————————————————————————————————
@@ -90,7 +268,7 @@ if(NOT WIN32)
     find_package(Threads REQUIRED)
     find_package(Boost REQUIRED COMPONENTS program_options)
     find_package(CURL REQUIRED)
-    find_package(PkgConfig)
+    # PkgConfig is already found earlier for XRT detection
     if(PkgConfig_FOUND)
         pkg_check_modules(FFTW3_PKG fftw3)
         pkg_check_modules(FFTW3F_PKG fftw3f)
@@ -115,8 +293,19 @@ target_include_directories(flm PUBLIC
     ${CMAKE_SOURCE_DIR}/runner
     ${CMAKE_SOURCE_DIR}/server
     ${CMAKE_SOURCE_DIR}/pull
-    ${XRT_INCLUDE_DIR}
 )
+
+# Add XRT include directories
+if(NOT WIN32 AND XRT_FOUND)
+    target_include_directories(flm PUBLIC ${XRT_INCLUDE_DIRS})
+else()
+    target_include_directories(flm PUBLIC ${XRT_INCLUDE_DIR})
+endif()
+
+# Add FFmpeg include directories if built from source
+if(FFMPEG_BUILT_FROM_SOURCE)
+    target_include_directories(flm PUBLIC ${FFMPEG_INCLUDE_DIRS})
+endif()
 
 if(WIN32)
     target_include_directories(flm PUBLIC
@@ -132,6 +321,10 @@ target_compile_definitions(flm PUBLIC
     __FLM_VERSION__=\"${FLM_VERSION}\"
     __NPU_VERSION__=\"${NPU_VERSION}\"
 )
+
+if(FLM_PORTABLE_BUILD)
+    target_compile_definitions(flm PUBLIC FLM_PORTABLE_BUILD=1)
+endif()
 
 if(WIN32)
     target_compile_definitions(flm PUBLIC
@@ -149,9 +342,15 @@ if(WIN32)
 endif()
 
 target_link_directories(flm PUBLIC
-    ${XRT_LIB_DIR}
     ${CMAKE_SOURCE_DIR}/lib
 )
+
+# Add XRT library directories
+if(NOT WIN32 AND XRT_FOUND)
+    target_link_directories(flm PUBLIC ${XRT_LIBRARY_DIRS})
+else()
+    target_link_directories(flm PUBLIC ${XRT_LIB_DIR})
+endif()
 
 if(WIN32)
     target_link_directories(flm PUBLIC
@@ -165,9 +364,25 @@ if(MSVC)
     target_link_libraries(flm PUBLIC ${STATIC_LIBS})
 endif()
 
+# ———————————————————————————————————————————————
+# Link XRT libraries (always dynamic)
+# ———————————————————————————————————————————————
+if(XRT_BUILT_FROM_SOURCE)
+    # If built from source, link to the shared library targets
+    if(TARGET xrt_coreutil)
+        target_link_libraries(flm PUBLIC xrt_coreutil)
+        message(STATUS "  Linked: xrt_coreutil (shared)")
+    endif()
+elseif(NOT WIN32 AND XRT_FOUND)
+    # Use pkg-config provided libraries
+    target_link_libraries(flm PUBLIC ${XRT_LIBRARIES})
+else()
+    # Fallback to manual linking
+    target_link_libraries(flm PUBLIC xrt_coreutil)
+endif()
+
 # Link your custom libraries (these may still be DLLs if no static versions available)
 target_link_libraries(flm PUBLIC
-    xrt_coreutil
     q4_npu_eXpress
     llama_npu
     qwen2_npu
@@ -199,13 +414,28 @@ else()
     )
 endif()
 
-target_link_libraries(flm PUBLIC
-    avformat
-    avcodec
-    avutil
-    swscale
-    swresample
-)
+# Link FFmpeg libraries (static if built from source, dynamic otherwise)
+if(FFMPEG_BUILT_FROM_SOURCE)
+    # Link static FFmpeg libraries
+    target_link_directories(flm PUBLIC ${FFMPEG_LIBRARY_DIRS})
+    target_link_libraries(flm PUBLIC
+        ${FFMPEG_LIBRARY_DIRS}/libavformat.a
+        ${FFMPEG_LIBRARY_DIRS}/libavcodec.a
+        ${FFMPEG_LIBRARY_DIRS}/libavutil.a
+        ${FFMPEG_LIBRARY_DIRS}/libswscale.a
+        ${FFMPEG_LIBRARY_DIRS}/libswresample.a
+    )
+    message(STATUS "Linking static FFmpeg libraries")
+else()
+    # Link dynamic FFmpeg libraries (default)
+    target_link_libraries(flm PUBLIC
+        avformat
+        avcodec
+        avutil
+        swscale
+        swresample
+    )
+endif()
 
 if(WIN32)
     target_link_libraries(flm PUBLIC
@@ -242,25 +472,28 @@ else()
         target_link_libraries(flm PUBLIC fftw3l)
     endif()
 
-    if(AVFORMAT_PKG_FOUND)
-        target_include_directories(flm PUBLIC ${AVFORMAT_PKG_INCLUDE_DIRS})
-        target_link_libraries(flm PUBLIC ${AVFORMAT_PKG_LIBRARIES})
-    endif()
-    if(AVCODEC_PKG_FOUND)
-        target_include_directories(flm PUBLIC ${AVCODEC_PKG_INCLUDE_DIRS})
-        target_link_libraries(flm PUBLIC ${AVCODEC_PKG_LIBRARIES})
-    endif()
-    if(AVUTIL_PKG_FOUND)
-        target_include_directories(flm PUBLIC ${AVUTIL_PKG_INCLUDE_DIRS})
-        target_link_libraries(flm PUBLIC ${AVUTIL_PKG_LIBRARIES})
-    endif()
-    if(SWSCALE_PKG_FOUND)
-        target_include_directories(flm PUBLIC ${SWSCALE_PKG_INCLUDE_DIRS})
-        target_link_libraries(flm PUBLIC ${SWSCALE_PKG_LIBRARIES})
-    endif()
-    if(SWRESAMPLE_PKG_FOUND)
-        target_include_directories(flm PUBLIC ${SWRESAMPLE_PKG_INCLUDE_DIRS})
-        target_link_libraries(flm PUBLIC ${SWRESAMPLE_PKG_LIBRARIES})
+    # Only use pkg-config FFmpeg if not building static FFmpeg from source
+    if(NOT FFMPEG_BUILT_FROM_SOURCE)
+        if(AVFORMAT_PKG_FOUND)
+            target_include_directories(flm PUBLIC ${AVFORMAT_PKG_INCLUDE_DIRS})
+            target_link_libraries(flm PUBLIC ${AVFORMAT_PKG_LIBRARIES})
+        endif()
+        if(AVCODEC_PKG_FOUND)
+            target_include_directories(flm PUBLIC ${AVCODEC_PKG_INCLUDE_DIRS})
+            target_link_libraries(flm PUBLIC ${AVCODEC_PKG_LIBRARIES})
+        endif()
+        if(AVUTIL_PKG_FOUND)
+            target_include_directories(flm PUBLIC ${AVUTIL_PKG_INCLUDE_DIRS})
+            target_link_libraries(flm PUBLIC ${AVUTIL_PKG_LIBRARIES})
+        endif()
+        if(SWSCALE_PKG_FOUND)
+            target_include_directories(flm PUBLIC ${SWSCALE_PKG_INCLUDE_DIRS})
+            target_link_libraries(flm PUBLIC ${SWSCALE_PKG_LIBRARIES})
+        endif()
+        if(SWRESAMPLE_PKG_FOUND)
+            target_include_directories(flm PUBLIC ${SWRESAMPLE_PKG_INCLUDE_DIRS})
+            target_link_libraries(flm PUBLIC ${SWRESAMPLE_PKG_LIBRARIES})
+        endif()
     endif()
 
     if(READLINE_LIBRARY)
@@ -323,6 +556,39 @@ if(WIN32)
 else()
     file(GLOB so_libs "${CMAKE_SOURCE_DIR}/lib/*.so")
     install(FILES ${so_libs} DESTINATION lib)
+
+    # Bundle system libraries for portable distribution
+    if(FLM_PORTABLE_BUILD)
+        # Use install CODE to properly copy libraries and preserve symlinks
+        install(CODE "
+            # Find and copy XRT library
+            file(GLOB XRT_FILES
+                \"/usr/lib/libxrt_coreutil.so*\"
+                \"/usr/lib/x86_64-linux-gnu/libxrt_coreutil.so*\"
+            )
+            foreach(XRT_FILE \${XRT_FILES})
+                get_filename_component(XRT_NAME \"\${XRT_FILE}\" NAME)
+                message(STATUS \"Copying XRT: \${XRT_FILE} -> \${CMAKE_INSTALL_PREFIX}/lib/\${XRT_NAME}\")
+                file(COPY \"\${XRT_FILE}\" DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\"
+                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+                     FOLLOW_SYMLINK_CHAIN)
+            endforeach()
+
+            # Find and copy XDNA plugin
+            file(GLOB XDNA_FILES
+                \"/usr/lib/libxrt_driver_xdna.so*\"
+                \"/usr/lib/x86_64-linux-gnu/libxrt_driver_xdna.so*\"
+            )
+            foreach(XDNA_FILE \${XDNA_FILES})
+                get_filename_component(XDNA_NAME \"\${XDNA_FILE}\" NAME)
+                message(STATUS \"Copying XDNA: \${XDNA_FILE} -> \${CMAKE_INSTALL_PREFIX}/lib/\${XDNA_NAME}\")
+                file(COPY \"\${XDNA_FILE}\" DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\"
+                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+                     FOLLOW_SYMLINK_CHAIN)
+            endforeach()
+        ")
+    endif()
+
     set_target_properties(flm PROPERTIES
         INSTALL_RPATH "$ORIGIN/../lib")
 endif()

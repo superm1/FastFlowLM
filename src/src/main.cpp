@@ -63,7 +63,12 @@ std::condition_variable exit_cv;
 ///@brief Preload critical XRT libraries from the executable directory
 ///@details This ensures that dlopen() calls within libraries find the bundled versions
 ///@note Only on Linux/Unix; Windows handles DLL loading differently
+///@note When using portable build (FLM_PORTABLE_BUILD), XRT is bundled but still dynamic
 void preload_bundled_libraries() {
+#if 0  // Always preload bundled libraries, even in portable build
+    // (Keeping old static build logic commented for reference)
+    return;
+#else
     std::string exe_dir = utils::get_executable_directory();
 
     // When running inside a snap, LD_LIBRARY_PATH already points at the
@@ -86,6 +91,7 @@ void preload_bundled_libraries() {
         std::string lib_path = lib_prefix + lib;
         void* handle = dlopen(lib_path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     }
+#endif
 }
 #endif
 
