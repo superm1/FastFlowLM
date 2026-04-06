@@ -612,19 +612,29 @@ else()
         ")
     endif()
 
-    set_target_properties(flm PROPERTIES
-        INSTALL_RPATH "$ORIGIN/../lib")
+    if(FLM_PORTABLE_BUILD)
+        # Portable build: flat structure with ./flm, ./lib/, ./xclbins/
+        set_target_properties(flm PROPERTIES INSTALL_RPATH "$ORIGIN/lib")
+    else()
+        # Standard FHS layout
+        set_target_properties(flm PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
+    endif()
 endif()
-install(TARGETS flm
-    RUNTIME DESTINATION bin
-    BUNDLE DESTINATION .
-)
 
-install(FILES model_list.json DESTINATION share/flm)
-
-# xclbins, which are loaded by shared libraries need to be in location
-# relative to the executable, so we install them to bin/xclbins
-install(DIRECTORY xclbins DESTINATION share/flm)
+if(FLM_PORTABLE_BUILD)
+    # Portable build: flat layout
+    install(TARGETS flm RUNTIME DESTINATION .)
+    install(FILES model_list.json DESTINATION .)
+    install(DIRECTORY xclbins DESTINATION .)
+else()
+    # Standard FHS layout
+    install(TARGETS flm
+        RUNTIME DESTINATION bin
+        BUNDLE DESTINATION .
+    )
+    install(FILES model_list.json DESTINATION share/flm)
+    install(DIRECTORY xclbins DESTINATION share/flm)
+endif()
 
 if(NOT WIN32 AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr" AND NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
     install(CODE "

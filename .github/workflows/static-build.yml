@@ -59,7 +59,7 @@ jobs:
 
         echo ""
         echo "=== Binary in installation ==="
-        ls -lh install/opt/fastflowlm/bin/flm
+        ls -lh install/opt/fastflowlm/flm
 
         echo ""
         echo "=== Bundled libraries ==="
@@ -80,11 +80,11 @@ jobs:
 
         echo ""
         echo "=== Binary dependencies ==="
-        ldd install/opt/fastflowlm/bin/flm | head -40
+        ldd install/opt/fastflowlm/flm | head -40
 
         echo ""
         echo "=== Checking FFmpeg linking ==="
-        if ldd install/opt/fastflowlm/bin/flm | grep -q "libavformat.so"; then
+        if ldd install/opt/fastflowlm/flm | grep -q "libavformat.so"; then
           echo "❌ FAIL: FFmpeg is dynamically linked (should be static)"
           exit 1
         else
@@ -95,9 +95,10 @@ jobs:
       run: |
         cd src/build/install/opt/fastflowlm
         tar czf $GITHUB_WORKSPACE/flm-portable-${{ matrix.distro }}${{ matrix.version }}.tar.gz \
-          bin/flm \
+          flm \
           lib/ \
-          share/flm/
+          xclbins/ \
+          model_list.json
         echo "Created tarball with symlinks preserved"
         tar tzf $GITHUB_WORKSPACE/flm-portable-${{ matrix.distro }}${{ matrix.version }}.tar.gz | grep libxrt
 
