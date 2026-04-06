@@ -582,10 +582,9 @@ else()
 
             if(XRT_SOURCE_DIR)
                 # Find all XRT library files (including symlinks)
-                file(GLOB XRT_FILES \"\${XRT_SOURCE_DIR}/libxrt_coreutil.so*\")
-                file(GLOB XDNA_FILES \"\${XRT_SOURCE_DIR}/libxrt_driver_xdna.so*\")
+                file(GLOB XRT_FILES \"\${XRT_SOURCE_DIR}/libxrt*.so*\")
 
-                foreach(LIB_FILE \${XRT_FILES} \${XDNA_FILES})
+                foreach(LIB_FILE \${XRT_FILES})
                     get_filename_component(LIB_NAME \"\${LIB_FILE}\" NAME)
                     set(DEST_FILE \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\${LIB_NAME}\")
 
