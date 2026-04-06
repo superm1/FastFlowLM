@@ -91,14 +91,21 @@ jobs:
           echo "✅ PASS: FFmpeg statically linked"
         fi
 
+    - name: Create portable tarball
+      run: |
+        cd src/build/install/opt/fastflowlm
+        tar czf $GITHUB_WORKSPACE/flm-portable-${{ matrix.distro }}${{ matrix.version }}.tar.gz \
+          bin/flm \
+          lib/ \
+          share/flm/
+        echo "Created tarball with symlinks preserved"
+        tar tzf $GITHUB_WORKSPACE/flm-portable-${{ matrix.distro }}${{ matrix.version }}.tar.gz | grep libxrt
+
     - name: Upload portable build artifact
       uses: actions/upload-artifact@v4
       with:
         name: flm-portable-${{ matrix.distro }}${{ matrix.version }}
-        path: |
-          src/build/install/opt/fastflowlm/bin/flm
-          src/build/install/opt/fastflowlm/lib/*.so
-          src/build/install/opt/fastflowlm/share/flm/
+        path: flm-portable-${{ matrix.distro }}${{ matrix.version }}.tar.gz
         retention-days: 7
         if-no-files-found: error
 
