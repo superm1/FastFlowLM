@@ -581,10 +581,11 @@ else()
             endif()
 
             if(XRT_SOURCE_DIR)
-                # Find all XRT library files (including symlinks)
+                # Find all XRT and Boost library files (including symlinks)
                 file(GLOB XRT_FILES \"\${XRT_SOURCE_DIR}/libxrt*.so*\")
+                file(GLOB BOOST_FILES \"\${XRT_SOURCE_DIR}/libboost_program_options.so*\")
 
-                foreach(LIB_FILE \${XRT_FILES})
+                foreach(LIB_FILE \${XRT_FILES} \${BOOST_FILES})
                     get_filename_component(LIB_NAME \"\${LIB_FILE}\" NAME)
                     set(DEST_FILE \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\${LIB_NAME}\")
 
