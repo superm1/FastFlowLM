@@ -163,6 +163,7 @@ else()
                 --disable-txtpages
                 --enable-pic
                 --disable-autodetect
+                --disable-x86asm
                 --enable-avcodec
                 --enable-avformat
                 --enable-avutil
@@ -179,8 +180,17 @@ else()
         endif()
 
         message(STATUS "Building FFmpeg static libraries...")
+        # Limit parallelism to avoid resource exhaustion during FFmpeg build
+        # FFmpeg compilation is memory-intensive, so use at most 4 jobs
+        if(DEFINED CMAKE_BUILD_PARALLEL_LEVEL AND CMAKE_BUILD_PARALLEL_LEVEL GREATER 4)
+            set(FFMPEG_BUILD_JOBS 4)
+        elseif(DEFINED CMAKE_BUILD_PARALLEL_LEVEL)
+            set(FFMPEG_BUILD_JOBS ${CMAKE_BUILD_PARALLEL_LEVEL})
+        else()
+            set(FFMPEG_BUILD_JOBS 2)
+        endif()
         execute_process(
-            COMMAND make -j${CMAKE_BUILD_PARALLEL_LEVEL}
+            COMMAND make -j${FFMPEG_BUILD_JOBS}
             WORKING_DIRECTORY ${FFMPEG_BUILD_DIR}
             RESULT_VARIABLE FFMPEG_BUILD_RESULT
             OUTPUT_FILE ${FFMPEG_BUILD_DIR}/build.log
