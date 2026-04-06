@@ -49,32 +49,31 @@ else()
         endif()
     endif()
 
-    # Check if we need to fetch dependencies from source for static build
-    set(NEED_FETCH_DEPS FALSE)
-    if(FLM_PORTABLE_BUILD)
-        if(NOT XRT_FOUND)
-            set(NEED_FETCH_DEPS TRUE)
-            message(STATUS "XRT not found on system, will fetch from source for static build")
-        else()
-            # Check if static libraries are available
-            set(CMAKE_FIND_LIBRARY_SUFFIXES_SAVE ${CMAKE_FIND_LIBRARY_SUFFIXES})
-            set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
-            find_library(XRT_STATIC_CHECK NAMES xrt_coreutil PATHS ${XRT_LIBRARY_DIRS} NO_DEFAULT_PATH)
-            set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES_SAVE})
+    # Check if we need to fetch dependencies from source for portable build
+    # For portable build: always build FFmpeg statically, only fetch XRT if not found
+    set(NEED_FETCH_XRT FALSE)
+    set(NEED_BUILD_FFMPEG_STATIC FALSE)
 
-            if(NOT XRT_STATIC_CHECK)
-                set(NEED_FETCH_DEPS TRUE)
-                message(STATUS "Static build requested but XRT static libraries not found, will fetch from source")
-            endif()
-            unset(XRT_STATIC_CHECK CACHE)
+    if(FLM_PORTABLE_BUILD)
+        # Always build FFmpeg statically for portable builds
+        set(NEED_BUILD_FFMPEG_STATIC TRUE)
+        message(STATUS "Portable build: FFmpeg will be built statically")
+
+        if(NOT XRT_FOUND)
+            set(NEED_FETCH_XRT TRUE)
+            message(STATUS "XRT not found on system, will fetch from source for portable build")
+        else()
+            message(STATUS "XRT found on system, will use it for portable build")
         endif()
     endif()
 
-    if(NEED_FETCH_DEPS)
-        message(STATUS "FLM_STATIC_BUILD enabled: Fetching dependencies from source...")
-        message(STATUS "  - XRT (Xilinx Runtime)")
-        message(STATUS "  - FFmpeg (multimedia libraries)")
+    # Include FetchContent if needed for either XRT or FFmpeg
+    if(NEED_FETCH_XRT OR NEED_BUILD_FFMPEG_STATIC)
         include(FetchContent)
+    endif()
+
+    if(NEED_FETCH_XRT)
+        message(STATUS "Fetching XRT from source...")
 
         # ———————————————————————————————————————————————
         # 1. Fetch XRT first (XDNA driver depends on it)
@@ -123,10 +122,12 @@ else()
         # 1. Installed from system packages (libxrt-npu2)
         # 2. Or placed in /usr/lib/ or lib/ directory manually
         message(STATUS "Note: XDNA plugin (libxrt_driver_xdna.so.2) must be provided separately")
+    endif()
 
-        # ———————————————————————————————————————————————
-        # 2. Fetch and build FFmpeg as static libraries
-        # ———————————————————————————————————————————————
+    # ———————————————————————————————————————————————
+    # Build FFmpeg as static libraries for portable builds
+    # ———————————————————————————————————————————————
+    if(NEED_BUILD_FFMPEG_STATIC)
         set(FFMPEG_GIT_REPO "https://github.com/FFmpeg/FFmpeg.git" CACHE STRING "FFmpeg Git repository URL")
         set(FFMPEG_GIT_TAG "n7.1" CACHE STRING "FFmpeg Git tag/branch to fetch")
 
