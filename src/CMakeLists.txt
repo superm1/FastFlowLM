@@ -570,33 +570,45 @@ else()
 
     # Bundle system libraries for portable distribution
     if(FLM_PORTABLE_BUILD)
-        # Use install CODE to properly copy libraries and preserve symlinks
+        # Copy XRT and XDNA libraries while preserving symlinks
         install(CODE "
-            # Find and copy XRT library
-            file(GLOB XRT_FILES
-                \"/usr/lib/libxrt_coreutil.so*\"
-                \"/usr/lib/x86_64-linux-gnu/libxrt_coreutil.so*\"
-            )
-            foreach(XRT_FILE \${XRT_FILES})
-                get_filename_component(XRT_NAME \"\${XRT_FILE}\" NAME)
-                message(STATUS \"Copying XRT: \${XRT_FILE} -> \${CMAKE_INSTALL_PREFIX}/lib/\${XRT_NAME}\")
-                file(COPY \"\${XRT_FILE}\" DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\"
-                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-                     FOLLOW_SYMLINK_CHAIN)
-            endforeach()
+            # Find source directory for XRT libraries
+            set(XRT_SOURCE_DIR \"\")
+            if(EXISTS \"/usr/lib/libxrt_coreutil.so.2\")
+                set(XRT_SOURCE_DIR \"/usr/lib\")
+            elseif(EXISTS \"/usr/lib/x86_64-linux-gnu/libxrt_coreutil.so.2\")
+                set(XRT_SOURCE_DIR \"/usr/lib/x86_64-linux-gnu\")
+            endif()
 
-            # Find and copy XDNA plugin
-            file(GLOB XDNA_FILES
-                \"/usr/lib/libxrt_driver_xdna.so*\"
-                \"/usr/lib/x86_64-linux-gnu/libxrt_driver_xdna.so*\"
-            )
-            foreach(XDNA_FILE \${XDNA_FILES})
-                get_filename_component(XDNA_NAME \"\${XDNA_FILE}\" NAME)
-                message(STATUS \"Copying XDNA: \${XDNA_FILE} -> \${CMAKE_INSTALL_PREFIX}/lib/\${XDNA_NAME}\")
-                file(COPY \"\${XDNA_FILE}\" DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\"
-                     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-                     FOLLOW_SYMLINK_CHAIN)
-            endforeach()
+            if(XRT_SOURCE_DIR)
+                # Find all XRT library files (including symlinks)
+                file(GLOB XRT_FILES \"\${XRT_SOURCE_DIR}/libxrt_coreutil.so*\")
+                file(GLOB XDNA_FILES \"\${XRT_SOURCE_DIR}/libxrt_driver_xdna.so*\")
+
+                foreach(LIB_FILE \${XRT_FILES} \${XDNA_FILES})
+                    get_filename_component(LIB_NAME \"\${LIB_FILE}\" NAME)
+                    set(DEST_FILE \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\${LIB_NAME}\")
+
+                    # Check if it's a symlink
+                    if(IS_SYMLINK \"\${LIB_FILE}\")
+                        # Get symlink target (relative path)
+                        file(READ_SYMLINK \"\${LIB_FILE}\" LINK_TARGET)
+                        message(STATUS \"Creating symlink: \${LIB_NAME} -> \${LINK_TARGET}\")
+                        execute_process(
+                            COMMAND \${CMAKE_COMMAND} -E create_symlink \"\${LINK_TARGET}\" \"\${DEST_FILE}\"
+                        )
+                    else()
+                        # Copy regular file
+                        message(STATUS \"Copying: \${LIB_NAME}\")
+                        file(COPY \"\${LIB_FILE}\" DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/lib/\"
+                             FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                                             GROUP_READ GROUP_EXECUTE
+                                             WORLD_READ WORLD_EXECUTE)
+                    endif()
+                endforeach()
+            else()
+                message(WARNING \"XRT libraries not found in /usr/lib or /usr/lib/x86_64-linux-gnu\")
+            endif()
         ")
     endif()
 
