@@ -139,6 +139,18 @@ In short: if 1.1 firmware breaks probing on stock 6.19, do not keep forcing the 
    sudo cmake --install .
    ```
 
+### Portable Build
+
+To build a self-contained bundle that runs on other Linux machines without installing FastFlowLM's dependencies system-wide:
+
+```sh
+cd src
+cmake --preset linux-portable
+cmake --build build -j$(nproc)
+```
+
+FFmpeg is linked statically and XRT is bundled in `lib/`. The XDNA driver plugin (`libxrt_driver_xdna.so.2`) is not bundled — install it on the target machine with `sudo apt install libxrt-npu2`. See [install_lin.md](docs/install_lin.md) for full details.
+
 ---
 
 ## Validating NPU Setup

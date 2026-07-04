@@ -181,18 +181,20 @@ If `flm validate` passes but `flm run` fails with `No such device with index '0'
 
 #### Advanced Build Options
 
-**Static Build with Bundled XRT/XDNA**
+**Portable Build with Bundled Libraries**
 
-To build a fully static binary that bundles XRT and XDNA driver (no system XRT required):
+To build a portable bundle that runs on other Linux machines without installing FastFlowLM's dependencies system-wide:
 
 ```sh
 cd src
-cmake --preset linux-static
+cmake --preset linux-portable
 cmake --build build -j$(nproc)
 sudo cmake --install build
 ```
 
-This will automatically fetch and build XRT (v2.21.75) and XDNA driver from source if not found on your system. The resulting binary is fully self-contained and more portable.
+The `linux-portable` preset is equivalent to `cmake --preset linux-default -DFLM_PORTABLE_BUILD=ON`.
+
+FFmpeg and zlib are compiled from source and linked statically, and the XRT runtime libraries are bundled alongside the binary in `lib/` (XRT v2.21.75 is fetched from source if not found on your system). The XDNA driver plugin (`libxrt_driver_xdna.so.2`) is **not** bundled — it must match your XRT version and NPU firmware, so install it on the target machine with `sudo apt install libxrt-npu2` or place it in the bundle's `lib/` directory manually.
 
 ---
 
