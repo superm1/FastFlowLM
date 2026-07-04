@@ -72,20 +72,20 @@ jobs:
         VERSION: ${{ steps.get_version.outputs.version }}
       run: |
         cd src/build/install/opt/fastflowlm
-        tar czf $GITHUB_WORKSPACE/fastflowlm-_${VERSION}_linux.tar.gz \
+        tar czf $GITHUB_WORKSPACE/fastflowlm_${VERSION}_linux.tar.gz \
           flm \
           flm-real \
           lib/ \
           xclbins/ \
           model_list.json
         echo "Created tarball with symlinks preserved"
-        tar tzf $GITHUB_WORKSPACE/fastflowlm-_${VERSION}_linux.tar.gz | grep libxrt
+        tar tzf $GITHUB_WORKSPACE/fastflowlm_${VERSION}_linux.tar.gz | grep libxrt
 
     - name: Upload portable build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: fastflowlm-${{ steps.get_version._{{ steps.get_version.outputs.version }}_linux
-        path: fastflowlm-${{ steps.get_version._{{ steps.get_version._{{ steps.get_version.outputs.version }}_linux.tar.gz
+        name: portable
+        path: fastflowlm_${{ steps.get_version.outputs.version }}_linux.tar.gz
         retention-days: 7
         if-no-files-found: error
 
